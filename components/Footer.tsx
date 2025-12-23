@@ -95,8 +95,15 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Lemach Hotel & Accommodations. All rights reserved.</p>
+        <div className="border-t border-gray-800 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400">
+            <p>&copy; 2024 Lemach Hotel & Accommodations. All rights reserved.</p>
+            <div className="flex gap-6 text-sm">
+              <Link href="/cookies" className="hover:text-primary transition-colors">
+                Cookie Policy
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
