@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import CartDrawer from "./CartDrawer";
@@ -15,7 +15,14 @@ export default function Header() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/rooms", label: "Rooms" },
+    {
+      href: "#",
+      label: "Rooms",
+      submenu: [
+        { href: "/rooms", label: "View Rooms" },
+        { href: "/gallery", label: "Gallery" },
+      ],
+    },
     { href: "/deals", label: "Deals" },
     {
       href: "#",
@@ -54,19 +61,27 @@ export default function Header() {
                 <div key={link.label} className="relative group">
                   {link.submenu ? (
                     <>
-                      <button className="text-gray-700 hover:text-primary font-medium flex items-center gap-1">
+                      <button 
+                        type="button"
+                        className="text-gray-700 hover:text-primary font-medium flex items-center gap-1 cursor-pointer"
+                      >
                         {link.label}
+                        <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                       </button>
-                      <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        {link.submenu.map((sub) => (
-                          <Link
-                            key={sub.href}
-                            href={sub.href}
-                            className="block px-4 py-2 text-gray-700 hover:bg-primary/10 hover:text-primary"
-                          >
-                            {sub.label}
-                          </Link>
-                        ))}
+                      <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+                        <div className="w-48 bg-white rounded-lg shadow-xl border border-gray-200">
+                          <div className="py-1">
+                            {link.submenu.map((sub) => (
+                              <Link
+                                key={sub.href}
+                                href={sub.href}
+                                className="block px-4 py-2.5 text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
+                              >
+                                {sub.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </>
                   ) : (
