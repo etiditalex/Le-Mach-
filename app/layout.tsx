@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import CookieBanner from "@/components/CookieBanner";
-import StickyBanner from "@/components/StickyBanner";
 
 export const metadata: Metadata = {
   title: "Lemach Hotel & Accommodations - Kilifi County",
@@ -18,7 +17,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <CartProvider>
-          <StickyBanner />
           {children}
           <CookieBanner />
         </CartProvider>

@@ -42,7 +42,7 @@ export default function StickyBanner() {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -100, opacity: 0 }}
       transition={{ type: "spring", damping: 25, stiffness: 300 }}
-      className="sticky top-16 left-0 right-0 z-[60] shadow-xl"
+      className="sticky top-16 left-0 right-0 z-[60] shadow-xl -mt-1"
     >
       <div className="bg-gradient-to-r from-primary via-secondary to-primary text-white py-3 px-4 border-b-2 border-accent/30">
         <div className="container mx-auto flex items-center justify-between gap-4">
