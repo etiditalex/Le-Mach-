@@ -69,7 +69,7 @@ export default function GalleryPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Photo Gallery
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -213,7 +213,7 @@ export default function GalleryPage() {
                 />
                 {selectedImage.title && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-                    <h3 className="text-2xl font-serif font-bold mb-2">{selectedImage.title}</h3>
+                    <h3 className="text-2xl font-sans font-bold mb-2">{selectedImage.title}</h3>
                     <p className="text-gray-300">
                       {lightboxIndex + 1} of {filteredImages.length}
                     </p>

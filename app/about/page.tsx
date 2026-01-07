@@ -113,7 +113,7 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               About Lemach Hotel
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -128,7 +128,7 @@ export default function AboutPage() {
             transition={{ delay: 0.1 }}
             className="bg-white rounded-lg shadow-md p-8 md:p-12 mb-16"
           >
-            <h2 className="text-4xl font-serif font-bold text-primary mb-6">Our Story</h2>
+            <h2 className="text-4xl font-sans font-bold text-primary mb-6">Our Story</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <p className="text-lg text-gray-600 mb-4 leading-relaxed">
@@ -160,19 +160,19 @@ export default function AboutPage() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
           >
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-2xl font-serif font-bold text-primary mb-4">Our Mission</h3>
+              <h3 className="text-2xl font-sans font-bold text-primary mb-4">Our Mission</h3>
               <p className="text-gray-600">
                 To provide exceptional hospitality experiences that exceed guest expectations while promoting the rich culture and beauty of Kilifi County.
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-2xl font-serif font-bold text-primary mb-4">Our Vision</h3>
+              <h3 className="text-2xl font-sans font-bold text-primary mb-4">Our Vision</h3>
               <p className="text-gray-600">
                 To be the leading hospitality destination in Kilifi County, known for luxury, comfort, and authentic Kenyan experiences.
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-2xl font-serif font-bold text-primary mb-4">Our Values</h3>
+              <h3 className="text-2xl font-sans font-bold text-primary mb-4">Our Values</h3>
               <p className="text-gray-600">
                 Excellence, Integrity, Hospitality, Sustainability, and Community engagement guide everything we do.
               </p>
@@ -186,7 +186,7 @@ export default function AboutPage() {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Why Choose Lemach Hotel
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,7 +215,7 @@ export default function AboutPage() {
             transition={{ delay: 0.4 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Our Leadership Team
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -236,7 +236,7 @@ export default function AboutPage() {
                     />
                   </div>
                   <div className="p-6 text-center">
-                    <h3 className="text-2xl font-serif font-bold text-gray-800 mb-1">
+                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-1">
                       {member.name}
                     </h3>
                     <p className="text-primary font-semibold mb-3">{member.position}</p>
@@ -254,7 +254,7 @@ export default function AboutPage() {
             transition={{ delay: 0.5 }}
             className="bg-white rounded-lg shadow-md p-8 mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Awards & Recognition
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -283,7 +283,7 @@ export default function AboutPage() {
             transition={{ delay: 0.6 }}
             className="bg-gradient-to-r from-primary to-secondary rounded-lg p-8 md:p-12 text-white mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold mb-6 text-center">
+            <h2 className="text-3xl font-sans font-bold mb-6 text-center">
               Community Engagement
             </h2>
             <p className="text-lg mb-8 text-center opacity-90 max-w-3xl mx-auto">

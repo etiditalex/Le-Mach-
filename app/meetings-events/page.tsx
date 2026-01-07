@@ -197,7 +197,7 @@ export default function MeetingsEventsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Meetings & Events
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -212,7 +212,7 @@ export default function MeetingsEventsPage() {
             transition={{ delay: 0.1 }}
             className="mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Our Event Spaces
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -233,7 +233,7 @@ export default function MeetingsEventsPage() {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">
+                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-2">
                       {space.name}
                     </h3>
                     <p className="text-gray-600 mb-4">{space.description}</p>
@@ -268,7 +268,7 @@ export default function MeetingsEventsPage() {
             transition={{ delay: 0.2 }}
             className="mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Types of Events
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -304,7 +304,7 @@ export default function MeetingsEventsPage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-lg shadow-md p-8 mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Event Services
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -330,7 +330,7 @@ export default function MeetingsEventsPage() {
             transition={{ delay: 0.4 }}
             className="mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Event Packages
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -342,7 +342,7 @@ export default function MeetingsEventsPage() {
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow"
                 >
-                  <h3 className="text-2xl font-serif font-bold text-primary mb-2">
+                  <h3 className="text-2xl font-sans font-bold text-primary mb-2">
                     {pkg.name}
                   </h3>
                   <p className="text-gray-600 mb-4">{pkg.duration}</p>
@@ -374,7 +374,7 @@ export default function MeetingsEventsPage() {
           >
             {/* Contact Info */}
             <div>
-              <h2 className="text-3xl font-serif font-bold text-primary mb-6">
+              <h2 className="text-3xl font-sans font-bold text-primary mb-6">
                 Get in Touch
               </h2>
               <p className="text-gray-600 mb-8">
@@ -430,7 +430,7 @@ export default function MeetingsEventsPage() {
 
             {/* Inquiry Form */}
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h2 className="text-2xl font-serif font-bold text-primary mb-6">
+              <h2 className="text-2xl font-sans font-bold text-primary mb-6">
                 Request a Quote
               </h2>
 

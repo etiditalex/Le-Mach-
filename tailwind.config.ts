@@ -28,7 +28,8 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["Playfair Display", "serif"],
-        sans: ["Poppins", "sans-serif"],
+        sans: ["Helvetica", "Arial", "Poppins", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
       },
     },
   },

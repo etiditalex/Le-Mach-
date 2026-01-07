@@ -171,7 +171,7 @@ export default function DealsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Special Deals & Offers
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -201,7 +201,7 @@ export default function DealsPage() {
                   </div>
                 </div>
                 <div className="p-8 lg:p-12 text-white">
-                  <h2 className="text-4xl font-serif font-bold mb-4">{featuredDeal.title}</h2>
+                  <h2 className="text-4xl font-sans font-bold mb-4">{featuredDeal.title}</h2>
                   <p className="text-lg mb-6 opacity-90">{featuredDeal.description}</p>
                   
                   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -245,7 +245,7 @@ export default function DealsPage() {
             transition={{ delay: 0.1 }}
             className="mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               All Special Offers
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -271,7 +271,7 @@ export default function DealsPage() {
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">
+                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-2">
                       {deal.title}
                     </h3>
                     <p className="text-gray-600 mb-4">{deal.description}</p>
@@ -315,7 +315,7 @@ export default function DealsPage() {
           >
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-serif font-bold mb-4">Lemach Rewards Program</h2>
+                <h2 className="text-4xl font-sans font-bold mb-4">Lemach Rewards Program</h2>
                 <p className="text-xl opacity-90">
                   Join our loyalty program and earn points with every stay. Enjoy exclusive benefits and special member-only offers.
                 </p>
@@ -358,7 +358,7 @@ export default function DealsPage() {
           >
             <div className="flex items-center gap-3 mb-8">
               <FileText className="w-8 h-8 text-primary" />
-              <h2 className="text-3xl font-serif font-bold text-primary">Terms & Conditions</h2>
+              <h2 className="text-3xl font-sans font-bold text-primary">Terms & Conditions</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

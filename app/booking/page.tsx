@@ -99,7 +99,7 @@ function BookingForm() {
             className="bg-white p-12 rounded-lg shadow-lg text-center max-w-2xl mx-4"
           >
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h1 className="text-4xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-4xl font-sans font-bold text-primary mb-4">
               Booking Confirmed!
             </h1>
             <p className="text-xl text-gray-600 mb-8">
@@ -157,7 +157,7 @@ function BookingForm() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">Book Your Stay</h1>
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">Book Your Stay</h1>
             <p className="text-xl text-gray-600">
               Reserve your perfect room at Lemach Hotel
             </p>
@@ -171,7 +171,7 @@ function BookingForm() {
                 animate={{ opacity: 1, x: 0 }}
                 className="bg-white p-8 rounded-lg shadow-md"
               >
-                <h2 className="text-2xl font-serif font-bold text-gray-800 mb-6">
+                <h2 className="text-2xl font-sans font-bold text-gray-800 mb-6">
                   Booking Information
                 </h2>
 
@@ -365,7 +365,7 @@ function BookingForm() {
                 animate={{ opacity: 1, x: 0 }}
                 className="bg-white p-6 rounded-lg shadow-md sticky top-24"
               >
-                <h2 className="text-2xl font-serif font-bold text-primary mb-6">Booking Summary</h2>
+                <h2 className="text-2xl font-sans font-bold text-primary mb-6">Booking Summary</h2>
 
                 {formData.roomType ? (
                   <>

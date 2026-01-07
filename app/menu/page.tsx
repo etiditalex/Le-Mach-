@@ -30,7 +30,7 @@ export default function MenuPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">Restaurant Menu</h1>
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">Restaurant Menu</h1>
             <p className="text-xl text-gray-600">
               Discover our exquisite culinary offerings featuring local and international cuisine
             </p>

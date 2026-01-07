@@ -110,7 +110,7 @@ export default function CookiesPage() {
             <div className="bg-gradient-to-r from-primary to-secondary w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Cookie className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Cookie Policy
             </h1>
             <p className="text-xl text-gray-600">
@@ -125,7 +125,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.1 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-4">
               Introduction
             </h2>
             <div className="prose prose-lg max-w-none text-gray-600 space-y-4">
@@ -145,7 +145,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.2 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4 flex items-center gap-3">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-4 flex items-center gap-3">
               <Info className="w-8 h-8" />
               What Are Cookies?
             </h2>
@@ -166,7 +166,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-6">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-6">
               How We Use Cookies
             </h2>
             <div className="space-y-6">
@@ -216,7 +216,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.4 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-6">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-6">
               Specific Cookies We Use
             </h2>
             <div className="overflow-x-auto">
@@ -264,7 +264,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.5 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-4">
               Third-Party Cookies
             </h2>
             <div className="prose prose-lg max-w-none text-gray-600 space-y-4">
@@ -292,7 +292,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.6 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4 flex items-center gap-3">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-4 flex items-center gap-3">
               <Settings className="w-8 h-8" />
               Your Cookie Choices
             </h2>
@@ -330,7 +330,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.7 }}
             className="bg-white rounded-lg shadow-md p-8 mb-8"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-4">
               Updates to This Policy
             </h2>
             <div className="prose prose-lg max-w-none text-gray-600">
@@ -350,7 +350,7 @@ export default function CookiesPage() {
             transition={{ delay: 0.8 }}
             className="bg-gradient-to-r from-primary to-secondary rounded-lg shadow-md p-8 text-white"
           >
-            <h2 className="text-3xl font-serif font-bold mb-4 flex items-center gap-3">
+            <h2 className="text-3xl font-sans font-bold mb-4 flex items-center gap-3">
               <Shield className="w-8 h-8" />
               Contact Us
             </h2>

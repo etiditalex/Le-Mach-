@@ -158,7 +158,7 @@ export default function BarRestaurantPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Bar & Restaurant
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -175,7 +175,7 @@ export default function BarRestaurantPage() {
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-serif font-bold text-primary mb-6">
+                <h2 className="text-4xl font-sans font-bold text-primary mb-6">
                   Welcome to Our Restaurant
                 </h2>
                 <p className="text-lg text-gray-600 mb-4 leading-relaxed">
@@ -224,7 +224,7 @@ export default function BarRestaurantPage() {
             transition={{ delay: 0.3 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Our Dining Areas
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -245,7 +245,7 @@ export default function BarRestaurantPage() {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-serif font-bold text-gray-800 mb-3">
+                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-3">
                       {area.name}
                     </h3>
                     <p className="text-gray-600 mb-4">{area.description}</p>
@@ -276,7 +276,7 @@ export default function BarRestaurantPage() {
             transition={{ delay: 0.4 }}
             className="bg-white rounded-lg shadow-md p-8 mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Bar Services
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -302,7 +302,7 @@ export default function BarRestaurantPage() {
             transition={{ delay: 0.5 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Special Dining Events
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -323,7 +323,7 @@ export default function BarRestaurantPage() {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-serif font-bold text-gray-800 mb-3">
+                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-3">
                       {event.name}
                     </h3>
                     <p className="text-gray-600 mb-4">{event.description}</p>
@@ -356,7 +356,7 @@ export default function BarRestaurantPage() {
             transition={{ delay: 0.6 }}
             className="bg-white rounded-lg shadow-md p-8 md:p-12 max-w-4xl mx-auto"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Make a Reservation
             </h2>
             <p className="text-center text-gray-600 mb-8">

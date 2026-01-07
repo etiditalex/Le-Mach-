@@ -83,7 +83,7 @@ export default function RoomsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
               Our Rooms & Accommodations
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -112,7 +112,7 @@ export default function RoomsPage() {
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h2 className="text-2xl font-serif font-bold text-gray-800 mb-2">
+                      <h2 className="text-2xl font-sans font-bold text-gray-800 mb-2">
                         {room.name}
                       </h2>
                       <div className="flex items-baseline gap-2">
@@ -162,7 +162,7 @@ export default function RoomsPage() {
             viewport={{ once: true }}
             className="bg-white rounded-lg shadow-md p-8 mb-20"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Room Amenities
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -194,7 +194,7 @@ export default function RoomsPage() {
             viewport={{ once: true }}
             className="bg-gradient-to-r from-primary to-secondary rounded-lg p-12 text-center text-white"
           >
-            <h2 className="text-4xl font-serif font-bold mb-4">
+            <h2 className="text-4xl font-sans font-bold mb-4">
               Ready to Book Your Stay?
             </h2>
             <p className="text-xl mb-8 opacity-90">

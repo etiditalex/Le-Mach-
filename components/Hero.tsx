@@ -100,7 +100,7 @@ export default function Hero() {
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4">
+              <h1 className="text-5xl md:text-7xl font-sans font-bold mb-4">
                 {slides[currentSlide].title}
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">

@@ -85,7 +85,7 @@ export default function ContactPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">Contact Us</h1>
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">Contact Us</h1>
             <p className="text-xl text-gray-600">
               We're here to help. Get in touch with us for any inquiries or assistance.
             </p>
@@ -186,7 +186,7 @@ export default function ContactPage() {
               transition={{ delay: 0.5 }}
               className="bg-white p-8 rounded-lg shadow-md"
             >
-              <h2 className="text-3xl font-serif font-bold text-primary mb-6">Send Us a Message</h2>
+              <h2 className="text-3xl font-sans font-bold text-primary mb-6">Send Us a Message</h2>
               
               {isSubmitted ? (
                 <motion.div
@@ -324,7 +324,7 @@ export default function ContactPage() {
               transition={{ delay: 0.6 }}
               className="bg-white p-8 rounded-lg shadow-md"
             >
-              <h2 className="text-3xl font-serif font-bold text-primary mb-6">Find Us</h2>
+              <h2 className="text-3xl font-sans font-bold text-primary mb-6">Find Us</h2>
               
               <div className="space-y-6">
                 <div>
@@ -407,7 +407,7 @@ export default function ContactPage() {
             transition={{ delay: 0.7 }}
             className="bg-white p-8 rounded-lg shadow-md mb-16"
           >
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4 max-w-3xl mx-auto">
@@ -433,7 +433,7 @@ export default function ContactPage() {
             transition={{ delay: 1 }}
             className="bg-gradient-to-r from-primary to-secondary p-8 rounded-lg text-white text-center"
           >
-            <h2 className="text-3xl font-serif font-bold mb-4">Stay Updated</h2>
+            <h2 className="text-3xl font-sans font-bold mb-4">Stay Updated</h2>
             <p className="mb-6 text-lg">
               Subscribe to our newsletter for special offers, events, and updates
             </p>

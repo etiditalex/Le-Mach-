@@ -147,7 +147,7 @@ export default function RoomDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-5xl font-serif font-bold text-primary mb-4">{room.name}</h1>
+            <h1 className="text-5xl font-sans font-bold text-primary mb-4">{room.name}</h1>
             <div className="flex items-baseline gap-2 mb-4">
               <span className="text-sm text-gray-500">From</span>
               <span className="text-4xl font-bold text-primary">
@@ -187,7 +187,7 @@ export default function RoomDetailPage() {
                 transition={{ delay: 0.2 }}
                 className="bg-white p-6 rounded-lg shadow-md"
               >
-                <h2 className="text-2xl font-serif font-bold text-gray-800 mb-4">About This Room</h2>
+                <h2 className="text-2xl font-sans font-bold text-gray-800 mb-4">About This Room</h2>
                 <p className="text-gray-600 leading-relaxed">{room.longDescription}</p>
               </motion.div>
 
@@ -198,7 +198,7 @@ export default function RoomDetailPage() {
                 transition={{ delay: 0.3 }}
                 className="bg-white p-6 rounded-lg shadow-md"
               >
-                <h2 className="text-2xl font-serif font-bold text-gray-800 mb-6">Room Features</h2>
+                <h2 className="text-2xl font-sans font-bold text-gray-800 mb-6">Room Features</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {room.features.map((feature, index) => (
                     <div key={index} className="flex items-start gap-3">
@@ -221,7 +221,7 @@ export default function RoomDetailPage() {
                 transition={{ delay: 0.4 }}
                 className="bg-white p-6 rounded-lg shadow-md"
               >
-                <h2 className="text-2xl font-serif font-bold text-gray-800 mb-6">Room Details</h2>
+                <h2 className="text-2xl font-sans font-bold text-gray-800 mb-6">Room Details</h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Room Size</p>
@@ -243,7 +243,7 @@ export default function RoomDetailPage() {
               className="lg:col-span-1"
             >
               <div className="bg-white p-6 rounded-lg shadow-md sticky top-24">
-                <h2 className="text-2xl font-serif font-bold text-primary mb-6">Book This Room</h2>
+                <h2 className="text-2xl font-sans font-bold text-primary mb-6">Book This Room</h2>
                 
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center gap-3 text-gray-600">

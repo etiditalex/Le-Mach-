@@ -33,7 +33,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-serif font-bold text-primary">Shopping Cart</h2>
+                <h2 className="text-2xl font-sans font-bold text-primary">Shopping Cart</h2>
                 <button
                   onClick={onClose}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
