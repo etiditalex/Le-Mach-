@@ -45,7 +45,7 @@ export default function RoomsShowcase() {
               transition={{ duration: 0.6 }}
               className="w-full md:w-1/2 bg-white flex items-center justify-center p-8 md:p-12 lg:p-16"
             >
-              <div className="max-w-xl">
+              <div className="max-w-xl mx-auto md:mx-0 w-full text-center md:text-left">
                 <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-sans">
                   {item.title}
                 </h3>

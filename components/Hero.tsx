@@ -56,8 +56,8 @@ export default function Hero() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Lower-left overlay: aligned with Introduction section (container + px-4) */}
-      <div className="relative h-full flex items-end justify-start">
+      {/* Overlay: centered on mobile, lower-left from md up */}
+      <div className="relative h-full flex items-end justify-center md:justify-start">
         <div className="container mx-auto px-4 md:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-28 text-white w-full">
           <AnimatePresence mode="wait">
             <motion.div
@@ -66,9 +66,9 @@ export default function Hero() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -12, opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="flex flex-col gap-3 sm:gap-4"
+              className="flex flex-col gap-3 sm:gap-4 items-center md:items-start text-center md:text-left"
             >
-              <div className="flex flex-col">
+              <div className="flex flex-col items-center md:items-start">
                 <span className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide text-logo drop-shadow-md">
                   Lemach
                 </span>
@@ -80,7 +80,7 @@ export default function Hero() {
                 initial={{ y: 16, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.45, delay: 0.15, ease: "easeOut" }}
-                className="pl-0.5 sm:pl-1 md:pl-2"
+                className="pl-0 md:pl-2"
               >
                 <Link
                   href="/booking"
