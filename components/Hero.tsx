@@ -56,9 +56,9 @@ export default function Hero() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Overlay: bottom-left corner on all screen sizes (mobile + desktop) */}
-      <div className="relative h-full flex items-end justify-start">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-28 text-white w-full">
+      {/* Overlay: pinned to bottom-left corner (absolute so it stays bottom, not top) */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
+        <div className="pointer-events-auto container mx-auto px-4 md:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-28 text-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -97,21 +97,21 @@ export default function Hero() {
       {/* Navigation Buttons */}
       <button
         onClick={prevSlide}
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-2 sm:p-3 rounded-full hover:bg-white/30 transition-colors"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm text-white p-2 sm:p-3 rounded-full hover:bg-white/30 transition-colors"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-2 sm:p-3 rounded-full hover:bg-white/30 transition-colors"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm text-white p-2 sm:p-3 rounded-full hover:bg-white/30 transition-colors"
         aria-label="Next slide"
       >
         <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
