@@ -33,8 +33,8 @@ const reviews = [
 export default function Reviews() {
   return (
     <section className="bg-gray-100 py-16 md:py-24">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
           {reviews.map((review, index) => (
             <motion.div
               key={review.id}
@@ -42,10 +42,10 @@ export default function Reviews() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white rounded-lg p-6 md:p-8 shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 md:p-8 shadow-md hover:shadow-lg transition-shadow text-center md:text-left"
             >
               {/* Rating Stars */}
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-4 justify-center md:justify-start">
                 {[...Array(review.rating)].map((_, i) => (
                   <Star
                     key={i}
@@ -55,7 +55,7 @@ export default function Reviews() {
               </div>
 
               {/* Quotation Mark */}
-              <div className="mb-4">
+              <div className="mb-4 flex justify-center md:justify-start">
                 <Quote className="w-12 h-12 text-gray-300" />
               </div>
 
