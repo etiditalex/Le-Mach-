@@ -64,7 +64,7 @@ export default function StickyBanner() {
           <div className="flex items-center gap-3 flex-shrink-0">
             <Link
               href="/booking"
-              className="hidden sm:flex items-center gap-2 bg-white text-primary px-4 py-2 rounded-lg font-semibold hover:bg-accent hover:text-white transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg"
+              className="hidden sm:flex items-center gap-2 bg-logo text-primary px-4 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg"
             >
               <Calendar className="w-4 h-4" />
               Book Now

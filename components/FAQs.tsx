@@ -137,7 +137,7 @@ export default function FAQs() {
           </p>
           <a
             href="/contact"
-            className="inline-block bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 font-sans"
+            className="inline-block bg-logo text-primary px-8 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300 font-sans shadow-md"
           >
             Contact Us
           </a>

@@ -54,7 +54,7 @@ export default function Offers() {
                 <p className="text-gray-600 mb-4">{offer.description}</p>
                 <Link
                   href={offer.link}
-                  className="inline-block bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-shadow"
+                  className="inline-block bg-logo text-primary px-6 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
                 >
                   View Deal
                 </Link>

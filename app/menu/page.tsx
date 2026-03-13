@@ -44,7 +44,7 @@ export default function MenuPage() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2 rounded-full font-medium transition-all ${
                   selectedCategory === category
-                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg"
+                    ? "bg-logo text-primary shadow-lg"
                     : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
               >
@@ -80,7 +80,7 @@ export default function MenuPage() {
                     </span>
                     <button
                       onClick={() => addToCart(item)}
-                      className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full font-semibold hover:shadow-lg transition-shadow"
+                      className="flex items-center gap-2 bg-logo text-primary px-4 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
                     >
                       <ShoppingCart className="w-5 h-5" />
                       Add to Cart

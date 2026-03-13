@@ -111,7 +111,7 @@ export default function Header() {
 
               <Link
                 href="/booking"
-                className="hidden md:block bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-shadow"
+                className="hidden md:block bg-logo text-primary px-6 py-2 rounded-full font-medium hover:bg-primary hover:text-white transition-all shadow-md"
               >
                 Book Now
               </Link>
@@ -165,7 +165,7 @@ export default function Header() {
                 ))}
                 <Link
                   href="/booking"
-                  className="block mt-4 bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full font-medium text-center"
+                  className="block mt-4 bg-logo text-primary px-6 py-2 rounded-full font-medium text-center hover:bg-primary hover:text-white transition-all shadow-md"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Book Now

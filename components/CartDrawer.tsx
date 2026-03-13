@@ -109,7 +109,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       Clear Cart
                     </button>
                     <button
-                      className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow"
+                      className="w-full bg-logo text-primary py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
                     >
                       Proceed to Checkout
                     </button>

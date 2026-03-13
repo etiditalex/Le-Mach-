@@ -25,6 +25,7 @@ const config: Config = {
           light: "#FFE44D",
           dark: "#DAA520",
         },
+        logo: "#dfc4b1", // Logo brand color
       },
       fontFamily: {
         serif: ["Playfair Display", "serif"],

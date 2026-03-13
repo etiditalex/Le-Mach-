@@ -90,7 +90,7 @@ export default function GalleryPage() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-2 rounded-full font-semibold transition-all duration-200 ${
                   selectedCategory === category.id
-                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg scale-105"
+                    ? "bg-logo text-primary shadow-lg scale-105"
                     : "bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200"
                 }`}
               >

@@ -129,7 +129,7 @@ function BookingForm() {
             <div className="flex gap-4 justify-center">
               <Link
                 href="/"
-                className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow"
+                className="bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
               >
                 Back to Home
               </Link>
@@ -340,7 +340,7 @@ function BookingForm() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !formData.roomType || !formData.checkIn || !formData.checkOut}
-                    className="w-full bg-gradient-to-r from-primary to-secondary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-logo text-primary px-6 py-4 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>

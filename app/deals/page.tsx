@@ -296,7 +296,7 @@ export default function DealsPage() {
 
                     <Link
                       href={`/booking?deal=${deal.id}`}
-                      className="w-full bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow text-center block"
+                      className="w-full bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md text-center block"
                     >
                       Book Now
                     </Link>

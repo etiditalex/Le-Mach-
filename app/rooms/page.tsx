@@ -139,7 +139,7 @@ export default function RoomsPage() {
                   <div className="flex gap-3">
                     <Link
                       href={`/booking?room=${room.id}`}
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow text-center"
+                      className="flex-1 bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md text-center"
                     >
                       Book Now
                     </Link>
