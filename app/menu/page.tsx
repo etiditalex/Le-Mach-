@@ -23,20 +23,43 @@ export default function MenuPage() {
   return (
     <main>
       <Header />
-      <div className="pt-24 pb-12">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">Restaurant Menu</h1>
-            <p className="text-xl text-gray-600">
-              Discover our exquisite culinary offerings featuring local and international cuisine
-            </p>
-          </motion.div>
+      {/* Menu Hero Section */}
+      <section className="relative mt-16 h-[260px] sm:h-[320px] md:h-[380px] lg:h-[420px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://res.cloudinary.com/dyfnobo9r/image/upload/v1773652442/LEMACHGARDENS191of562_nw6lzg.jpg')",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
 
-          {/* Category Filter */}
+        <div className="relative h-full flex items-center justify-center">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center text-white">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 0, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl mx-auto"
+            >
+              <p className="text-sm md:text-base uppercase tracking-[0.3em] text-white/80 mb-2 font-sans">
+                Welcome to
+              </p>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-bold mb-3">
+                Lemach Hotel Menu
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-white/90">
+                Discover our curated selection of dishes, drinks, and desserts crafted for every taste.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <div className="pb-12">
+        <div className="container mx-auto px-4">
+
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             {categories.map((category) => (
               <button

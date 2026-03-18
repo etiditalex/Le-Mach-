@@ -37,7 +37,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-[70vh] sm:min-h-[85vh] md:h-screen mt-16 overflow-hidden">
+    <section className="relative min-h-[62vh] sm:min-h-[75vh] md:min-h-[86vh] mt-16 overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
@@ -58,7 +58,7 @@ export default function Hero() {
 
       {/* Overlay: pinned to bottom-left corner (absolute so it stays bottom, not top) */}
       <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
-        <div className="pointer-events-auto container mx-auto px-4 md:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-28 text-white">
+        <div className="pointer-events-auto container mx-auto px-4 md:px-6 lg:px-8 pb-14 sm:pb-16 md:pb-20 text-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -69,12 +69,10 @@ export default function Hero() {
               className="flex flex-col gap-3 sm:gap-4 items-start text-left"
             >
               <div className="flex flex-col items-start">
-                <span className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide text-logo drop-shadow-md">
-                  Lemach
-                </span>
-                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-bold tracking-tight text-logo drop-shadow-md">
-                  Hotels
-                </span>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-bold tracking-tight text-white drop-shadow-md leading-tight">
+                  <span className="block">Le Mach Hotels</span>
+                  <span className="block">Apartments</span>
+                </h1>
               </div>
               <motion.div
                 initial={{ y: 16, opacity: 0 }}

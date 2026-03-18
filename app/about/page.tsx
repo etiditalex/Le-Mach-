@@ -39,27 +39,6 @@ const whyChooseUs = [
   },
 ];
 
-const leadershipTeam = [
-  {
-    name: "John Kamau",
-    position: "General Manager",
-    description: "With over 15 years of hospitality experience, John leads our team with passion and dedication.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-  },
-  {
-    name: "Sarah Mwangi",
-    position: "Operations Manager",
-    description: "Sarah ensures smooth daily operations and exceptional guest experiences.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-  },
-  {
-    name: "Chef Michael Ochieng",
-    position: "Head Chef",
-    description: "Our culinary expert creates memorable dining experiences with local and international flavors.",
-    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=400&fit=crop",
-  },
-];
-
 const awards = [
   {
     title: "Best Hotel in Kilifi County",
@@ -113,12 +92,21 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
-              About Lemach Hotel
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Your Gateway to Luxury in Kilifi County
-            </p>
+            <div
+              className="relative overflow-hidden min-h-[220px] sm:min-h-[260px] md:min-h-[320px]"
+            >
+              {/* Background image with improved clarity */}
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage:
+                    "url(https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841224/Boardroom_2_ybp800.jpg)",
+                  filter: "brightness(0.92) contrast(1.18) saturate(1.06)",
+                }}
+              />
+              {/* Dark overlay kept lighter since there is no text */}
+              <div className="absolute inset-0 bg-primary/35" />
+            </div>
           </motion.div>
 
           {/* Our Story Section */}
@@ -203,45 +191,6 @@ export default function AboutPage() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">{item.title}</h3>
                   <p className="text-gray-600">{item.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Leadership Team */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-16"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Our Leadership Team
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {leadershipTeam.map((member, index) => (
-                <motion.div
-                  key={member.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative h-64">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6 text-center">
-                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-1">
-                      {member.name}
-                    </h3>
-                    <p className="text-primary font-semibold mb-3">{member.position}</p>
-                    <p className="text-gray-600 text-sm">{member.description}</p>
-                  </div>
                 </motion.div>
               ))}
             </div>

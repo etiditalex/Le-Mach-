@@ -7,11 +7,13 @@ import Footer from "@/components/Footer";
 import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowRight, Check } from "lucide-react";
 import Image from "next/image";
 
+const cld = (src: string, transform: string) => src.replace("/image/upload/", `/image/upload/${transform}/`);
+
 const rooms = [
   {
     id: "standard",
     name: "Standard Room",
-    price: 8500,
+    price: 4500,
     description: "Perfect for solo travelers or couples, our standard rooms offer comfort and convenience with modern amenities.",
     features: [
       { icon: Bed, text: "1 King Bed" },
@@ -19,46 +21,42 @@ const rooms = [
       { icon: Droplet, text: "Private Bathroom" },
       { icon: Wifi, text: "Free WiFi" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2936_sgngqe.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS12of5621_d09e4v.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
   },
   {
     id: "deluxe",
     name: "Deluxe Room",
-    price: 12000,
-    description: "Spacious and elegant, our deluxe rooms feature premium furnishings and stunning views of Kilifi County.",
+    price: 8000,
+    description: "Ideal for small families or groups, our 2-bedroom Deluxe Room offers extra space and comfort (without bed & breakfast).",
     features: [
-      { icon: Bed, text: "1 King Bed" },
-      { icon: Users, text: "2 Guests" },
+      { icon: Bed, text: "2 Bedrooms" },
+      { icon: Users, text: "4 Guests" },
       { icon: Droplet, text: "En-suite Bathroom" },
-      { icon: Wind, text: "Balcony View" },
+      { icon: Wind, text: "Garden View" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2926_nzrxnh.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS333of562_kjjury.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
   },
   {
     id: "family",
     name: "Family Suite",
-    price: 18000,
-    description: "Perfect for families, our spacious suite includes separate living area and multiple bedrooms.",
+    price: 10000,
+    description: "Perfect for families, our spacious suite includes bed & breakfast and plenty of room to relax.",
     features: [
       { icon: Bed, text: "2 Bedrooms" },
       { icon: Users, text: "4 Guests" },
       { icon: Tv, text: "Living Room" },
       { icon: Tv, text: "Smart TV" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014478/IMG_2925_ah7764.jpg",
-  },
-  {
-    id: "executive",
-    name: "Executive Suite",
-    price: 25000,
-    description: "Ultimate luxury with premium amenities, private balcony, and exclusive services for discerning guests.",
-    features: [
-      { icon: Bed, text: "King Bed" },
-      { icon: Users, text: "2 Guests" },
-      { icon: Bell, text: "Butler Service" },
-      { icon: Droplet, text: "Jacuzzi" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014472/IMG_2921_ces2aj.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
   },
 ];
 
@@ -81,14 +79,25 @@ export default function RoomsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="relative overflow-hidden mb-16"
           >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
-              Our Rooms & Accommodations
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Experience comfort and luxury in our carefully designed rooms
-            </p>
+            {/* Hero background image (no text per request) */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  'url("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS300of562_uhl0eq.jpg")',
+                // Improve contrast/clarity while keeping colors natural.
+                filter: "brightness(0.88) contrast(1.30) saturate(1.10)",
+              }}
+            />
+
+            {/* Lightweight overlay so the background reads clearly */}
+            <div aria-hidden="true" className="absolute inset-0 bg-primary/20" />
+
+            {/* Keep hero area visible even without text */}
+            <div className="relative z-10 h-56 sm:h-64 lg:h-72" />
           </motion.div>
 
           {/* Rooms Grid */}
@@ -107,6 +116,8 @@ export default function RoomsPage() {
                     alt={room.name}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={index === 0}
                   />
                 </div>
                 <div className="p-6">

@@ -8,6 +8,9 @@ import { Users, Tv, Coffee, Utensils, Wifi, Music, CheckCircle, Calendar, Clock,
 import Image from "next/image";
 import Link from "next/link";
 
+const cld = (src: string, transform: string) =>
+  src.replace("/image/upload/", `/image/upload/${transform}/`);
+
 const eventSpaces = [
   {
     id: "conference",
@@ -20,7 +23,10 @@ const eventSpaces = [
       { icon: Wifi, text: "High-speed WiFi" },
       { icon: Tv, text: "Video Conferencing" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_2958_dsuafs.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841224/Boardroom_1_hfa8v2.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
     size: "150 sqm",
   },
   {
@@ -34,7 +40,10 @@ const eventSpaces = [
       { icon: Wifi, text: "WiFi Access" },
       { icon: Users, text: "Executive Seating" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014501/IMG_2941_t3rved.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841223/Boardroom_5_lf2hqj.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
     size: "40 sqm",
   },
   {
@@ -48,35 +57,11 @@ const eventSpaces = [
       { icon: Wifi, text: "Free WiFi" },
       { icon: Utensils, text: "Catering Options" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014505/IMG_2947_u6egrt.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841223/Boardroom_6_bx9clk.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
     size: "60 sqm",
-  },
-];
-
-const eventTypes = [
-  {
-    id: "corporate",
-    name: "Corporate Events",
-    description: "Professional corporate meetings, conferences, seminars, and business presentations.",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_2958_dsuafs.jpg",
-  },
-  {
-    id: "wedding",
-    name: "Weddings",
-    description: "Celebrate your special day in our elegant venue with beautiful settings and professional service.",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756012069/download_2_ye1m22.jpg",
-  },
-  {
-    id: "birthday",
-    name: "Birthday Celebrations",
-    description: "Make birthdays memorable with our celebration packages and personalized service.",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756012069/download_3_lnn47e.jpg",
-  },
-  {
-    id: "social",
-    name: "Social Gatherings",
-    description: "Perfect venue for family reunions, anniversaries, and social celebrations.",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756012069/download_4_sknues.jpg",
   },
 ];
 
@@ -197,12 +182,20 @@ export default function MeetingsEventsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
-              Meetings & Events
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Host your perfect event in our professional and elegant venues
-            </p>
+            <div
+              className="relative overflow-hidden rounded-none"
+              style={{
+                backgroundImage:
+                  "url(https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841224/Boardroom_2_ybp800.jpg)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                  filter: "brightness(0.95) contrast(1.25) saturate(1.08)",
+                minHeight: 260,
+              }}
+            >
+                {/* Dark overlay reduced since there is no hero text */}
+                <div className="absolute inset-0 bg-primary/25" />
+            </div>
           </motion.div>
 
           {/* Event Spaces */}
@@ -255,42 +248,6 @@ export default function MeetingsEventsPage() {
                         </div>
                       ))}
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Event Types */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-20"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Types of Events
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {eventTypes.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative h-40">
-                    <Image
-                      src={event.image}
-                      alt={event.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">{event.name}</h3>
-                    <p className="text-sm text-gray-600">{event.description}</p>
                   </div>
                 </motion.div>
               ))}

@@ -4,7 +4,8 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Introduction from "@/components/Introduction";
 import RoomsShowcase from "@/components/RoomsShowcase";
-import Reviews from "@/components/Reviews";
+import PhotoCarousel from "@/components/PhotoCarousel";
+import WhyBookDirectly from "@/components/WhyBookDirectly";
 import FAQs from "@/components/FAQs";
 
 export const metadata: Metadata = {
@@ -26,7 +27,8 @@ export default function Home() {
       <Hero />
       <Introduction />
       <RoomsShowcase />
-      <Reviews />
+      <PhotoCarousel />
+      <WhyBookDirectly />
       <FAQs />
       <Footer />
     </main>

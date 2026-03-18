@@ -4,110 +4,82 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Calendar, Users, Utensils, Wifi, Waves, Heart, Sparkles, Gift, Star, Check, ArrowRight, Clock, FileText, AlertCircle } from "lucide-react";
+import { Calendar, Users, Utensils, Wifi, Waves, Heart, Sparkles, Gift, Star, Check, ArrowRight, Clock, FileText, AlertCircle, Bed, Droplet, Wind } from "lucide-react";
 import Image from "next/image";
 
+const cld = (src: string, transform: string) =>
+  src.replace("/image/upload/", `/image/upload/${transform}/`);
+
 const featuredDeal = {
-  id: "weekend-getaway",
-  badge: "Limited Time Offer",
-  title: "Weekend Getaway Package",
-  description: "Escape to luxury this weekend with our special package including accommodation, breakfast, and dinner for two.",
-  originalPrice: 25000,
-  discountedPrice: 18000,
-  discount: 28,
+  id: "family",
+  badge: "Family Suite",
+  title: "Family Suite (Bed & Breakfast Included)",
+  description:
+    "Bed & breakfast included per night. Spacious comfort for families and small groups.",
+  price: 10000,
   features: [
-    { icon: Calendar, text: "2 Nights Stay" },
-    { icon: Utensils, text: "Breakfast & Dinner" },
-    { icon: Waves, text: "Pool Access" },
+    { icon: Users, text: "Up to 4 Guests" },
+    { icon: Bed, text: "2 Bedrooms" },
+    { icon: Utensils, text: "Breakfast Included" },
     { icon: Wifi, text: "Free WiFi" },
   ],
-  image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014497/IMG_2954_y59iig.jpg",
+  image: cld(
+    "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg",
+    "f_auto,q_auto,w_1600"
+  ),
 };
 
 const deals = [
   {
+    id: "standard",
+    badge: "Standard Room",
+    title: "Standard Room",
+    description: "Comfortable stay with private bathroom and free WiFi.",
+    price: 4500,
+    features: [
+      { icon: Bed, text: "1 King Bed" },
+      { icon: Users, text: "2 Guests" },
+      { icon: Droplet, text: "Private Bathroom" },
+      { icon: Wifi, text: "Free WiFi" },
+    ],
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS12of5621_d09e4v.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
+  },
+  {
+    id: "deluxe",
+    badge: "Deluxe Room",
+    title: "Deluxe Room (2 Bedrooms)",
+    description: "Extra space for families or groups (no bed & breakfast).",
+    price: 8000,
+    features: [
+      { icon: Bed, text: "2 Bedrooms" },
+      { icon: Users, text: "4 Guests" },
+      { icon: Droplet, text: "En-suite Bathroom" },
+      { icon: Wind, text: "Garden View" },
+    ],
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS333of562_kjjury.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
+  },
+  {
     id: "family",
-    badge: "Family Special",
-    title: "Family Package",
-    description: "Perfect for families with spacious accommodation and activities for children.",
-    originalPrice: 35000,
-    discountedPrice: 28000,
+    badge: "Family Suite",
+    title: "Family Suite (Bed & Breakfast Included)",
+    description: "Bed & breakfast included per night for families.",
+    price: 10000,
     features: [
       { icon: Users, text: "Up to 4 Guests" },
-      { icon: Utensils, text: "All Meals Included" },
-      { icon: Gift, text: "Kids Activities" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2926_nzrxnh.jpg",
-  },
-  {
-    id: "business",
-    badge: "Business Special",
-    title: "Business Package",
-    description: "Ideal for business travelers with conference facilities and business amenities.",
-    originalPrice: 20000,
-    discountedPrice: 15000,
-    features: [
-      { icon: FileText, text: "Conference Room Access" },
-      { icon: Wifi, text: "High-speed WiFi" },
-      { icon: Utensils, text: "Business Lunch" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_2958_dsuafs.jpg",
-  },
-  {
-    id: "honeymoon",
-    badge: "Romance Special",
-    title: "Honeymoon Package",
-    description: "Create unforgettable memories with our romantic honeymoon package.",
-    originalPrice: 45000,
-    discountedPrice: 35000,
-    features: [
-      { icon: Heart, text: "Romantic Setup" },
-      { icon: Utensils, text: "Candlelight Dinner" },
-      { icon: Sparkles, text: "Spa Treatment" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756012069/download_cxioxr.jpg",
-  },
-  {
-    id: "long-stay",
-    badge: "Extended Stay",
-    title: "Long Stay Package",
-    description: "Special rates for extended stays of 7 nights or more with additional amenities.",
-    originalPrice: 60000,
-    discountedPrice: 45000,
-    features: [
-      { icon: Calendar, text: "7+ Nights" },
-      { icon: Utensils, text: "Daily Breakfast" },
-      { icon: Star, text: "Concierge Service" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2936_sgngqe.jpg",
-  },
-  {
-    id: "group",
-    badge: "Group Discount",
-    title: "Group Booking",
-    description: "Special rates for groups of 10 or more people with dedicated event planning.",
-    originalPrice: 80000,
-    discountedPrice: 60000,
-    features: [
-      { icon: Users, text: "10+ Guests" },
-      { icon: Calendar, text: "Event Planning" },
-      { icon: Utensils, text: "Group Catering" },
-    ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_2958_dsuafs.jpg",
-  },
-  {
-    id: "seasonal",
-    badge: "Seasonal Special",
-    title: "Seasonal Offer",
-    description: "Take advantage of our seasonal rates during off-peak periods.",
-    originalPrice: 15000,
-    discountedPrice: 10000,
-    features: [
-      { icon: Calendar, text: "Off-peak Rates" },
+      { icon: Bed, text: "2 Bedrooms" },
       { icon: Utensils, text: "Breakfast Included" },
-      { icon: Waves, text: "Pool Access" },
+      { icon: Wifi, text: "Free WiFi" },
     ],
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014497/IMG_2954_y59iig.jpg",
+    image: cld(
+      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg",
+      "f_auto,q_auto,w_1200"
+    ),
   },
 ];
 
@@ -169,14 +141,24 @@ export default function DealsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="relative overflow-hidden mb-16"
           >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
-              Special Deals & Offers
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover amazing deals and packages for your perfect stay at Lemach Hotel
-            </p>
+            {/* Hero background image */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  'url("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS317of562_kplmrj.jpg")',
+                // Improve contrast/clarity so the banner looks crisp.
+                filter: "brightness(0.88) contrast(1.30) saturate(1.10)",
+              }}
+            />
+            {/* Lighter overlay since there is no text here */}
+            <div aria-hidden="true" className="absolute inset-0 bg-primary/20" />
+
+            {/* Keep hero area height (text removed as requested) */}
+            <div className="relative z-10 h-56 sm:h-64 lg:h-72" />
           </motion.div>
 
           {/* Featured Deal */}
@@ -215,23 +197,18 @@ export default function DealsPage() {
 
                   <div className="flex items-baseline gap-4 mb-6">
                     <div>
-                      <span className="text-sm opacity-75 line-through">
-                        KSh {featuredDeal.originalPrice.toLocaleString()}
-                      </span>
+                      <span className="text-sm opacity-75">Price per night</span>
                       <div className="text-4xl font-bold">
-                        KSh {featuredDeal.discountedPrice.toLocaleString()}
+                        KSh {featuredDeal.price.toLocaleString()}
                       </div>
-                    </div>
-                    <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                      <span className="text-2xl font-bold">Save {featuredDeal.discount}%</span>
                     </div>
                   </div>
 
                   <Link
-                    href={`/booking?deal=${featuredDeal.id}`}
+                    href={`/booking?room=${featuredDeal.id}`}
                     className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                   >
-                    Book This Deal
+                    Book This Room
                   </Link>
                 </div>
               </div>
@@ -246,7 +223,7 @@ export default function DealsPage() {
             className="mb-20"
           >
             <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              All Special Offers
+              Choose Your Room
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {deals.map((deal, index) => (
@@ -286,16 +263,15 @@ export default function DealsPage() {
                     </div>
 
                     <div className="flex items-baseline gap-3 mb-6">
-                      <span className="text-sm text-gray-500 line-through">
-                        KSh {deal.originalPrice.toLocaleString()}
-                      </span>
+                      <span className="text-sm text-gray-500">KSh</span>
                       <span className="text-2xl font-bold text-primary">
-                        KSh {deal.discountedPrice.toLocaleString()}
+                        {deal.price.toLocaleString()}
                       </span>
+                      <span className="text-sm text-gray-500">/night</span>
                     </div>
 
                     <Link
-                      href={`/booking?deal=${deal.id}`}
+                      href={`/booking?room=${deal.id}`}
                       className="w-full bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md text-center block"
                     >
                       Book Now

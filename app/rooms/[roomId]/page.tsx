@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -8,11 +9,13 @@ import Footer from "@/components/Footer";
 import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowLeft, Check, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
 
+const cld = (src: string, transform: string) => src.replace("/image/upload/", `/image/upload/${transform}/`);
+
 const rooms = {
   standard: {
     id: "standard",
     name: "Standard Room",
-    price: 8500,
+    price: 4500,
     description: "Perfect for solo travelers or couples, our standard rooms offer comfort and convenience with modern amenities.",
     longDescription: "Our Standard Rooms are thoughtfully designed to provide a comfortable and relaxing stay. Each room features a plush king-size bed, modern furnishings, and all the essential amenities you need for a pleasant stay. The room includes a private bathroom with hot water, complimentary WiFi, and a cozy atmosphere perfect for unwinding after a day of exploring Kilifi County.",
     features: [
@@ -24,9 +27,14 @@ const rooms = {
       { icon: Wind, text: "Air Conditioning", description: "Climate control for your comfort" },
     ],
     images: [
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2936_sgngqe.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014487/IMG_2937_idnyhf.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014488/IMG_2938_ahm3zz.jpg",
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS12of5621_d09e4v.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS16of562_ouub2u.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS17of562_wefrcn.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS14of562_tkmzvc.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS6of562_x8fn3x.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS11of562_jh9vzn.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS7of562_cohiqd.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS8of562_zcckde.jpg", "f_auto,q_auto,w_1200"),
     ],
     size: "25 sqm",
     view: "Garden View",
@@ -34,30 +42,40 @@ const rooms = {
   deluxe: {
     id: "deluxe",
     name: "Deluxe Room",
-    price: 12000,
-    description: "Spacious and elegant, our deluxe rooms feature premium furnishings and stunning views of Kilifi County.",
-    longDescription: "Experience elevated comfort in our Deluxe Rooms, featuring spacious layouts and elegant design. These rooms offer stunning views of Kilifi County from your private balcony, premium furnishings, and enhanced amenities. Perfect for those seeking a more luxurious stay with additional space and comfort.",
+    price: 8000,
+    description: "Ideal for small families or groups, our 2-bedroom Deluxe Room offers extra space and comfort (without bed & breakfast).",
+    longDescription:
+      "Enjoy more space in our 2-bedroom Deluxe Room—perfect for families and small groups. This option is offered without bed & breakfast, while still providing the comfort and amenities you need for a relaxing stay in Kilifi County.",
     features: [
-      { icon: Bed, text: "1 King Bed", description: "Premium king-size bed with luxury linens" },
-      { icon: Users, text: "2 Guests", description: "Accommodates up to 2 guests" },
-      { icon: Droplet, text: "En-suite Bathroom", description: "Spacious bathroom with modern amenities" },
-      { icon: Wind, text: "Balcony View", description: "Private balcony with stunning views" },
-      { icon: Tv, text: "Smart TV", description: "Large screen with streaming services" },
-      { icon: Coffee, text: "Coffee Maker", description: "In-room coffee and tea facilities" },
+      { icon: Bed, text: "2 Bedrooms", description: "Two separate bedrooms for added comfort" },
+      { icon: Users, text: "4 Guests", description: "Accommodates up to 4 guests" },
+      { icon: Droplet, text: "En-suite Bathroom", description: "Private bathroom with modern fixtures" },
+      { icon: Wifi, text: "Free WiFi", description: "High-speed internet access" },
+      { icon: Tv, text: "Smart TV", description: "Entertainment with streaming services" },
+      { icon: Wind, text: "Garden View", description: "Relaxing views of the gardens" },
     ],
     images: [
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2926_nzrxnh.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014489/IMG_2942_oawe9y.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014505/IMG_2947_u6egrt.jpg",
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS333of562_kjjury.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS337of562_ehegod.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS339of562_goabil.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS330of562_j5zdhm.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS332of562_u2i6bj.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS328of562_al2oim.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS331of562_jsv5x6.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS317of562_kplmrj.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS319of562_fnigu4.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS302of562_n3f4y7.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS300of562_uhl0eq.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg", "f_auto,q_auto,w_1200"),
     ],
-    size: "35 sqm",
-    view: "County View",
+    size: "45 sqm",
+    view: "Garden View",
   },
   family: {
     id: "family",
     name: "Family Suite",
-    price: 18000,
-    description: "Perfect for families, our spacious suite includes separate living area and multiple bedrooms.",
+    price: 10000,
+    description: "Perfect for families, our spacious suite includes bed & breakfast and plenty of room to relax.",
     longDescription: "Our Family Suite is designed with families in mind, offering ample space and comfort for everyone. The suite features two separate bedrooms, a spacious living area, and all the amenities needed for a comfortable family stay. The separate living room provides space for relaxation and family time.",
     features: [
       { icon: Bed, text: "2 Bedrooms", description: "Two separate bedrooms with comfortable beds" },
@@ -68,34 +86,21 @@ const rooms = {
       { icon: Droplet, text: "2 Bathrooms", description: "Two en-suite bathrooms" },
     ],
     images: [
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014478/IMG_2925_ah7764.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2926_nzrxnh.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014481/IMG_2936_sgngqe.jpg",
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS333of562_kjjury.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS337of562_ehegod.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS339of562_goabil.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS330of562_j5zdhm.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS332of562_u2i6bj.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS328of562_al2oim.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS331of562_jsv5x6.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS317of562_kplmrj.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS319of562_fnigu4.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS302of562_n3f4y7.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS300of562_uhl0eq.jpg", "f_auto,q_auto,w_1200"),
+      cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg", "f_auto,q_auto,w_1200"),
     ],
     size: "60 sqm",
     view: "Garden & Pool View",
-  },
-  executive: {
-    id: "executive",
-    name: "Executive Suite",
-    price: 25000,
-    description: "Ultimate luxury with premium amenities, private balcony, and exclusive services for discerning guests.",
-    longDescription: "Indulge in the ultimate luxury experience in our Executive Suite. This premium accommodation features the finest furnishings, a private jacuzzi, butler service, and exclusive amenities. Perfect for special occasions, business travelers, or those seeking the very best in hospitality.",
-    features: [
-      { icon: Bed, text: "King Bed", description: "Premium king-size bed with luxury linens" },
-      { icon: Users, text: "2 Guests", description: "Accommodates up to 2 guests" },
-      { icon: Bell, text: "Butler Service", description: "Dedicated butler for personalized service" },
-      { icon: Droplet, text: "Jacuzzi", description: "Private jacuzzi in the bathroom" },
-      { icon: Wind, text: "Private Balcony", description: "Spacious balcony with premium views" },
-      { icon: Coffee, text: "Premium Minibar", description: "Fully stocked premium minibar" },
-    ],
-    images: [
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014472/IMG_2921_ces2aj.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014505/IMG_2947_u6egrt.jpg",
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014501/IMG_2941_t3rved.jpg",
-    ],
-    size: "80 sqm",
-    view: "Panoramic County View",
   },
 };
 
@@ -103,6 +108,12 @@ export default function RoomDetailPage() {
   const params = useParams();
   const roomId = params.roomId as string;
   const room = rooms[roomId as keyof typeof rooms];
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
+
+  const visibleImages = useMemo(() => {
+    const initialCount = 3;
+    return showAllPhotos ? room?.images ?? [] : (room?.images ?? []).slice(0, initialCount);
+  }, [room?.images, showAllPhotos]);
 
   if (!room) {
     return (
@@ -163,18 +174,34 @@ export default function RoomDetailPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
+            className="mb-12"
           >
-            {room.images.map((image, index) => (
-              <div key={index} className="relative h-64 rounded-lg overflow-hidden">
-                <Image
-                  src={image}
-                  alt={`${room.name} - Image ${index + 1}`}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-300"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {visibleImages.map((image, index) => (
+                <div key={image} className="relative h-64 rounded-lg overflow-hidden">
+                  <Image
+                    src={image}
+                    alt={`${room.name} - Image ${index + 1}`}
+                    fill
+                    className="object-cover hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    priority={index === 0}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {room.images.length > visibleImages.length && (
+              <div className="mt-6 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllPhotos(true)}
+                  className="px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary hover:text-white transition-colors"
+                >
+                  Show more photos
+                </button>
               </div>
-            ))}
+            )}
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

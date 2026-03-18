@@ -4,7 +4,6 @@ const ROOM_NAMES: Record<string, string> = {
   standard: "Standard Room",
   deluxe: "Deluxe Room",
   family: "Family Suite",
-  executive: "Executive Suite",
 };
 
 type Props = {

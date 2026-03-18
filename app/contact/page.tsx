@@ -83,12 +83,24 @@ export default function ContactPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="relative text-center mb-12 overflow-hidden"
           >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-600">
-              We're here to help. Get in touch with us for any inquiries or assistance.
-            </p>
+            {/* Hero background image */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  'url("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839989/LEMACHGARDENS330of562_j5zdhm.jpg")',
+                // Improve image readability while keeping colors natural.
+                filter: "brightness(0.88) contrast(1.25) saturate(1.08)",
+              }}
+            />
+            {/* Dark overlay for text readability */}
+            <div aria-hidden="true" className="absolute inset-0 bg-primary/25" />
+
+            {/* Keep a visible hero area even with no text content */}
+            <div className="relative z-10 h-48 sm:h-56 lg:h-64" />
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
@@ -126,8 +138,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">Phone</h3>
                   <p className="text-gray-600">
-                    <a href="tel:+254721929446" className="hover:text-primary transition-colors">
-                      +254 721 929446
+                    <a href="tel:+254790998880" className="hover:text-primary transition-colors">
+                      0790 998880
                     </a>
                   </p>
                 </div>

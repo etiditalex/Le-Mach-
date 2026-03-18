@@ -9,18 +9,19 @@ import { Calendar, Users, Bed, CheckCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 const roomTypes = {
-  standard: { name: "Standard Room", price: 8500 },
-  deluxe: { name: "Deluxe Room", price: 12000 },
-  family: { name: "Family Suite", price: 18000 },
-  executive: { name: "Executive Suite", price: 25000 },
+  standard: { name: "Standard Room", price: 4500 },
+  deluxe: { name: "Deluxe Room", price: 8000 },
+  family: { name: "Family Suite", price: 10000 },
 };
 
 function BookingForm() {
   const searchParams = useSearchParams();
   const roomParam = searchParams.get("room");
+  const initialRoomType =
+    roomParam && roomParam in roomTypes ? roomParam : "";
 
   const [formData, setFormData] = useState({
-    roomType: roomParam || "",
+    roomType: initialRoomType,
     checkIn: "",
     checkOut: "",
     guests: "1",
