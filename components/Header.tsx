@@ -33,6 +33,7 @@ export default function Header() {
       ],
     },
     { href: "/meetings-events", label: "Meetings & Events" },
+    { href: "/signage", label: "Digital Signage" },
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact Us" },
   ];
