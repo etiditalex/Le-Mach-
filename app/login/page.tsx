@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,9 +11,11 @@ import { LogIn, Loader2 } from "lucide-react";
 import { Suspense } from "react";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
+
+  const safePath = (path: string) =>
+    path.startsWith("/") && !path.startsWith("//") ? path : "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,8 +37,8 @@ function LoginForm() {
         setLoading(false);
         return;
       }
-      router.refresh();
-      router.push(redirectTo.startsWith("/") ? redirectTo : "/");
+      // Full navigation so the Supabase cookie session is visible to middleware and server on Vercel
+      window.location.assign(safePath(redirectTo));
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
@@ -118,24 +120,7 @@ function LoginForm() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-gray-600">
-            Need an account?{" "}
-            <Link href="/contact" className="font-medium text-primary hover:underline">
-              Contact the hotel
-            </Link>{" "}
-            or create a user in your{" "}
-            <a
-              href="https://supabase.com/dashboard"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-primary hover:underline"
-            >
-              Supabase dashboard
-            </a>
-            .
-          </p>
-
-          <p className="mt-4 text-center">
+          <p className="mt-8 text-center">
             <Link href="/" className="text-sm text-gray-500 hover:text-primary">
               ← Back to home
             </Link>

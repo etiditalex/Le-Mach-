@@ -3,12 +3,12 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import CookieBanner from "@/components/CookieBanner";
 import StickyBanner from "@/components/StickyBanner";
+import { getSiteUrl, SITE_LOGO_ICON_URL, SITE_OG_IMAGE_URL } from "@/lib/site";
 
-const SITE_URL = "https://lemach.co.ke";
-const DEFAULT_OG_IMAGE = "https://res.cloudinary.com/dyfnobo9r/image/upload/v1766037561/Le_mach_Logo_g7q4n4.jpg";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
     template: "%s | Lemach Hotel",
@@ -21,17 +21,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_KE",
-    url: SITE_URL,
+    url: siteUrl,
     siteName: "Lemach Hotel & Accommodations",
     title: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
     description:
       "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
     images: [
       {
-        url: DEFAULT_OG_IMAGE,
+        url: SITE_OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
+        alt: "Lemach Hotel & Accommodations",
       },
     ],
   },
@@ -40,11 +40,15 @@ export const metadata: Metadata = {
     title: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
     description:
       "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
-    images: [DEFAULT_OG_IMAGE],
+    images: [SITE_OG_IMAGE_URL],
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: SITE_LOGO_ICON_URL, type: "image/jpeg", sizes: "192x192" },
+      { url: SITE_LOGO_ICON_URL, type: "image/jpeg", sizes: "32x32" },
+    ],
+    apple: [{ url: SITE_LOGO_ICON_URL, sizes: "180x180" }],
+    shortcut: SITE_LOGO_ICON_URL,
   },
   robots: {
     index: true,
@@ -69,4 +73,3 @@ export default function RootLayout({
     </html>
   );
 }
-
