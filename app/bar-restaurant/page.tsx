@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Utensils, Wine, Music, Trees, Users, Clock, CheckCircle, Coffee, Sparkles, Heart, Calendar, Phone, Mail } from "lucide-react";
+import { Utensils, Wine, Music, Trees, Users, Clock, CheckCircle, Coffee, Sparkles, Calendar } from "lucide-react";
 import Image from "next/image";
+import type { BarBrandRecord } from "@/lib/hotel-types";
 
 const features = [
   { icon: Utensils, title: "Fine Dining", description: "Exquisite cuisine prepared by expert chefs" },
@@ -98,6 +99,20 @@ const specialEvents = [
 ];
 
 export default function BarRestaurantPage() {
+  const [barBrands, setBarBrands] = useState<BarBrandRecord[]>([]);
+  const [brandsLoadError, setBrandsLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/public/bar-brands")
+      .then(async (r) => {
+        const data = (await r.json()) as { brands?: BarBrandRecord[]; error?: string };
+        if (!r.ok) throw new Error(data.error || "Could not load brands");
+        setBarBrands(data.brands ?? []);
+        setBrandsLoadError(null);
+      })
+      .catch((e) => setBrandsLoadError(e instanceof Error ? e.message : "Could not load brands"));
+  }, []);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -263,6 +278,64 @@ export default function BarRestaurantPage() {
                         <span>{area.features}</span>
                       </div>
                     </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Alcohol brands & pricing */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-16"
+          >
+            <h2 className="text-3xl font-sans font-bold text-primary mb-3 text-center">
+              Spirits, wines & premium pours
+            </h2>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+              Selection and prices for our bar — updated from the admin dashboard. Ask our staff for today&apos;s full list
+              and specials.
+            </p>
+            {brandsLoadError && (
+              <p className="text-center text-amber-800 bg-amber-50 rounded-lg py-3 px-4 max-w-xl mx-auto text-sm mb-8">
+                {brandsLoadError}
+              </p>
+            )}
+            {!brandsLoadError && barBrands.length === 0 && (
+              <p className="text-center text-gray-500 text-sm">
+                Brands will appear here once they are added in Admin → Bar brands.
+              </p>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {barBrands.map((brand, index) => (
+                <motion.div
+                  key={brand.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index }}
+                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
+                >
+                  <div className="relative h-52 bg-gray-100">
+                    <Image
+                      src={brand.imageUrl}
+                      alt={brand.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="text-xl font-sans font-bold text-gray-900">{brand.name}</h3>
+                      <span className="text-lg font-bold text-primary whitespace-nowrap tabular-nums">
+                        KSh {brand.price.toLocaleString()}
+                      </span>
+                    </div>
+                    {brand.description ? (
+                      <p className="text-gray-600 text-sm leading-relaxed">{brand.description}</p>
+                    ) : null}
                   </div>
                 </motion.div>
               ))}

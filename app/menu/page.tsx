@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Image from "next/image";
-import { useCart } from "@/context/CartContext";
-import { menuItems } from "@/data/menuItems";
+import { useCart, type MenuItem } from "@/context/CartContext";
+import { menuItems as defaultMenuItems } from "@/data/menuItems";
 import { ShoppingCart } from "lucide-react";
 
 const categories = ["all", "breakfast", "lunch", "dinner", "desserts", "beverages"];
 
 export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/public/menu");
+        if (!res.ok) return;
+        const data = (await res.json()) as { items?: MenuItem[] };
+        if (!cancelled && data.items?.length) setMenuItems(data.items);
+      } catch {
+        /* keep bundled fallback */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredItems =
     selectedCategory === "all"

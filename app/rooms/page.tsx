@@ -1,63 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowRight, Check } from "lucide-react";
+import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowRight } from "lucide-react";
 import Image from "next/image";
+import type { RoomRecord } from "@/lib/hotel-types";
 
-const cld = (src: string, transform: string) => src.replace("/image/upload/", `/image/upload/${transform}/`);
-
-const rooms = [
-  {
-    id: "standard",
-    name: "Standard Room",
-    price: 4500,
-    description: "Perfect for solo travelers or couples, our standard rooms offer comfort and convenience with modern amenities.",
-    features: [
-      { icon: Bed, text: "1 King Bed" },
-      { icon: Users, text: "2 Guests" },
-      { icon: Droplet, text: "Private Bathroom" },
-      { icon: Wifi, text: "Free WiFi" },
-    ],
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837496/LEMACHGARDENS12of5621_d09e4v.jpg",
-      "f_auto,q_auto,w_1200"
-    ),
-  },
-  {
-    id: "deluxe",
-    name: "Deluxe Room",
-    price: 8000,
-    description: "Ideal for small families or groups, our 2-bedroom Deluxe Room offers extra space and comfort (without bed & breakfast).",
-    features: [
-      { icon: Bed, text: "2 Bedrooms" },
-      { icon: Users, text: "4 Guests" },
-      { icon: Droplet, text: "En-suite Bathroom" },
-      { icon: Wind, text: "Garden View" },
-    ],
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839990/LEMACHGARDENS333of562_kjjury.jpg",
-      "f_auto,q_auto,w_1200"
-    ),
-  },
-  {
-    id: "family",
-    name: "Family Suite",
-    price: 10000,
-    description: "Perfect for families, our spacious suite includes bed & breakfast and plenty of room to relax.",
-    features: [
-      { icon: Bed, text: "2 Bedrooms" },
-      { icon: Users, text: "4 Guests" },
-      { icon: Tv, text: "Living Room" },
-      { icon: Tv, text: "Smart TV" },
-    ],
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg",
-      "f_auto,q_auto,w_1200"
-    ),
-  },
+/** Shown on cards; full detail pages can use richer legacy data when available. */
+const quickFeatures = [
+  { icon: Bed, text: "Comfortable stay" },
+  { icon: Users, text: "Spacious for guests" },
+  { icon: Wifi, text: "Free WiFi" },
+  { icon: Droplet, text: "Private bathroom" },
 ];
 
 const amenities = [
@@ -70,6 +27,20 @@ const amenities = [
 ];
 
 export default function RoomsPage() {
+  const [rooms, setRooms] = useState<RoomRecord[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/public/rooms")
+      .then(async (r) => {
+        const data = (await r.json()) as { rooms?: RoomRecord[]; error?: string };
+        if (!r.ok) throw new Error(data.error || "Could not load rooms");
+        setRooms(data.rooms ?? []);
+        setLoadError(null);
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : "Could not load rooms"));
+  }, []);
+
   return (
     <main>
       <Header />
@@ -102,6 +73,12 @@ export default function RoomsPage() {
 
           {/* Rooms Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            {loadError ? (
+              <p className="text-red-600 md:col-span-2 text-center">{loadError}</p>
+            ) : null}
+            {!loadError && rooms.length === 0 ? (
+              <p className="text-gray-600 md:col-span-2 text-center">No rooms available yet.</p>
+            ) : null}
             {rooms.map((room, index) => (
               <motion.div
                 key={room.id}
@@ -129,17 +106,17 @@ export default function RoomsPage() {
                       <div className="flex items-baseline gap-2">
                         <span className="text-sm text-gray-500">From</span>
                         <span className="text-3xl font-bold text-primary">
-                          KSh {room.price.toLocaleString()}
+                          KSh {room.pricePerNight.toLocaleString()}
                         </span>
                         <span className="text-gray-500">per night</span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-gray-600 mb-6">{room.description}</p>
+                  <p className="text-gray-600 mb-6">{room.description ?? ""}</p>
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
-                    {room.features.map((feature, idx) => (
+                    {quickFeatures.map((feature, idx) => (
                       <div key={idx} className="flex items-center gap-2 text-gray-700">
                         <feature.icon className="w-5 h-5 text-primary flex-shrink-0" />
                         <span className="text-sm">{feature.text}</span>

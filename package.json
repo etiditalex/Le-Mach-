@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.100.1",
+    "framer-motion": "^11.3.0",
+    "lucide-react": "^0.400.0",
     "next": "^14.2.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "framer-motion": "^11.3.0",
-    "lucide-react": "^0.400.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
@@ -26,4 +28,3 @@
     "typescript": "^5.5.3"
   }
 }
-

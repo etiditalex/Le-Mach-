@@ -6,22 +6,18 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Calendar, Users, Bed, CheckCircle, ArrowRight } from "lucide-react";
-import Link from "next/link";
-
-const roomTypes = {
-  standard: { name: "Standard Room", price: 4500 },
-  deluxe: { name: "Deluxe Room", price: 8000 },
-  family: { name: "Family Suite", price: 10000 },
-};
+import PaymentPanel from "@/components/PaymentPanel";
+import type { RoomRecord } from "@/lib/hotel-types";
 
 function BookingForm() {
   const searchParams = useSearchParams();
   const roomParam = searchParams.get("room");
-  const initialRoomType =
-    roomParam && roomParam in roomTypes ? roomParam : "";
+  const [roomsList, setRoomsList] = useState<RoomRecord[]>([]);
+  const [roomsLoading, setRoomsLoading] = useState(true);
+  const [roomsError, setRoomsError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    roomType: initialRoomType,
+    roomType: "",
     checkIn: "",
     checkOut: "",
     guests: "1",
@@ -33,9 +29,45 @@ function BookingForm() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [step, setStep] = useState<"form" | "pay">("form");
+  const [bookingId, setBookingId] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/rooms")
+      .then(async (r) => {
+        const data = (await r.json()) as { rooms?: RoomRecord[]; error?: string };
+        if (!r.ok) throw new Error(data.error || "Could not load rooms");
+        return data.rooms ?? [];
+      })
+      .then((rooms) => {
+        if (!cancelled) {
+          setRoomsList(rooms);
+          setRoomsError(null);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) setRoomsError(e instanceof Error ? e.message : "Could not load rooms");
+      })
+      .finally(() => {
+        if (!cancelled) setRoomsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!roomsList.length) return;
+    const fromUrl = roomParam && roomsList.some((r) => r.id === roomParam) ? roomParam : "";
+    setFormData((prev) => ({
+      ...prev,
+      roomType: fromUrl || prev.roomType || roomsList[0].id,
+    }));
+  }, [roomsList, roomParam]);
 
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
@@ -51,14 +83,15 @@ function BookingForm() {
 
   useEffect(() => {
     if (formData.roomType && nights > 0) {
-      const room = roomTypes[formData.roomType as keyof typeof roomTypes];
-      if (room) {
-        setTotalPrice(room.price * nights);
-      }
+      const room = roomsList.find((r) => r.id === formData.roomType);
+      if (room) setTotalPrice(room.pricePerNight * nights);
+      else setTotalPrice(0);
     } else {
       setTotalPrice(0);
     }
-  }, [formData.roomType, nights]);
+  }, [formData.roomType, nights, roomsList]);
+
+  const selectedRoom = roomsList.find((r) => r.id === formData.roomType);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -71,13 +104,35 @@ function BookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBookingError(null);
     setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomId: formData.roomType,
+          checkIn: formData.checkIn,
+          checkOut: formData.checkOut,
+          guests: Number(formData.guests) || 1,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          specialRequests: formData.specialRequests,
+        }),
+      });
+      const data = (await res.json()) as { bookingId?: string; error?: string };
+      if (!res.ok || !data.bookingId) {
+        throw new Error(data.error || "Could not create booking");
+      }
+      setBookingId(data.bookingId);
+      setStep("pay");
+    } catch (err) {
+      setBookingError(err instanceof Error ? err.message : "Booking failed");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 2000);
+    }
   };
 
   const getMinCheckOutDate = () => {
@@ -88,65 +143,6 @@ function BookingForm() {
     }
     return "";
   };
-
-  if (isSubmitted) {
-    return (
-      <main>
-        <Header />
-        <div className="pt-24 pb-12 min-h-screen flex items-center justify-center bg-gray-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-12 rounded-lg shadow-lg text-center max-w-2xl mx-4"
-          >
-            <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h1 className="text-4xl font-sans font-bold text-primary mb-4">
-              Booking Confirmed!
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Thank you for your booking. We've sent a confirmation email to{" "}
-              <strong>{formData.email}</strong>
-            </p>
-            <div className="bg-gray-50 p-6 rounded-lg mb-8 text-left">
-              <h3 className="font-semibold text-gray-800 mb-4">Booking Details</h3>
-              <div className="space-y-2 text-gray-600">
-                <p>
-                  <strong>Room:</strong> {roomTypes[formData.roomType as keyof typeof roomTypes]?.name}
-                </p>
-                <p>
-                  <strong>Check-in:</strong> {new Date(formData.checkIn).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Check-out:</strong> {new Date(formData.checkOut).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Guests:</strong> {formData.guests}
-                </p>
-                <p>
-                  <strong>Total:</strong> KSh {totalPrice.toLocaleString()}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4 justify-center">
-              <Link
-                href="/"
-                className="bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
-              >
-                Back to Home
-              </Link>
-              <Link
-                href="/rooms"
-                className="border-2 border-primary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-colors"
-              >
-                View More Rooms
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-        <Footer />
-      </main>
-    );
-  }
 
   return (
     <main>
@@ -173,10 +169,47 @@ function BookingForm() {
                 className="bg-white p-8 rounded-lg shadow-md"
               >
                 <h2 className="text-2xl font-sans font-bold text-gray-800 mb-6">
-                  Booking Information
+                  {step === "form" ? "Booking information" : "Payment"}
                 </h2>
 
+                {step === "pay" && bookingId ? (
+                  <div className="space-y-4">
+                    <p className="text-gray-600">
+                      Total due: <strong>KSh {totalPrice.toLocaleString()}</strong>. Pay with M-Pesa (Daraja STK) or
+                      card via Paystack.
+                    </p>
+                    <PaymentPanel
+                      target="booking"
+                      entityId={bookingId}
+                      onPaid={async () => {
+                        const r = await fetch(`/api/bookings/${bookingId}`, { cache: "no-store" });
+                        const d = (await r.json()) as { receiptKey?: string };
+                        if (d.receiptKey) {
+                          window.location.href = `/receipt/booking/${bookingId}?key=${encodeURIComponent(d.receiptKey)}`;
+                        } else {
+                          window.location.href = "/";
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep("form");
+                        setBookingId(null);
+                      }}
+                      className="text-sm text-gray-600 hover:text-primary"
+                    >
+                      ← Edit booking details
+                    </button>
+                  </div>
+                ) : null}
+
+                {step === "form" ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {roomsLoading ? (
+                    <p className="text-gray-600 text-sm">Loading room options…</p>
+                  ) : null}
+                  {roomsError ? <p className="text-sm text-red-600">{roomsError}</p> : null}
                   {/* Room Type */}
                   <div>
                     <label htmlFor="roomType" className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,12 +221,13 @@ function BookingForm() {
                       required
                       value={formData.roomType}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      disabled={roomsLoading || !roomsList.length}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60"
                     >
                       <option value="">Select a room type</option>
-                      {Object.entries(roomTypes).map(([key, room]) => (
-                        <option key={key} value={key}>
-                          {room.name} - KSh {room.price.toLocaleString()}/night
+                      {roomsList.map((room) => (
+                        <option key={room.id} value={room.id}>
+                          {room.name} — KSh {room.pricePerNight.toLocaleString()}/night
                         </option>
                       ))}
                     </select>
@@ -340,7 +374,13 @@ function BookingForm() {
 
                   <button
                     type="submit"
-                    disabled={isSubmitting || !formData.roomType || !formData.checkIn || !formData.checkOut}
+                    disabled={
+                      isSubmitting ||
+                      !formData.roomType ||
+                      !formData.checkIn ||
+                      !formData.checkOut ||
+                      !roomsList.length
+                    }
                     className="w-full bg-logo text-primary px-6 py-4 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
@@ -350,12 +390,14 @@ function BookingForm() {
                       </>
                     ) : (
                       <>
-                        Complete Booking
+                        Continue to payment
                         <ArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </button>
+                  {bookingError && <p className="text-sm text-red-600">{bookingError}</p>}
                 </form>
+                ) : null}
               </motion.div>
             </div>
 
@@ -368,17 +410,15 @@ function BookingForm() {
               >
                 <h2 className="text-2xl font-sans font-bold text-primary mb-6">Booking Summary</h2>
 
-                {formData.roomType ? (
+                {formData.roomType && selectedRoom ? (
                   <>
                     <div className="space-y-4 mb-6">
                       <div className="flex items-center gap-3">
                         <Bed className="w-5 h-5 text-primary" />
                         <div>
-                          <p className="font-semibold text-gray-800">
-                            {roomTypes[formData.roomType as keyof typeof roomTypes]?.name}
-                          </p>
+                          <p className="font-semibold text-gray-800">{selectedRoom.name}</p>
                           <p className="text-sm text-gray-600">
-                            KSh {roomTypes[formData.roomType as keyof typeof roomTypes]?.price.toLocaleString()}/night
+                            KSh {selectedRoom.pricePerNight.toLocaleString()}/night
                           </p>
                         </div>
                       </div>

@@ -24,7 +24,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# local env files (set real values in Vercel → Settings → Environment Variables)
+.env
 .env*.local
 
 # vercel
@@ -33,4 +34,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
 

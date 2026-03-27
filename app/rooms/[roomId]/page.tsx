@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -8,9 +8,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowLeft, Check, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
+import type { RoomRecord } from "@/lib/hotel-types";
 
 const cld = (src: string, transform: string) => src.replace("/image/upload/", `/image/upload/${transform}/`);
 
+/** Extra copy and galleries for legacy slugs; names/prices/descriptions/images still sync from Supabase when loaded. */
 const rooms = {
   standard: {
     id: "standard",
@@ -104,16 +106,78 @@ const rooms = {
   },
 };
 
+const fallbackFeatures = [
+  { icon: Bed, text: "Comfortable bedding", description: "Quality linens for a restful stay" },
+  { icon: Users, text: "Spacious layout", description: "Roomy accommodation for your group" },
+  { icon: Wifi, text: "Free WiFi", description: "Stay connected throughout your visit" },
+  { icon: Droplet, text: "Private bathroom", description: "Modern en-suite facilities" },
+];
+
 export default function RoomDetailPage() {
   const params = useParams();
   const roomId = params.roomId as string;
-  const room = rooms[roomId as keyof typeof rooms];
+  const legacy = rooms[roomId as keyof typeof rooms];
+  const [apiRoom, setApiRoom] = useState<RoomRecord | null | undefined>(undefined);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setApiRoom(undefined);
+    fetch("/api/public/rooms")
+      .then(async (r) => {
+        const data = (await r.json()) as { rooms?: RoomRecord[] };
+        if (!r.ok) return null;
+        return (data.rooms ?? []).find((x) => x.id === roomId) ?? null;
+      })
+      .then((found) => {
+        if (!cancelled) setApiRoom(found);
+      })
+      .catch(() => {
+        if (!cancelled) setApiRoom(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [roomId]);
+
+  const room = useMemo(() => {
+    if (apiRoom === undefined) return null;
+    if (!apiRoom) return null;
+    const legacyImages = legacy?.images ?? [];
+    const images =
+      legacyImages.length > 0
+        ? [apiRoom.image, ...legacyImages.filter((u) => u !== apiRoom.image)]
+        : [apiRoom.image];
+    return {
+      id: apiRoom.id,
+      name: apiRoom.name,
+      price: apiRoom.pricePerNight,
+      description: apiRoom.description ?? "",
+      longDescription: legacy?.longDescription ?? apiRoom.description ?? "",
+      features: legacy?.features ?? fallbackFeatures,
+      images,
+      size: legacy?.size ?? "—",
+      view: legacy?.view ?? "—",
+    };
+  }, [apiRoom, legacy]);
 
   const visibleImages = useMemo(() => {
     const initialCount = 3;
-    return showAllPhotos ? room?.images ?? [] : (room?.images ?? []).slice(0, initialCount);
-  }, [room?.images, showAllPhotos]);
+    if (!room) return [];
+    return showAllPhotos ? room.images : room.images.slice(0, initialCount);
+  }, [room, showAllPhotos]);
+
+  if (apiRoom === undefined) {
+    return (
+      <main>
+        <Header />
+        <div className="pt-24 pb-12 min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+        <Footer />
+      </main>
+    );
+  }
 
   if (!room) {
     return (
@@ -191,7 +255,7 @@ export default function RoomDetailPage() {
               ))}
             </div>
 
-            {room.images.length > visibleImages.length && (
+            {room.images.length > 3 && !showAllPhotos && (
               <div className="mt-6 flex justify-center">
                 <button
                   type="button"

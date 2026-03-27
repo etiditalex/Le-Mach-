@@ -17,3 +17,18 @@
   }
 }
 
+/* Receipt pages: clean paper output */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  html,
+  body {
+    background: white !important;
+  }
+  .receipt-print {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
