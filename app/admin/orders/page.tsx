@@ -31,12 +31,12 @@ export default async function AdminOrdersPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100">Orders & bookings</h1>
-        <p className="text-zinc-400 mt-1">Latest room service orders and room reservations.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Orders & bookings</h1>
+        <p className="text-gray-600 mt-1">Latest room service orders and room reservations.</p>
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-200 mb-3">Food orders</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Food orders</h2>
         <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-sm">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-600">
@@ -101,7 +101,7 @@ export default async function AdminOrdersPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-zinc-200 mb-3">Bookings</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Bookings</h2>
         <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-sm">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-600">

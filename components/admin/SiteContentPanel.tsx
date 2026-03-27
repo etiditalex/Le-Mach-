@@ -106,16 +106,13 @@ export default function SiteContentPanel() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <FileText className="w-7 h-7 text-primary" />
           Site content
         </h1>
-        <p className="text-zinc-400 mt-1">
+        <p className="text-gray-600 mt-1">
           Text snippets for pages (taglines, footers). Use stable slugs; wire the public site to{" "}
-          <code className="text-xs bg-zinc-800 text-zinc-200 px-1 rounded border border-zinc-700">
-            /api/public/content?slug=...
-          </code>{" "}
-          when needed.
+          <code className="text-xs bg-gray-100 px-1 rounded">/api/public/content?slug=...</code> when needed.
         </p>
       </div>
 

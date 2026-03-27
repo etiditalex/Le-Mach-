@@ -24,7 +24,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   await requireAdminUser();
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex text-zinc-100">
+    <div className="min-h-screen flex">
       <aside className="w-56 shrink-0 border-r border-zinc-800 bg-zinc-900 hidden sm:flex flex-col">
         <div className="p-4 border-b border-zinc-800">
           <p className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Lemach</p>
@@ -100,10 +100,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
-        <header className="sm:hidden bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#f8f6f3] text-gray-900">
+        <header className="sm:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <span className="font-bold text-primary">Lemach Admin</span>
-          <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-200">
+          <Link href="/" className="text-sm text-gray-600 hover:text-primary">
             Site
           </Link>
         </header>

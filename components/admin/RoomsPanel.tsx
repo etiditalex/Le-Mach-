@@ -125,8 +125,8 @@ export default function RoomsPanel() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100">Rooms</h1>
-        <p className="text-zinc-400 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Rooms</h1>
+        <p className="text-gray-600 mt-1">
           Manage room types, rates, images, and descriptions. Used for bookings and public listings.
         </p>
       </div>

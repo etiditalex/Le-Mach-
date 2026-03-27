@@ -26,9 +26,9 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Summary report</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Summary report</h1>
         </div>
-        <Link href="/admin" className="text-sm text-zinc-400 hover:text-primary shrink-0">
+        <Link href="/admin" className="text-sm text-primary hover:underline shrink-0">
           ← Dashboard
         </Link>
       </div>
@@ -82,8 +82,8 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
 
       {report && (
         <>
-          <p className="text-sm text-zinc-400">
-            <span className="font-medium text-zinc-300">Period:</span> {report.period.description}
+          <p className="text-sm text-gray-500">
+            <span className="font-medium text-gray-700">Period:</span> {report.period.description}
           </p>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

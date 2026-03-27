@@ -27,8 +27,8 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100">Dashboard</h1>
-        <p className="text-zinc-400 mt-1">Overview of guest orders, bookings, and alerts.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-1">Overview of guest orders, bookings, and alerts.</p>
       </div>
 
       {err && (
