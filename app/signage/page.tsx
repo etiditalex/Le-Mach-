@@ -3,12 +3,15 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { BedDouble, Wine, UtensilsCrossed } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { BedDouble, Wine, UtensilsCrossed, Youtube, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { menuItems as staticMenuItems } from "@/data/menuItems";
 import type { MenuItem } from "@/context/CartContext";
 import { DEFAULT_SIGNAGE_YOUTUBE } from "@/lib/site";
 import { youtubeVideoIdFromInput, youtubeSignageEmbedUrl } from "@/lib/youtube";
+
+/** Browser-only override for featured video (no navigation away from /signage). */
+const SIGNAGE_YOUTUBE_STORAGE_KEY = "lemach_signage_youtube";
 
 const cld = (src: string, transform: string) =>
   src.replace("/image/upload/", `/image/upload/${transform}/`);
@@ -66,6 +69,7 @@ function SignageFallback() {
 }
 
 function SignageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const youtubeParam =
     searchParams.get("youtube") ||
@@ -75,12 +79,70 @@ function SignageContent() {
   const envYoutube =
     typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SIGNAGE_YOUTUBE?.trim() || "" : "";
 
+  const [clientYoutubeRaw, setClientYoutubeRaw] = useState("");
+  const [videoPickerOpen, setVideoPickerOpen] = useState(false);
+  const [videoInputDraft, setVideoInputDraft] = useState("");
+  const [videoInputError, setVideoInputError] = useState("");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SIGNAGE_YOUTUBE_STORAGE_KEY)?.trim();
+      if (saved) setClientYoutubeRaw(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const youtubeId = useMemo(() => {
-    const raw = youtubeParam || envYoutube || DEFAULT_SIGNAGE_YOUTUBE;
+    const raw =
+      youtubeParam ||
+      clientYoutubeRaw.trim() ||
+      envYoutube ||
+      DEFAULT_SIGNAGE_YOUTUBE;
     return youtubeVideoIdFromInput(raw);
-  }, [youtubeParam, envYoutube]);
+  }, [youtubeParam, clientYoutubeRaw, envYoutube]);
 
   const embedSrc = youtubeId ? youtubeSignageEmbedUrl(youtubeId) : null;
+
+  const openVideoPicker = () => {
+    const currentRaw =
+      youtubeParam ||
+      clientYoutubeRaw.trim() ||
+      envYoutube ||
+      DEFAULT_SIGNAGE_YOUTUBE;
+    setVideoInputDraft(clientYoutubeRaw.trim() || currentRaw);
+    setVideoInputError("");
+    setVideoPickerOpen(true);
+  };
+
+  const applyVideoFromPicker = () => {
+    const id = youtubeVideoIdFromInput(videoInputDraft);
+    if (!id) {
+      setVideoInputError("Paste a valid YouTube link or video ID.");
+      return;
+    }
+    setVideoInputError("");
+    try {
+      localStorage.setItem(SIGNAGE_YOUTUBE_STORAGE_KEY, videoInputDraft.trim());
+    } catch {
+      /* private mode — session only */
+    }
+    setClientYoutubeRaw(videoInputDraft.trim());
+    setVideoPickerOpen(false);
+    router.replace("/signage", { scroll: false });
+  };
+
+  const clearSavedVideo = () => {
+    try {
+      localStorage.removeItem(SIGNAGE_YOUTUBE_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+    setClientYoutubeRaw("");
+    setVideoInputError("");
+    setVideoPickerOpen(false);
+    router.replace("/signage", { scroll: false });
+  };
 
   const [menuSource, setMenuSource] = useState<MenuItem[]>(staticMenuItems);
   const [rooms, setRooms] = useState<RoomSlide[]>(defaultRooms);
@@ -270,14 +332,103 @@ function SignageContent() {
         </div>
       ) : null}
 
+      {videoPickerOpen ? (
+        <div
+          className="fixed inset-0 z-[260] flex items-end justify-center bg-black/45 p-3 pb-6 sm:items-center sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="signage-video-picker-title"
+        >
+          <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 id="signage-video-picker-title" className="text-lg font-semibold text-gray-900">
+                  Change featured video
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Paste a YouTube URL or video ID. The page stays here—nothing opens in a new tab.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="-m-1 rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                aria-label="Close"
+                onClick={() => setVideoPickerOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {youtubeParam ? (
+              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                The address bar has <code className="font-mono">?youtube=</code> or{" "}
+                <code className="font-mono">?v=</code> — that wins until you apply below (we will
+                clear it and save your choice for this screen).
+              </p>
+            ) : null}
+            <label htmlFor="signage-youtube-input" className="mt-4 block text-xs font-medium text-gray-700">
+              YouTube link or ID
+            </label>
+            <input
+              id="signage-youtube-input"
+              type="text"
+              value={videoInputDraft}
+              onChange={(e) => {
+                setVideoInputDraft(e.target.value);
+                setVideoInputError("");
+              }}
+              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#fe0000] focus:outline-none focus:ring-2 focus:ring-[#fe0000]/25"
+              placeholder="https://www.youtube.com/watch?v=… or youtu.be/…"
+              autoComplete="off"
+            />
+            {videoInputError ? (
+              <p className="mt-2 text-sm text-red-600" role="alert">
+                {videoInputError}
+              </p>
+            ) : null}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-xl bg-[#fe0000] px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-red-700"
+                onClick={() => applyVideoFromPicker()}
+              >
+                Apply video
+              </button>
+              <button
+                type="button"
+                className="rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50"
+                onClick={() => clearSavedVideo()}
+              >
+                Use hotel default
+              </button>
+              <button
+                type="button"
+                className="rounded-xl px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
+                onClick={() => setVideoPickerOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {/* Grid: top row shrinks; bottom row (price ticker) always keeps height — avoids flex min-height pushing ticker off-screen (esp. fullscreen). */}
       <div className="signage-layout-shell relative z-10 grid min-h-0 w-full min-w-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
         <div className="signage-layout-top flex min-h-0 min-w-0 flex-col overflow-hidden px-2 pb-1 pt-1 sm:px-3">
           <header className="mx-auto flex w-full max-w-6xl shrink-0 items-start justify-between gap-3 py-1">
-            <div>
-              <h1 className="text-base font-semibold leading-tight text-gray-900 sm:text-xl md:text-2xl">
+            <div className="flex min-w-0 items-start gap-2">
+              <h1 className="min-w-0 text-base font-semibold leading-tight text-gray-900 sm:text-xl md:text-2xl">
                 Lemach Foods, Drinks & Rooms
               </h1>
+              <button
+                type="button"
+                onClick={() => openVideoPicker()}
+                className="mt-0.5 shrink-0 rounded-xl border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition hover:border-[#fe0000]/50 hover:bg-red-50 hover:text-[#fe0000]"
+                title="Change YouTube video without leaving this page"
+                aria-label="Change featured YouTube video"
+              >
+                <Youtube className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden />
+              </button>
             </div>
 
             <div className="shrink-0 text-right">
@@ -304,6 +455,7 @@ function SignageContent() {
             >
               <div className="relative z-0 h-full min-h-[100px] isolate overflow-hidden rounded-xl border border-gray-200 bg-black shadow-md sm:rounded-2xl">
                 <iframe
+                  key={youtubeId}
                   title="Lemach digital signage — YouTube"
                   src={embedSrc}
                   className="block h-full w-full border-0"
