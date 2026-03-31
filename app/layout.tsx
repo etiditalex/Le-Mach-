@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
-import CookieBanner from "@/components/CookieBanner";
-import StickyBanner from "@/components/StickyBanner";
+import SiteChrome from "@/components/SiteChrome";
 import { getSiteUrl, SITE_LOGO_ICON_URL, SITE_OG_IMAGE_URL } from "@/lib/site";
 
 const siteUrl = getSiteUrl();
+
+export const viewport: Viewport = {
+  themeColor: "#E31837",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,8 +47,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: SITE_LOGO_ICON_URL, type: "image/jpeg", sizes: "192x192" },
-      { url: SITE_LOGO_ICON_URL, type: "image/jpeg", sizes: "32x32" },
+      { url: SITE_LOGO_ICON_URL, type: "image/png", sizes: "192x192" },
+      { url: SITE_LOGO_ICON_URL, type: "image/png", sizes: "32x32" },
     ],
     apple: [{ url: SITE_LOGO_ICON_URL, sizes: "180x180" }],
     shortcut: SITE_LOGO_ICON_URL,
@@ -65,9 +68,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased overflow-x-hidden">
         <CartProvider>
-          <StickyBanner />
-          {children}
-          <CookieBanner />
+          <SiteChrome>{children}</SiteChrome>
         </CartProvider>
       </body>
     </html>

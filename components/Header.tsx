@@ -10,6 +10,7 @@ import { useCart } from "@/context/CartContext";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import CartDrawer from "./CartDrawer";
+import { SITE_LOGO_URL } from "@/lib/site";
 
 export default function Header() {
   const router = useRouter();
@@ -58,12 +59,13 @@ export default function Header() {
             <Link href="/" className="flex items-center">
               <div className="h-16 w-auto">
                 <Image
-                  src="https://res.cloudinary.com/dyfnobo9r/image/upload/v1766037561/Le_mach_Logo_g7q4n4.jpg"
-                  alt="Lemach Hotel Logo"
-                  width={250}
-                  height={75}
-                  className="h-full w-auto object-contain"
+                  src={SITE_LOGO_URL}
+                  alt="Le Mach Hotel & Conferences"
+                  width={320}
+                  height={153}
+                  className="h-full w-auto max-h-16 object-contain object-left"
                   priority
+                  sizes="(max-width: 1024px) 220px, 320px"
                 />
               </div>
             </Link>

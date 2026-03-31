@@ -9,23 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Color palette from logo
+        // Palette matched to official logo: vibrant red wordmark & sun yellow
         primary: {
-          DEFAULT: "#8B4513", // Saddle Brown
-          light: "#A0522D",
-          dark: "#654321",
+          DEFAULT: "#E31837",
+          light: "#FF4D6D",
+          dark: "#A51229",
         },
         secondary: {
-          DEFAULT: "#D2691E", // Chocolate
-          light: "#E6A366",
-          dark: "#B8860B",
+          DEFAULT: "#FFCD00",
+          light: "#FFE14D",
+          dark: "#E6B400",
         },
         accent: {
-          DEFAULT: "#FFD700", // Gold
-          light: "#FFE44D",
-          dark: "#DAA520",
+          DEFAULT: "#FFEB3B",
+          light: "#FFF59D",
+          dark: "#FBC02D",
         },
-        logo: "#dfc4b1", // Logo brand color
+        logo: "#FFF9E6",
       },
       fontFamily: {
         serif: ["Playfair Display", "serif"],
@@ -37,4 +37,3 @@ const config: Config = {
   plugins: [],
 };
 export default config;
-

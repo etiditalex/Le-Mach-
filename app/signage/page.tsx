@@ -1,17 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { BedDouble, Wine, UtensilsCrossed } from "lucide-react";
-import { menuItems } from "@/data/menuItems";
-
-type MenuItem = (typeof menuItems)[number];
+import { useSearchParams } from "next/navigation";
+import { menuItems as staticMenuItems } from "@/data/menuItems";
+import type { MenuItem } from "@/context/CartContext";
+import { DEFAULT_SIGNAGE_YOUTUBE } from "@/lib/site";
+import { youtubeVideoIdFromInput, youtubeSignageEmbedUrl } from "@/lib/youtube";
 
 const cld = (src: string, transform: string) =>
   src.replace("/image/upload/", `/image/upload/${transform}/`);
 
-const rooms = [
+type RoomSlide = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+};
+
+const defaultRooms: RoomSlide[] = [
   {
     id: "standard",
     name: "Standard Room",
@@ -50,22 +59,98 @@ function cyclicGet<T>(arr: T[], start: number, offset: number) {
   return arr[(start + offset) % arr.length];
 }
 
-export default function SignagePage() {
-  const foods = useMemo(
-    () => menuItems.filter((item) => item.category !== "beverages"),
-    []
+function SignageFallback() {
+  return (
+    <main className="fixed inset-0 z-[200] flex items-center justify-center bg-white text-gray-600" />
   );
-  const drinks = useMemo(
-    () => menuItems.filter((item) => item.category === "beverages"),
-    []
-  );
-  const tickerItems = useMemo(() => menuItems, []);
+}
+
+function SignageContent() {
+  const searchParams = useSearchParams();
+  const youtubeParam =
+    searchParams.get("youtube") ||
+    searchParams.get("yt") ||
+    searchParams.get("v") ||
+    "";
+  const envYoutube =
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SIGNAGE_YOUTUBE?.trim() || "" : "";
+
+  const youtubeId = useMemo(() => {
+    const raw = youtubeParam || envYoutube || DEFAULT_SIGNAGE_YOUTUBE;
+    return youtubeVideoIdFromInput(raw);
+  }, [youtubeParam, envYoutube]);
+
+  const embedSrc = youtubeId ? youtubeSignageEmbedUrl(youtubeId) : null;
+
+  const [menuSource, setMenuSource] = useState<MenuItem[]>(staticMenuItems);
+  const [rooms, setRooms] = useState<RoomSlide[]>(defaultRooms);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const [menuRes, roomsRes] = await Promise.all([
+          fetch("/api/public/menu", { cache: "no-store" }),
+          fetch("/api/public/rooms", { cache: "no-store" }),
+        ]);
+        if (cancelled) return;
+        const menuJson = (await menuRes.json()) as { items?: MenuItem[] };
+        if (Array.isArray(menuJson.items) && menuJson.items.length > 0) {
+          setMenuSource(menuJson.items);
+        }
+        const roomsJson = (await roomsRes.json()) as {
+          rooms?: { id: string; name: string; pricePerNight: number; image: string }[];
+        };
+        if (Array.isArray(roomsJson.rooms) && roomsJson.rooms.length > 0) {
+          setRooms(
+            roomsJson.rooms.map((r) => ({
+              id: r.id,
+              name: r.name,
+              price: r.pricePerNight,
+              image: r.image,
+            }))
+          );
+        }
+      } catch {
+        /* keep static fallback */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const foods = useMemo(() => {
+    return menuSource.filter((item) => {
+      const cat = (item.category ?? "").trim().toLowerCase();
+      return cat !== "beverages";
+    });
+  }, [menuSource]);
+  const drinks = useMemo(() => {
+    return menuSource.filter((item) => {
+      const cat = (item.category ?? "").trim().toLowerCase();
+      return cat === "beverages";
+    });
+  }, [menuSource]);
+  const tickerItems = useMemo(() => menuSource, [menuSource]);
+
+  /** Long enough strip so one loop is wider than typical TVs (seamless -50% scroll). */
+  const marqueeStrip = useMemo(() => {
+    if (tickerItems.length === 0) return [];
+    const out: MenuItem[] = [];
+    while (out.length < 20) {
+      for (const it of tickerItems) out.push(it);
+    }
+    return out;
+  }, [tickerItems]);
 
   const [foodBase, setFoodBase] = useState(0);
   const [drinkBase, setDrinkBase] = useState(0);
   const [roomIndex, setRoomIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [clock, setClock] = useState<Date | null>(null);
+  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(true);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -75,6 +160,39 @@ export default function SignagePage() {
     }, 60_000);
     return () => clearInterval(t);
   }, []);
+
+  /** Lock document scroll; page fills one screen — no vertical page scroll. */
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    html.classList.add("signage-kiosk-html");
+    body.classList.add("signage-kiosk-body");
+
+    const onFsChange = () => {
+      if (document.fullscreenElement) setShowFullscreenPrompt(false);
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    onFsChange();
+
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      html.classList.remove("signage-kiosk-html");
+      body.classList.remove("signage-kiosk-body");
+      const fs = document.fullscreenElement;
+      if (fs) void document.exitFullscreen?.().catch(() => {});
+    };
+  }, []);
+
+  const enterFullscreen = () => {
+    const el = mainRef.current;
+    if (el?.requestFullscreen) {
+      void el.requestFullscreen().catch(() => {
+        void document.documentElement.requestFullscreen?.().catch(() => {});
+      });
+    } else {
+      void document.documentElement.requestFullscreen?.().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -91,11 +209,12 @@ export default function SignagePage() {
   }, [drinks.length]);
 
   useEffect(() => {
+    if (rooms.length === 0) return;
     const t = setInterval(() => {
       setRoomIndex((v) => (v + 1) % rooms.length);
     }, 5200);
     return () => clearInterval(t);
-  }, []);
+  }, [rooms.length]);
 
   const visibleFoods = useMemo(() => {
     return Array.from(
@@ -114,62 +233,57 @@ export default function SignagePage() {
   const activeRoom = rooms[roomIndex % rooms.length];
 
   return (
-    <main className="min-h-screen w-full text-white relative overflow-hidden bg-[#0b0b0e]">
-      {/* Hand-made facade texture: wood grain + subtle noise */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-100"
-        style={{
-          backgroundImage:
-            // Brand blend (subtle) + dark base so it isn't too bright.
-            "radial-gradient(980px 520px at 20% 0%, rgba(221,20,2,0.22), transparent 62%)," +
-            "radial-gradient(980px 520px at 85% 10%, rgba(255,150,31,0.18), transparent 62%)," +
-            "radial-gradient(820px 520px at 50% 105%, rgba(139,69,19,0.20), transparent 60%)," +
-            "linear-gradient(180deg, rgba(6,6,10,0.25) 0%, rgba(2,2,4,0.92) 70%, rgba(2,2,4,0.98) 100%)," +
-            // Reduce visible background grid lines (more "handmade" texture).
-            "repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 40px),"+
-            "repeating-linear-gradient(0deg, rgba(255,255,255,0.010) 0 1px, transparent 1px 56px)",
-          filter: "blur(0.15px)",
-        }}
-      />
+    <main
+      ref={mainRef}
+      className="signage-root fixed inset-0 z-[100] flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden bg-white text-gray-900"
+    >
+      {showFullscreenPrompt ? (
+        <div
+          className="fixed inset-0 z-[250] flex flex-col items-center justify-center bg-black/55 px-6 text-center text-white backdrop-blur-[2px]"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Fullscreen option"
+        >
+          <p className="max-w-md text-lg font-semibold leading-snug sm:text-xl">
+            Hide browser tabs and address bar
+          </p>
+          <p className="mt-2 max-w-sm text-sm text-white/85">
+            Fullscreen uses the whole monitor for signage. Browsers require a tap here first.
+          </p>
+          <button
+            type="button"
+            className="mt-6 rounded-full bg-white px-8 py-3 text-base font-semibold text-gray-900 shadow-lg transition hover:bg-gray-100"
+            onClick={() => {
+              enterFullscreen();
+              setShowFullscreenPrompt(false);
+            }}
+          >
+            Enter fullscreen
+          </button>
+          <button
+            type="button"
+            className="mt-4 text-sm text-white/75 underline decoration-white/40 underline-offset-4 hover:text-white"
+            onClick={() => setShowFullscreenPrompt(false)}
+          >
+            Continue in normal window
+          </button>
+        </div>
+      ) : null}
 
-      {/* Faux imperfections */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-18"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 12% 18%, rgba(255,255,255,0.10), transparent 22%)," +
-            "radial-gradient(circle at 82% 26%, rgba(255,255,255,0.08), transparent 26%)," +
-            "radial-gradient(circle at 36% 76%, rgba(255,255,255,0.06), transparent 30%)",
-          filter: "blur(0.2px) saturate(1.05)",
-        }}
-      />
-
-      {/* Subtle breathing glow for the whole facade (not AI-ish) */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-22"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(221,20,2,0.00) 0%, rgba(221,20,2,0.14) 22%, rgba(255,150,31,0.14) 50%, rgba(139,69,19,0.12) 72%, rgba(221,20,2,0.00) 100%)",
-          animation: "lemachFacadeGlow 7.2s ease-in-out infinite",
-        }}
-      />
-
-      <div className="relative z-10 px-4 py-6 sm:py-10">
-        <header className="max-w-6xl mx-auto">
-          <div className="flex items-start justify-between gap-4">
-              <h1 className="text-lg sm:text-2xl font-semibold text-white/90 leading-tight">
+      {/* Grid: top row shrinks; bottom row (price ticker) always keeps height — avoids flex min-height pushing ticker off-screen (esp. fullscreen). */}
+      <div className="signage-layout-shell relative z-10 grid min-h-0 w-full min-w-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+        <div className="signage-layout-top flex min-h-0 min-w-0 flex-col overflow-hidden px-2 pb-1 pt-1 sm:px-3">
+          <header className="mx-auto flex w-full max-w-6xl shrink-0 items-start justify-between gap-3 py-1">
+            <div>
+              <h1 className="text-base font-semibold leading-tight text-gray-900 sm:text-xl md:text-2xl">
                 Lemach Foods, Drinks & Rooms
               </h1>
+            </div>
 
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-widest text-white/60">
-                Tonight
-              </p>
+            <div className="shrink-0 text-right">
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 sm:text-xs">Tonight</p>
               <p
-                className="text-sm sm:text-base tabular-nums text-white/90"
+                className="tabular-nums text-sm text-gray-900 sm:text-base"
                 suppressHydrationWarning
               >
                 {mounted && clock
@@ -180,189 +294,200 @@ export default function SignagePage() {
                   : "--:--"}
               </p>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <section className="max-w-6xl mx-auto mt-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 items-stretch">
-            {/* Foods Panel */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden relative shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
-              {/* rivets */}
-              <div aria-hidden="true" className="absolute top-3 left-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div className="px-4 pt-4">
+          <div className="mx-auto flex min-h-0 w-full min-w-0 max-w-6xl flex-1 flex-col gap-2 overflow-hidden">
+          {embedSrc ? (
+            <section
+              className="relative z-0 min-h-0 flex-1 basis-0 overflow-hidden"
+              aria-label="YouTube video"
+            >
+              <div className="relative z-0 h-full min-h-[100px] isolate overflow-hidden rounded-xl border border-gray-200 bg-black shadow-md sm:rounded-2xl">
+                <iframe
+                  title="Lemach digital signage — YouTube"
+                  src={embedSrc}
+                  className="block h-full w-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+            </section>
+          ) : null}
+
+          <section className="flex min-h-0 shrink-0 flex-col gap-2 overflow-hidden pb-1">
+          <div className="grid grid-cols-1 items-stretch gap-2 md:grid-cols-3 md:gap-2">
+            <div className="relative overflow-hidden rounded-2xl border border-red-700/30 bg-[#fe0000] text-white shadow-lg md:rounded-3xl">
+              <div
+                aria-hidden="true"
+                className="absolute left-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:left-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute right-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:right-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div className="px-3 pt-2 sm:px-3 sm:pt-3">
                 <div className="flex items-center gap-2">
-                  <UtensilsCrossed className="w-5 h-5 text-secondary" />
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                    Foods
-                  </p>
+                  <UtensilsCrossed className="h-4 w-4 text-secondary sm:h-5 sm:w-5" />
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/90 sm:text-xs">Foods</p>
                 </div>
               </div>
 
-              <div className="px-4 pb-4 pt-3">
+              <div className="px-3 pb-2 pt-2 sm:px-3 sm:pb-3">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`foods-${foodBase}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    className="space-y-3"
+                    className="space-y-1.5 sm:space-y-2"
                   >
                     {visibleFoods.map((item) => (
                       <div
                         key={item.id}
-                        className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 overflow-hidden"
+                        className="flex gap-2 overflow-hidden rounded-xl border border-white/25 bg-black/20 sm:gap-3 sm:rounded-2xl"
                       >
-                        <div className="relative h-16 w-16 shrink-0">
+                        <div className="relative h-12 w-12 shrink-0 self-center overflow-hidden rounded-l-lg bg-black/45 p-0.5 sm:h-14 sm:w-14 sm:rounded-l-xl sm:p-1">
                           <Image
                             src={item.image}
                             alt={item.name}
                             fill
-                            className="object-cover"
-                            sizes="64px"
+                            className="object-contain"
+                            sizes="56px"
                           />
                         </div>
-                        <div className="py-3 pr-3">
-                          <p className="text-[12px] font-semibold text-white/90 leading-tight">
+                        <div className="min-w-0 py-1.5 pr-2 sm:py-2 sm:pr-3">
+                          <p className="text-[11px] font-semibold leading-tight text-white sm:text-xs">
                             {item.name}
                           </p>
-                          <p className="text-[11px] text-white/60">
-                            {formatKsh(item.price)}
-                          </p>
+                          <p className="text-[10px] text-white/80 sm:text-[11px]">{formatKsh(item.price)}</p>
                         </div>
                       </div>
                     ))}
 
                     {visibleFoods.length === 0 && (
-                      <p className="text-white/60 text-sm">No food items.</p>
+                      <p className="text-sm text-white/80">No food items.</p>
                     )}
                   </motion.div>
                 </AnimatePresence>
               </div>
             </div>
 
-            {/* Drinks Panel */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden relative shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
-              <div aria-hidden="true" className="absolute top-3 left-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div className="px-4 pt-4">
+            <div className="relative overflow-hidden rounded-2xl border border-red-700/30 bg-[#fe0000] text-white shadow-lg md:rounded-3xl">
+              <div
+                aria-hidden="true"
+                className="absolute left-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:left-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute right-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:right-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div className="px-3 pt-2 sm:px-3 sm:pt-3">
                 <div className="flex items-center gap-2">
-                  <Wine className="w-5 h-5 text-secondary" />
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                    Drinks
-                  </p>
+                  <Wine className="h-4 w-4 text-secondary sm:h-5 sm:w-5" />
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/90 sm:text-xs">Drinks</p>
                 </div>
               </div>
 
-              <div className="px-4 pb-4 pt-3">
+              <div className="px-3 pb-2 pt-2 sm:px-3 sm:pb-3">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`drinks-${drinkBase}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    className="space-y-3"
+                    className="space-y-1.5 sm:space-y-2"
                   >
                     {visibleDrinks.map((item) => (
                       <div
                         key={item.id}
-                        className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 overflow-hidden"
+                        className="flex gap-2 overflow-hidden rounded-xl border border-white/25 bg-black/20 sm:gap-3 sm:rounded-2xl"
                       >
-                        <div className="relative h-16 w-16 shrink-0">
+                        <div className="relative h-12 w-12 shrink-0 self-center overflow-hidden rounded-l-lg bg-black/45 p-0.5 sm:h-14 sm:w-14 sm:rounded-l-xl sm:p-1">
                           <Image
                             src={item.image}
                             alt={item.name}
                             fill
-                            className="object-cover"
-                            sizes="64px"
+                            className="object-contain"
+                            sizes="56px"
                           />
                         </div>
-                        <div className="py-3 pr-3">
-                          <p className="text-[12px] font-semibold text-white/90 leading-tight">
+                        <div className="min-w-0 py-1.5 pr-2 sm:py-2 sm:pr-3">
+                          <p className="text-[11px] font-semibold leading-tight text-white sm:text-xs">
                             {item.name}
                           </p>
-                          <p className="text-[11px] text-white/60">
-                            {formatKsh(item.price)}
-                          </p>
+                          <p className="text-[10px] text-white/80 sm:text-[11px]">{formatKsh(item.price)}</p>
                         </div>
                       </div>
                     ))}
 
                     {visibleDrinks.length === 0 && (
-                      <p className="text-white/60 text-sm">No drink items.</p>
+                      <p className="text-sm text-white/80">No drink items.</p>
                     )}
                   </motion.div>
                 </AnimatePresence>
               </div>
             </div>
 
-            {/* Rooms Panel */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden relative shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
-              <div aria-hidden="true" className="absolute top-3 left-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 rounded-full bg-secondary/80 shadow-[0_0_18px_rgba(210,105,30,0.45)]" />
-              <div className="px-4 pt-4">
+            <div className="relative overflow-hidden rounded-2xl border border-red-700/30 bg-[#fe0000] text-white shadow-lg md:rounded-3xl">
+              <div
+                aria-hidden="true"
+                className="absolute left-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:left-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute right-2 top-2 z-[1] h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(255,205,0,0.7)] sm:right-3 sm:top-3 sm:h-2 sm:w-2"
+              />
+              <div className="px-3 pt-2 sm:px-3 sm:pt-3">
                 <div className="flex items-center gap-2">
-                  <BedDouble className="w-5 h-5 text-secondary" />
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                    Rooms
-                  </p>
+                  <BedDouble className="h-4 w-4 text-secondary sm:h-5 sm:w-5" />
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/90 sm:text-xs">Rooms</p>
                 </div>
               </div>
 
-              <div className="px-4 pb-4 pt-3">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`room-${activeRoom.id}`}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="relative h-72 sm:h-80 rounded-3xl overflow-hidden border border-white/10 bg-black/20"
-                  >
-                    <Image
-                      src={activeRoom.image}
-                      alt={activeRoom.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      priority={roomIndex === 0}
-                    />
-                    <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
+              <div className="px-3 pb-2 pt-2 sm:px-3 sm:pb-3">
+                {activeRoom ? (
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`room-${activeRoom.id}`}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="relative h-[clamp(9rem,20vh,13rem)] overflow-hidden rounded-2xl border border-white/25 bg-black/25 sm:h-[clamp(10rem,22vh,15rem)]"
+                    >
+                      <Image
+                        src={activeRoom.image}
+                        alt={activeRoom.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        priority={roomIndex === 0}
+                      />
+                      <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
+                      <div aria-hidden="true" className="signage-room-shimmer absolute inset-0 opacity-35" />
+                      <div className="absolute bottom-2 left-3 right-3 sm:bottom-3 sm:left-4 sm:right-4">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-white/65 sm:text-xs">
+                          From {formatKsh(activeRoom.price)} / night
+                        </p>
+                        <h2 className="mt-0.5 text-base font-bold text-white/95 sm:text-lg">{activeRoom.name}</h2>
+                        <p className="mt-1 hidden text-[11px] text-white/70 sm:block sm:text-[12px]">
+                          Book and arrive refreshed.
+                        </p>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                ) : (
+                  <p className="py-4 text-sm text-white/80">No rooms.</p>
+                )}
 
-                    {/* "facade window" highlight */}
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 opacity-35"
-                      style={{
-                        background:
-                          "linear-gradient(110deg, rgba(255,210,140,0.0) 20%, rgba(210,105,30,0.20) 42%, rgba(255,210,140,0.0) 68%)",
-                        transform: "translateX(-25%)",
-                        animation: "lemachWindow 3.2s ease-in-out infinite",
-                      }}
-                    />
-
-                    <div className="absolute left-4 right-4 bottom-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-white/65">
-                        From {formatKsh(activeRoom.price)} / night
-                      </p>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white/95 mt-1">
-                        {activeRoom.name}
-                      </h2>
-                      <p className="text-[12px] text-white/70 mt-2">
-                        Book and arrive refreshed.
-                      </p>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-
-                {/* Mini room indicators */}
-                <div className="flex gap-2 mt-3">
+                <div className="mt-2 flex gap-2">
                   {rooms.map((r, idx) => {
                     const isActive = idx === roomIndex;
                     return (
                       <div
                         key={r.id}
-                        className={`h-2 flex-1 rounded-full transition-colors ${
-                          isActive ? "bg-secondary" : "bg-white/15"
+                        className={`h-1.5 flex-1 rounded-full transition-colors sm:h-2 ${
+                          isActive ? "bg-secondary" : "bg-white/30"
                         }`}
                       />
                     );
@@ -371,114 +496,52 @@ export default function SignagePage() {
               </div>
             </div>
           </div>
+          </section>
+        </div>
+        </div>
 
-          {/* Live Menu Ticker */}
-          <div className="mt-4 sm:mt-6 rounded-3xl border border-white/10 bg-white/5 overflow-hidden relative shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
-            {/* bottom screws */}
+        {/* Edge-to-edge price ticker — grid row 2: always visible; z above iframe compositor in fullscreen */}
+        <div className="signage-price-ticker relative z-30 min-h-[3rem] w-full max-w-none shrink-0 overflow-hidden bg-[#fe0000] text-white [transform:translateZ(0)]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-16 bg-gradient-to-r from-[#fe0000] to-transparent sm:w-24"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-16 bg-gradient-to-l from-[#fe0000] to-transparent sm:w-24"
+          />
+
+          <div className="overflow-hidden">
             <div
-              aria-hidden="true"
-              className="absolute bottom-3 left-6 w-2 h-2 rounded-full bg-secondary/70 shadow-[0_0_18px_rgba(210,105,30,0.35)]"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute bottom-3 right-6 w-2 h-2 rounded-full bg-secondary/70 shadow-[0_0_18px_rgba(210,105,30,0.35)]"
-            />
-
-            <div className="px-4 py-3 flex items-center justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                Live Menu Running
-              </p>
-              <p className="text-xs text-white/55">Foods & Drinks</p>
-            </div>
-
-            <div className="relative">
-              {/* Fade edges for readability */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-y-0 left-0 w-20 pointer-events-none"
-                style={{
-                  background: "linear-gradient(90deg, rgba(0,0,0,0.85), transparent)",
-                }}
-              />
-              <div
-                aria-hidden="true"
-                className="absolute inset-y-0 right-0 w-20 pointer-events-none"
-                style={{
-                  background: "linear-gradient(-90deg, rgba(0,0,0,0.85), transparent)",
-                }}
-              />
-
-              <div
-                aria-label="Live menu ticker"
-                className="flex items-center whitespace-nowrap"
-                style={{
-                  animation: "lemachMarquee 28s linear infinite",
-                }}
-              >
-                {[0, 1].flatMap((copy) =>
-                  tickerItems.map((item) => (
-                    <div
-                      key={`${copy}-${item.id}`}
-                      className="mr-4 sm:mr-6 flex items-center gap-2 rounded-full border border-white/10 bg-black/25 px-3 py-2"
-                    >
-                      <span className="text-[11px] uppercase tracking-[0.2em] text-secondary/80">
-                        {item.category}
-                      </span>
-                      <span className="text-[12px] font-semibold text-white/90">
-                        {item.name}
-                      </span>
-                      <span className="text-[12px] font-bold text-secondary">
-                        {formatKsh(item.price)}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
+              aria-label="Live menu prices"
+              className="signage-marquee-track whitespace-nowrap py-2.5 sm:py-3"
+            >
+              {[0, 1].flatMap((copy) =>
+                marqueeStrip.map((item, idx) => (
+                  <div
+                    key={`${copy}-${item.id}-${idx}`}
+                    className="mr-4 inline-flex shrink-0 items-center gap-2 rounded-full border border-white/30 bg-black/25 px-3 py-2 sm:mr-5 sm:px-4 sm:py-2.5"
+                  >
+                    <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-secondary sm:text-xs">
+                      {item.category}
+                    </span>
+                    <span className="text-xs font-semibold text-white sm:text-sm">{item.name}</span>
+                    <span className="text-xs font-bold text-white sm:text-sm">{formatKsh(item.price)}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-        </section>
+        </div>
       </div>
-
-      <style jsx>{`
-        @keyframes lemachMarquee {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        @keyframes lemachFacadeGlow {
-          0%,
-          100% {
-            filter: saturate(1) brightness(1);
-            opacity: 0.35;
-          }
-          50% {
-            filter: saturate(1.1) brightness(1.05);
-            opacity: 0.55;
-          }
-        }
-        @keyframes lemachWindow {
-          0%,
-          100% {
-            transform: translateX(-30%);
-          }
-          50% {
-            transform: translateX(30%);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .facadeMotion,
-          * {
-            animation-duration: 0.001ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.001ms !important;
-          }
-        }
-      `}</style>
     </main>
   );
 }
 
+export default function SignagePage() {
+  return (
+    <Suspense fallback={<SignageFallback />}>
+      <SignageContent />
+    </Suspense>
+  );
+}
