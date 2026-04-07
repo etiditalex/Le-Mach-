@@ -18,6 +18,7 @@ export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalItems } = useCart();
   const { user, loading: authLoading } = useSupabaseUser();
+  const loginHref = "/login?redirect=/admin";
 
   const handleSignOut = async () => {
     const supabase = createBrowserSupabaseClient();
@@ -135,7 +136,7 @@ export default function Header() {
                 </div>
               ) : !authLoading ? (
                 <Link
-                  href="/login"
+                  href={loginHref}
                   className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-primary px-3 py-2 rounded-full border border-gray-200 hover:border-primary/40 transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
@@ -164,7 +165,7 @@ export default function Header() {
 
               {!authLoading && !user && (
                 <Link
-                  href="/login"
+                  href={loginHref}
                   className="lg:hidden p-2 text-gray-700 hover:text-primary"
                   aria-label="Log in"
                 >
@@ -243,7 +244,7 @@ export default function Header() {
                   </div>
                 ) : !authLoading ? (
                   <Link
-                    href="/login"
+                    href={loginHref}
                     className="flex items-center justify-center gap-2 py-2.5 rounded-full border border-gray-200 font-medium text-gray-800 hover:border-primary hover:text-primary"
                     onClick={() => setIsMenuOpen(false)}
                   >
