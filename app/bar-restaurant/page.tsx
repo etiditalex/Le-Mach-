@@ -116,6 +116,8 @@ export default function BarRestaurantPage() {
   const [barBrands, setBarBrands] = useState<BarBrandRecord[]>([]);
   const [brandsLoadError, setBrandsLoadError] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const [brandSearch, setBrandSearch] = useState("");
+  const [activeBrandCategory, setActiveBrandCategory] = useState("all");
 
   useEffect(() => {
     fetch("/api/public/bar-brands")
@@ -140,6 +142,21 @@ export default function BarRestaurantPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const brandCategoryTabs = [
+    { key: "all", label: "Categories" },
+    { key: "beers", label: "Beers" },
+    { key: "wines", label: "Wine" },
+    { key: "cans", label: "Champagne" },
+    { key: "whiskey", label: "Spirits" },
+    { key: "vodka", label: "Vodka" },
+  ];
+  const filteredBarBrands = barBrands.filter((brand) => {
+    const matchesCategory =
+      activeBrandCategory === "all" || brand.category.toLowerCase() === activeBrandCategory;
+    const q = brandSearch.trim().toLowerCase();
+    const matchesSearch = !q || brand.name.toLowerCase().includes(q) || brand.category.toLowerCase().includes(q);
+    return matchesCategory && matchesSearch;
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -313,6 +330,36 @@ export default function BarRestaurantPage() {
               Selection and prices for our bar — updated from the admin dashboard. Ask our staff for today&apos;s full list
               and specials.
             </p>
+            <div className="max-w-5xl mx-auto mb-8 space-y-4">
+              <input
+                type="search"
+                value={brandSearch}
+                onChange={(e) => setBrandSearch(e.target.value)}
+                placeholder="Search drinks..."
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <div className="overflow-x-auto">
+                <div className="min-w-max flex items-center gap-3">
+                  {brandCategoryTabs.map((tab) => {
+                    const isActive = activeBrandCategory === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActiveBrandCategory(tab.key)}
+                        className={`rounded-md px-4 py-2 text-sm font-semibold uppercase tracking-wide whitespace-nowrap transition-colors ${
+                          isActive
+                            ? "bg-primary text-white"
+                            : "bg-white border border-gray-200 text-gray-900 hover:border-primary/40 hover:text-primary"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
             {brandsLoadError && (
               <p className="text-center text-amber-800 bg-amber-50 rounded-lg py-3 px-4 max-w-xl mx-auto text-sm mb-8">
                 {brandsLoadError}
@@ -323,8 +370,13 @@ export default function BarRestaurantPage() {
                 Brands will appear here once they are added in Admin → Bar brands.
               </p>
             )}
+            {!brandsLoadError && barBrands.length > 0 && filteredBarBrands.length === 0 && (
+              <p className="text-center text-gray-500 text-sm">
+                No drinks match your current search or category.
+              </p>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {barBrands.map((brand, index) => (
+              {filteredBarBrands.map((brand, index) => (
                 <motion.div
                   key={brand.id}
                   initial={{ opacity: 0, y: 16 }}
