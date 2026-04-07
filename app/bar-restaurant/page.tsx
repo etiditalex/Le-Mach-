@@ -332,12 +332,12 @@ export default function BarRestaurantPage() {
                   transition={{ delay: 0.05 * index }}
                   className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
                 >
-                  <div className="relative h-52 bg-gray-100">
+                  <div className="relative h-72 bg-white p-4">
                     <Image
                       src={brand.imageUrl}
                       alt={brand.name}
                       fill
-                      className="object-cover"
+                      className="object-contain p-2"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
