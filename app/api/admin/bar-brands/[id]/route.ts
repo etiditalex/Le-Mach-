@@ -4,7 +4,17 @@ import { getServiceSupabase } from "@/lib/supabase/service";
 import { BAR_BRANDS_BUCKET, barBrandPathFromPublicUrl } from "@/lib/storage/bar-brands-bucket";
 
 export const runtime = "nodejs";
-const ALLOWED_CATEGORIES = new Set(["wines", "cans", "beers", "whiskey", "vodka"]);
+const ALLOWED_CATEGORIES = new Set([
+  "wines",
+  "cans",
+  "beers",
+  "whiskey",
+  "vodka",
+  "shots",
+  "tequila",
+  "rum-spirits",
+  "creams-liqueurs",
+]);
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const auth = await requireAdminApi();

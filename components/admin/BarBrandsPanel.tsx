@@ -14,6 +14,18 @@ type Item = {
   sort_order: number;
 };
 
+const CATEGORY_OPTIONS = [
+  { value: "wines", label: "Wines" },
+  { value: "cans", label: "Cans" },
+  { value: "beers", label: "Beers" },
+  { value: "whiskey", label: "Whiskey" },
+  { value: "vodka", label: "Vodka" },
+  { value: "shots", label: "Shots" },
+  { value: "tequila", label: "Tequila" },
+  { value: "rum-spirits", label: "Rum & Spirits" },
+  { value: "creams-liqueurs", label: "Creams & Liqueurs" },
+] as const;
+
 async function uploadBrandImage(file: File): Promise<string> {
   const fd = new FormData();
   fd.set("file", file);
@@ -214,11 +226,11 @@ export default function BarBrandsPanel() {
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             >
-              <option value="wines">Wines</option>
-              <option value="cans">Cans</option>
-              <option value="beers">Beers</option>
-              <option value="whiskey">Whiskey</option>
-              <option value="vodka">Vodka</option>
+              {CATEGORY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
           <div>

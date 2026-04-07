@@ -147,7 +147,11 @@ export default function BarRestaurantPage() {
     { key: "beers", label: "Beers" },
     { key: "wines", label: "Wine" },
     { key: "cans", label: "Cans" },
-    { key: "whiskey", label: "Spirits" },
+    { key: "whiskey", label: "Whiskey" },
+    { key: "shots", label: "Shots" },
+    { key: "tequila", label: "Tequila" },
+    { key: "rum-spirits", label: "Rum & Spirits" },
+    { key: "creams-liqueurs", label: "Creams & Liqueurs" },
     { key: "vodka", label: "Vodka" },
   ];
   const filteredBarBrands = barBrands.filter((brand) => {

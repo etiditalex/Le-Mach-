@@ -3,7 +3,17 @@ import { requireAdminApi } from "@/lib/admin-auth";
 import { getServiceSupabase } from "@/lib/supabase/service";
 
 export const runtime = "nodejs";
-const ALLOWED_CATEGORIES = new Set(["wines", "cans", "beers", "whiskey", "vodka"]);
+const ALLOWED_CATEGORIES = new Set([
+  "wines",
+  "cans",
+  "beers",
+  "whiskey",
+  "vodka",
+  "shots",
+  "tequila",
+  "rum-spirits",
+  "creams-liqueurs",
+]);
 
 export async function GET() {
   const auth = await requireAdminApi();
