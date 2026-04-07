@@ -10,12 +10,7 @@ import {
   Wine,
   Music,
   Trees,
-  Users,
-  Clock,
   CheckCircle,
-  Coffee,
-  Sparkles,
-  Calendar,
   ShoppingCart,
 } from "lucide-react";
 import Image from "next/image";
@@ -27,89 +22,6 @@ const features = [
   { icon: Wine, title: "Premium Beverages", description: "Curated selection of wines and cocktails" },
   { icon: Music, title: "Live Music", description: "Enjoy live entertainment on select evenings" },
   { icon: Trees, title: "Garden Views", description: "Beautiful views of our landscaped gardens" },
-];
-
-const diningAreas = [
-  {
-    id: "main",
-    name: "Main Restaurant",
-    description: "Our elegant main dining area offers a sophisticated atmosphere perfect for any occasion. Enjoy our signature dishes in a comfortable and stylish setting.",
-    capacity: "Up to 80 guests",
-    hours: "6:30 AM - 10:30 PM",
-    features: "Full menu available",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014494/IMG_2948_kzpa8s.jpg",
-  },
-  {
-    id: "terrace",
-    name: "Outdoor Terrace",
-    description: "Experience al fresco dining on our beautiful terrace with stunning views of the surrounding landscape. Perfect for romantic dinners and special occasions.",
-    capacity: "Up to 40 guests",
-    hours: "7:00 AM - 9:00 PM",
-    features: "Garden views",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_20250710_183035_xxzjze.jpg",
-  },
-  {
-    id: "bar",
-    name: "Bar & Lounge",
-    description: "Relax and unwind in our stylish bar and lounge area. Enjoy premium cocktails, local beers, and light snacks in a casual and welcoming atmosphere.",
-    capacity: "Up to 50 guests",
-    hours: "11:00 AM - 12:00 AM",
-    features: "Live entertainment",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014505/IMG_2947_u6egrt.jpg",
-  },
-];
-
-const barServices = [
-  {
-    icon: Sparkles,
-    title: "Craft Cocktails",
-    description: "Expertly crafted cocktails using premium spirits and fresh local ingredients.",
-  },
-  {
-    icon: Wine,
-    title: "Premium Beverages",
-    description: "Curated selection of premium non-alcoholic beverages, fresh juices, and specialty drinks to complement your meal.",
-  },
-  {
-    icon: Utensils,
-    title: "Local Specialties",
-    description: "Selection of local Kenyan specialties, fresh juices, and international favorites.",
-  },
-  {
-    icon: Coffee,
-    title: "Coffee & Tea",
-    description: "Premium coffee from local Kenyan beans and a variety of specialty teas.",
-  },
-];
-
-const specialEvents = [
-  {
-    id: "brunch",
-    name: "Sunday Brunch",
-    description: "Join us every Sunday for our famous brunch featuring live cooking stations, fresh pastries, and bottomless fresh juices.",
-    schedule: "Every Sunday",
-    time: "11:00 AM - 3:00 PM",
-    price: "KSh 3,500 per person",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014498/IMG_20250710_183035_xxzjze.jpg",
-  },
-  {
-    id: "gourmet",
-    name: "Gourmet Dine Evenings",
-    description: "Monthly gourmet pairing dinners featuring exquisite dishes paired with carefully selected premium beverages.",
-    schedule: "Last Friday of Month",
-    time: "7:00 PM - 10:00 PM",
-    price: "KSh 5,000 per person",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014497/IMG_2954_y59iig.jpg",
-  },
-  {
-    id: "romantic",
-    name: "Romantic Dinner Packages",
-    description: "Special romantic dinner packages for couples with private seating and personalized service.",
-    schedule: "Available Daily",
-    time: "6:30 PM - 9:30 PM",
-    price: "KSh 8,000 per couple",
-    image: "https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014505/IMG_2947_u6egrt.jpg",
-  },
 ];
 
 export default function BarRestaurantPage() {
@@ -269,58 +181,6 @@ export default function BarRestaurantPage() {
             ))}
           </motion.div>
 
-          {/* Dining Areas */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-16"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Our Dining Areas
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {diningAreas.map((area, index) => (
-                <motion.div
-                  key={area.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={area.image}
-                      alt={area.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-3">
-                      {area.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">{area.description}</p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Users className="w-4 h-4 text-primary" />
-                        <span>{area.capacity}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span>{area.hours}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-primary" />
-                        <span>{area.features}</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
           {/* Alcohol brands & pricing */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -423,86 +283,6 @@ export default function BarRestaurantPage() {
                     >
                       <ShoppingCart className="w-4 h-4" />
                       Add to Cart
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Bar Services */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white rounded-lg shadow-md p-8 mb-16"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Bar Services
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {barServices.map((service, index) => (
-                <div
-                  key={service.title}
-                  className="text-center"
-                >
-                  <div className="bg-gradient-to-r from-primary to-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <service.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">{service.title}</h3>
-                  <p className="text-sm text-gray-600">{service.description}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Special Dining Events */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mb-16"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Special Dining Events
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {specialEvents.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={event.image}
-                      alt={event.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-3">
-                      {event.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">{event.description}</p>
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        <span>{event.schedule}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span>{event.time}</span>
-                      </div>
-                      <div className="text-lg font-bold text-primary mt-3">
-                        {event.price}
-                      </div>
-                    </div>
-                    <button className="w-full bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md">
-                      Reserve Table
                     </button>
                   </div>
                 </motion.div>
