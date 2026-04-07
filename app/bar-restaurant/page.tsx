@@ -1,12 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Utensils, Wine, Music, Trees, Users, Clock, CheckCircle, Coffee, Sparkles, Calendar } from "lucide-react";
+import {
+  Utensils,
+  Wine,
+  Music,
+  Trees,
+  Users,
+  Clock,
+  CheckCircle,
+  Coffee,
+  Sparkles,
+  Calendar,
+  ShoppingCart,
+} from "lucide-react";
 import Image from "next/image";
 import type { BarBrandRecord } from "@/lib/hotel-types";
+import { useCart } from "@/context/CartContext";
 
 const features = [
   { icon: Utensils, title: "Fine Dining", description: "Exquisite cuisine prepared by expert chefs" },
@@ -101,7 +115,7 @@ const specialEvents = [
 export default function BarRestaurantPage() {
   const [barBrands, setBarBrands] = useState<BarBrandRecord[]>([]);
   const [brandsLoadError, setBrandsLoadError] = useState<string | null>(null);
-  const formatCategory = (category: string) => category.charAt(0).toUpperCase() + category.slice(1);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetch("/api/public/bar-brands")
@@ -329,19 +343,30 @@ export default function BarRestaurantPage() {
                   </div>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <div>
+                      <Link href={`/bar-restaurant/brands/${encodeURIComponent(brand.id)}`} className="hover:text-primary">
                         <h3 className="text-xl font-sans font-bold text-gray-900">{brand.name}</h3>
-                        <span className="inline-flex mt-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
-                          {formatCategory(brand.category)}
-                        </span>
-                      </div>
+                      </Link>
                       <span className="text-lg font-bold text-primary whitespace-nowrap tabular-nums">
                         KSh {brand.price.toLocaleString()}
                       </span>
                     </div>
-                    {brand.description ? (
-                      <p className="text-gray-600 text-sm leading-relaxed">{brand.description}</p>
-                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        addToCart({
+                          id: brand.id,
+                          name: brand.name,
+                          description: brand.description,
+                          price: brand.price,
+                          image: brand.imageUrl,
+                          category: brand.category,
+                        })
+                      }
+                      className="mt-2 inline-flex items-center gap-2 bg-logo text-primary px-4 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition-all shadow-md"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      Add to Cart
+                    </button>
                   </div>
                 </motion.div>
               ))}
