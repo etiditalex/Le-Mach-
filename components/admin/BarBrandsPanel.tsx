@@ -8,6 +8,7 @@ type Item = {
   id: string;
   name: string;
   description: string;
+  category: string;
   price: number;
   image_url: string;
   sort_order: number;
@@ -35,6 +36,7 @@ export default function BarBrandsPanel() {
   const emptyForm = {
     name: "",
     description: "",
+    category: "wines",
     price: "",
     sort_order: "0",
   };
@@ -80,6 +82,7 @@ export default function BarBrandsPanel() {
     setForm({
       name: it.name,
       description: it.description,
+      category: it.category || "wines",
       price: String(it.price),
       sort_order: String(it.sort_order),
     });
@@ -120,6 +123,7 @@ export default function BarBrandsPanel() {
         const payload: Record<string, unknown> = {
           name: form.name,
           description: form.description,
+          category: form.category,
           price: Number(form.price),
           sort_order: Number(form.sort_order) || 0,
         };
@@ -139,6 +143,7 @@ export default function BarBrandsPanel() {
           body: JSON.stringify({
             name: form.name,
             description: form.description,
+            category: form.category,
             price: Number(form.price),
             sort_order: Number(form.sort_order) || 0,
             image_url: imageUrl,
@@ -201,6 +206,20 @@ export default function BarBrandsPanel() {
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="wines">Wines</option>
+              <option value="cans">Cans</option>
+              <option value="beers">Beers</option>
+              <option value="whiskey">Whiskey</option>
+              <option value="vodka">Vodka</option>
+            </select>
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Price (KSh)</label>
@@ -275,6 +294,7 @@ export default function BarBrandsPanel() {
             <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
                 <th className="px-4 py-3 font-medium">Brand</th>
+                <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Price</th>
                 <th className="px-4 py-3 font-medium">Order</th>
                 <th className="px-4 py-3 font-medium w-24" />
@@ -293,6 +313,11 @@ export default function BarBrandsPanel() {
                         <p className="text-xs text-gray-500 truncate max-w-md">{it.description}</p>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-700">
+                      {it.category}
+                    </span>
                   </td>
                   <td className="px-4 py-3 tabular-nums">KSh {it.price.toLocaleString()}</td>
                   <td className="px-4 py-3 tabular-nums">{it.sort_order}</td>

@@ -4,13 +4,21 @@ import { getServiceSupabase } from "@/lib/supabase/service";
 import { BAR_BRANDS_BUCKET, barBrandPathFromPublicUrl } from "@/lib/storage/bar-brands-bucket";
 
 export const runtime = "nodejs";
+const ALLOWED_CATEGORIES = new Set(["wines", "cans", "beers", "whiskey", "vodka"]);
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const auth = await requireAdminApi();
   if (auth instanceof NextResponse) return auth;
 
   const { id } = params;
-  let body: Partial<{ name: string; description: string; price: number; image_url: string; sort_order: number }>;
+  let body: Partial<{
+    name: string;
+    description: string;
+    category: string;
+    price: number;
+    image_url: string;
+    sort_order: number;
+  }>;
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -27,6 +35,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const row: Record<string, unknown> = {};
   if (body.name !== undefined) row.name = body.name.trim();
   if (body.description !== undefined) row.description = body.description.trim();
+  if (body.category !== undefined) {
+    const category = body.category.trim().toLowerCase();
+    if (!ALLOWED_CATEGORIES.has(category)) {
+      return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+    }
+    row.category = category;
+  }
   if (body.price !== undefined) row.price = Math.max(0, Math.floor(Number(body.price)));
   if (body.image_url !== undefined) row.image_url = body.image_url.trim();
   if (body.sort_order !== undefined) row.sort_order = Math.floor(Number(body.sort_order));

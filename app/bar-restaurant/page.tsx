@@ -101,6 +101,7 @@ const specialEvents = [
 export default function BarRestaurantPage() {
   const [barBrands, setBarBrands] = useState<BarBrandRecord[]>([]);
   const [brandsLoadError, setBrandsLoadError] = useState<string | null>(null);
+  const formatCategory = (category: string) => category.charAt(0).toUpperCase() + category.slice(1);
 
   useEffect(() => {
     fetch("/api/public/bar-brands")
@@ -328,7 +329,12 @@ export default function BarRestaurantPage() {
                   </div>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="text-xl font-sans font-bold text-gray-900">{brand.name}</h3>
+                      <div>
+                        <h3 className="text-xl font-sans font-bold text-gray-900">{brand.name}</h3>
+                        <span className="inline-flex mt-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                          {formatCategory(brand.category)}
+                        </span>
+                      </div>
                       <span className="text-lg font-bold text-primary whitespace-nowrap tabular-nums">
                         KSh {brand.price.toLocaleString()}
                       </span>

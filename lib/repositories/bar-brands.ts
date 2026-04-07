@@ -6,6 +6,7 @@ type Row = {
   name: string;
   description: string;
   price: number;
+  category: string | null;
   image_url: string;
   sort_order: number;
 };
@@ -25,6 +26,7 @@ export async function fetchAllBarBrands(): Promise<BarBrandRecord[]> {
       name: r.name,
       description: r.description,
       price: r.price,
+      category: (r.category ?? "wines").trim() || "wines",
       imageUrl: r.image_url,
       sortOrder: r.sort_order,
     };

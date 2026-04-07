@@ -30,6 +30,7 @@ export type BarBrandRecord = {
   name: string;
   description: string;
   price: number;
+  category: string;
   imageUrl: string;
   sortOrder: number;
 };

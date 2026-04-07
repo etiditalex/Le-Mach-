@@ -3,6 +3,7 @@ import { requireAdminApi } from "@/lib/admin-auth";
 import { getServiceSupabase } from "@/lib/supabase/service";
 
 export const runtime = "nodejs";
+const ALLOWED_CATEGORIES = new Set(["wines", "cans", "beers", "whiskey", "vodka"]);
 
 export async function GET() {
   const auth = await requireAdminApi();
@@ -11,7 +12,7 @@ export async function GET() {
   const sb = getServiceSupabase();
   const { data, error } = await sb
     .from("bar_brands")
-    .select("id, name, description, price, image_url, sort_order, created_at")
+    .select("id, name, description, category, price, image_url, sort_order, created_at")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -32,7 +33,14 @@ export async function POST(req: Request) {
   const auth = await requireAdminApi();
   if (auth instanceof NextResponse) return auth;
 
-  let body: { name?: string; description?: string; price?: number; image_url?: string; sort_order?: number };
+  let body: {
+    name?: string;
+    description?: string;
+    category?: string;
+    price?: number;
+    image_url?: string;
+    sort_order?: number;
+  };
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -46,13 +54,17 @@ export async function POST(req: Request) {
   if (!image_url) return NextResponse.json({ error: "image required — upload a file first" }, { status: 400 });
 
   const description = (body.description ?? "").trim();
+  const category = (body.category ?? "wines").trim().toLowerCase();
+  if (!ALLOWED_CATEGORIES.has(category)) {
+    return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+  }
   const price = Math.max(0, Math.floor(Number(body.price) || 0));
   const sort_order = Math.floor(Number(body.sort_order) || 0);
 
   const sb = getServiceSupabase();
   const { data, error } = await sb
     .from("bar_brands")
-    .insert({ name, description, price, image_url, sort_order })
+    .insert({ name, description, category, price, image_url, sort_order })
     .select("id")
     .maybeSingle();
 
