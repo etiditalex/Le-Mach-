@@ -146,7 +146,7 @@ export default function BarRestaurantPage() {
     { key: "all", label: "Categories" },
     { key: "beers", label: "Beers" },
     { key: "wines", label: "Wine" },
-    { key: "cans", label: "Champagne" },
+    { key: "cans", label: "Cans" },
     { key: "whiskey", label: "Spirits" },
     { key: "vodka", label: "Vodka" },
   ];
