@@ -11,6 +11,7 @@ const ALLOWED_CATEGORIES = new Set([
   "vodka",
   "shots",
   "tequila",
+  "gin",
   "rum-spirits",
   "creams-liqueurs",
 ]);

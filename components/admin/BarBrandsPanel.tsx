@@ -22,6 +22,7 @@ const CATEGORY_OPTIONS = [
   { value: "vodka", label: "Vodka" },
   { value: "shots", label: "Shots" },
   { value: "tequila", label: "Tequila" },
+  { value: "gin", label: "Gin" },
   { value: "rum-spirits", label: "Rum & Spirits" },
   { value: "creams-liqueurs", label: "Creams & Liqueurs" },
 ] as const;

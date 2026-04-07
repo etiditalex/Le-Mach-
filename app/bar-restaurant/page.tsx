@@ -150,6 +150,7 @@ export default function BarRestaurantPage() {
     { key: "whiskey", label: "Whiskey" },
     { key: "shots", label: "Shots" },
     { key: "tequila", label: "Tequila" },
+    { key: "gin", label: "Gin" },
     { key: "rum-spirits", label: "Rum & Spirits" },
     { key: "creams-liqueurs", label: "Creams & Liqueurs" },
     { key: "vodka", label: "Vodka" },
