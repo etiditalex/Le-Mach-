@@ -17,13 +17,6 @@ import Image from "next/image";
 import type { BarBrandRecord } from "@/lib/hotel-types";
 import { useCart } from "@/context/CartContext";
 
-const features = [
-  { icon: Utensils, title: "Fine Dining", description: "Exquisite cuisine prepared by expert chefs" },
-  { icon: Wine, title: "Premium Beverages", description: "Curated selection of wines and cocktails" },
-  { icon: Music, title: "Live Music", description: "Enjoy live entertainment on select evenings" },
-  { icon: Trees, title: "Garden Views", description: "Beautiful views of our landscaped gardens" },
-];
-
 export default function BarRestaurantPage() {
   const [barBrands, setBarBrands] = useState<BarBrandRecord[]>([]);
   const [brandsLoadError, setBrandsLoadError] = useState<string | null>(null);
@@ -116,71 +109,6 @@ export default function BarRestaurantPage() {
       <Header />
       <div className="pt-24 pb-12 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl font-sans font-bold text-primary mb-4">
-              Bar & Restaurant
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Experience exquisite dining and refreshing drinks in our elegant restaurant and bar
-            </p>
-          </motion.div>
-
-          {/* Welcome Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-lg shadow-md p-8 md:p-12 mb-16"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-sans font-bold text-primary mb-6">
-                  Welcome to Our Restaurant
-                </h2>
-                <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                  At Lemach Hotel's restaurant, we take pride in offering a culinary journey that combines traditional Kenyan flavors with international cuisine. Our expert chefs use the finest local ingredients to create memorable dining experiences.
-                </p>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Whether you're enjoying a romantic dinner, a family meal, or a business lunch, our restaurant provides the perfect setting with its elegant ambiance and attentive service.
-                </p>
-              </div>
-              <div className="relative h-64 lg:h-96 rounded-lg overflow-hidden">
-                <Image
-                  src="https://res.cloudinary.com/dyfnobo9r/image/upload/v1756014494/IMG_2948_kzpa8s.jpg"
-                  alt="Restaurant Interior"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Features */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
-          >
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow"
-              >
-                <div className="bg-gradient-to-r from-primary to-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-800 mb-2">{feature.title}</h3>
-                <p className="text-sm text-gray-600">{feature.description}</p>
-              </div>
-            ))}
-          </motion.div>
-
           {/* Alcohol brands & pricing */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -189,7 +117,7 @@ export default function BarRestaurantPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-sans font-bold text-primary mb-3 text-center">
-              Spirits, wines & premium pours
+              Our bar offers from the given selection
             </h2>
             <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10">
               Selection and prices for our bar — updated from the admin dashboard. Ask our staff for today&apos;s full list
