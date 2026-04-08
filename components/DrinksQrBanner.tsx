@@ -9,8 +9,15 @@ const DISMISS_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 export default function DrinksQrBanner() {
   const [hidden, setHidden] = useState(false);
+  const [origin, setOrigin] = useState("");
 
-  const drinksUrl = useMemo(() => `${getSiteUrl()}/bar-restaurant`, []);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  const drinksUrl = useMemo(() => `${(origin || getSiteUrl()).replace(/\/$/, "")}/bar-restaurant`, [origin]);
   const qrSrc = useMemo(() => {
     const q = encodeURIComponent(drinksUrl);
     return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${q}`;
