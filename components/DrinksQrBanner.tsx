@@ -6,18 +6,25 @@ import { getSiteUrl } from "@/lib/site";
 
 const DISMISS_KEY = "lemach_drinks_qr_banner_dismissed_until";
 const DISMISS_MS = 12 * 60 * 60 * 1000; // 12 hours
+const DEFAULT_CUSTOM_DOMAIN = "https://lemach.co.ke";
 
 export default function DrinksQrBanner() {
   const [hidden, setHidden] = useState(false);
   const [origin, setOrigin] = useState("");
+  const configuredSiteUrl = useMemo(() => getSiteUrl().replace(/\/$/, ""), []);
+  const canonicalSiteUrl = useMemo(() => {
+    return configuredSiteUrl.includes("vercel.app") ? DEFAULT_CUSTOM_DOMAIN : configuredSiteUrl;
+  }, [configuredSiteUrl]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setOrigin(window.location.origin);
+      const currentOrigin = window.location.origin.replace(/\/$/, "");
+      // Force custom domain whenever app is accessed via temporary vercel.app host.
+      setOrigin(currentOrigin.includes("vercel.app") ? canonicalSiteUrl : currentOrigin);
     }
-  }, []);
+  }, [canonicalSiteUrl]);
 
-  const drinksUrl = useMemo(() => `${(origin || getSiteUrl()).replace(/\/$/, "")}/bar-restaurant`, [origin]);
+  const drinksUrl = useMemo(() => `${(origin || canonicalSiteUrl)}/bar-restaurant`, [origin, canonicalSiteUrl]);
   const qrSrc = useMemo(() => {
     const q = encodeURIComponent(drinksUrl);
     return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${q}`;
