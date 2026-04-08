@@ -10,16 +10,50 @@ export function youtubeVideoIdFromInput(input: string): string | null {
   return null;
 }
 
-/** Embed URL for digital signage: autoplay muted (browser-safe), loop single video. */
-export function youtubeSignageEmbedUrl(videoId: string): string {
+/** Parse one or many YouTube links/IDs from free text input. */
+export function youtubeVideoIdsFromInput(input: string): string[] {
+  const tokens = input
+    .split(/[\s,;]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const ids: string[] = [];
+  for (const token of tokens) {
+    const id = youtubeVideoIdFromInput(token);
+    if (!id) continue;
+    if (!ids.includes(id)) ids.push(id);
+  }
+  return ids;
+}
+
+/** Embed URL for digital signage: autoplay with optional playlist. */
+export function youtubeSignageEmbedUrl(videoId: string, playlistVideoIds: string[] = []): string {
   const q = new URLSearchParams({
     autoplay: "1",
-    mute: "1",
     playsinline: "1",
     rel: "0",
     modestbranding: "1",
-    loop: "1",
-    playlist: videoId,
+    controls: "1",
   });
+  if (playlistVideoIds.length > 1) {
+    q.set("loop", "0");
+    q.set("playlist", playlistVideoIds.join(","));
+  } else {
+    q.set("loop", "1");
+    q.set("playlist", videoId);
+  }
   return `https://www.youtube-nocookie.com/embed/${videoId}?${q.toString()}`;
+}
+
+/** Embed URL for YouTube search results in signage. */
+export function youtubeSignageSearchEmbedUrl(searchQuery: string): string {
+  const q = new URLSearchParams({
+    autoplay: "1",
+    playsinline: "1",
+    rel: "0",
+    modestbranding: "1",
+    controls: "1",
+    listType: "search",
+    list: searchQuery.trim(),
+  });
+  return `https://www.youtube-nocookie.com/embed?${q.toString()}`;
 }

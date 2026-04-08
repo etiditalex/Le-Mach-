@@ -3,12 +3,18 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { BedDouble, Wine, UtensilsCrossed, Youtube, X } from "lucide-react";
+import { BedDouble, ChevronLeft, ChevronRight, Wine, UtensilsCrossed, Youtube, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { menuItems as staticMenuItems } from "@/data/menuItems";
 import type { MenuItem } from "@/context/CartContext";
+import type { BarBrandRecord } from "@/lib/hotel-types";
 import { DEFAULT_SIGNAGE_YOUTUBE } from "@/lib/site";
-import { youtubeVideoIdFromInput, youtubeSignageEmbedUrl } from "@/lib/youtube";
+import {
+  youtubeVideoIdFromInput,
+  youtubeVideoIdsFromInput,
+  youtubeSignageEmbedUrl,
+  youtubeSignageSearchEmbedUrl,
+} from "@/lib/youtube";
 
 /** Browser-only override for featured video (no navigation away from /signage). */
 const SIGNAGE_YOUTUBE_STORAGE_KEY = "lemach_signage_youtube";
@@ -62,6 +68,42 @@ function cyclicGet<T>(arr: T[], start: number, offset: number) {
   return arr[(start + offset) % arr.length];
 }
 
+function youtubeIndexSafe(index: number, total: number) {
+  if (total <= 0) return 0;
+  return ((index % total) + total) % total;
+}
+
+const DRINK_CATEGORIES = new Set([
+  "beverages",
+  "beer",
+  "beers",
+  "wine",
+  "wines",
+  "cans",
+  "whiskey",
+  "shots",
+  "tequila",
+  "gin",
+  "rum-spirits",
+  "creams-liqueurs",
+  "vodka",
+  "cocktail",
+  "cocktails",
+  "drinks",
+  "drink",
+  "spirits",
+  "juice",
+  "coffee",
+  "tea",
+  "soda",
+  "soft-drinks",
+]);
+
+function isDrinkCategory(category?: string | null) {
+  const cat = (category ?? "").trim().toLowerCase();
+  return DRINK_CATEGORIES.has(cat);
+}
+
 function SignageFallback() {
   return (
     <main className="fixed inset-0 z-[200] flex items-center justify-center bg-white text-gray-600" />
@@ -83,6 +125,10 @@ function SignageContent() {
   const [videoPickerOpen, setVideoPickerOpen] = useState(false);
   const [videoInputDraft, setVideoInputDraft] = useState("");
   const [videoInputError, setVideoInputError] = useState("");
+  const [videoIndex, setVideoIndex] = useState(0);
+  const [videoSearchDraft, setVideoSearchDraft] = useState("");
+  const [videoSearchQuery, setVideoSearchQuery] = useState("");
+  const [videoSearchError, setVideoSearchError] = useState("");
 
   useEffect(() => {
     try {
@@ -93,16 +139,29 @@ function SignageContent() {
     }
   }, []);
 
-  const youtubeId = useMemo(() => {
+  const youtubeIds = useMemo(() => {
     const raw =
       youtubeParam ||
       clientYoutubeRaw.trim() ||
       envYoutube ||
       DEFAULT_SIGNAGE_YOUTUBE;
-    return youtubeVideoIdFromInput(raw);
+    const ids = youtubeVideoIdsFromInput(raw);
+    if (ids.length > 0) return ids;
+    const fallbackOne = youtubeVideoIdFromInput(raw);
+    return fallbackOne ? [fallbackOne] : [];
   }, [youtubeParam, clientYoutubeRaw, envYoutube]);
 
-  const embedSrc = youtubeId ? youtubeSignageEmbedUrl(youtubeId) : null;
+  const youtubeId = youtubeIds[youtubeIndexSafe(videoIndex, youtubeIds.length)] ?? null;
+
+  useEffect(() => {
+    setVideoIndex(0);
+  }, [youtubeIds]);
+
+  const embedSrc = useMemo(() => {
+    if (videoSearchQuery.trim()) return youtubeSignageSearchEmbedUrl(videoSearchQuery.trim());
+    if (!youtubeId) return null;
+    return youtubeSignageEmbedUrl(youtubeId, youtubeIds);
+  }, [videoSearchQuery, youtubeId, youtubeIds]);
 
   const openVideoPicker = () => {
     const currentRaw =
@@ -116,9 +175,9 @@ function SignageContent() {
   };
 
   const applyVideoFromPicker = () => {
-    const id = youtubeVideoIdFromInput(videoInputDraft);
-    if (!id) {
-      setVideoInputError("Paste a valid YouTube link or video ID.");
+    const ids = youtubeVideoIdsFromInput(videoInputDraft);
+    if (ids.length === 0) {
+      setVideoInputError("Paste one or more valid YouTube links or video IDs.");
       return;
     }
     setVideoInputError("");
@@ -144,6 +203,22 @@ function SignageContent() {
     router.replace("/signage", { scroll: false });
   };
 
+  const applyVideoSearch = () => {
+    const q = videoSearchDraft.trim();
+    if (q.length < 2) {
+      setVideoSearchError("Type at least 2 characters to search music.");
+      return;
+    }
+    setVideoSearchError("");
+    setVideoSearchQuery(q);
+  };
+
+  const clearVideoSearch = () => {
+    setVideoSearchDraft("");
+    setVideoSearchQuery("");
+    setVideoSearchError("");
+  };
+
   const [menuSource, setMenuSource] = useState<MenuItem[]>(staticMenuItems);
   const [rooms, setRooms] = useState<RoomSlide[]>(defaultRooms);
 
@@ -151,27 +226,51 @@ function SignageContent() {
     let cancelled = false;
     void (async () => {
       try {
-        const [menuRes, roomsRes] = await Promise.all([
+        const [menuRes, roomsRes, barBrandsRes] = await Promise.allSettled([
           fetch("/api/public/menu", { cache: "no-store" }),
           fetch("/api/public/rooms", { cache: "no-store" }),
+          fetch("/api/public/bar-brands", { cache: "no-store" }),
         ]);
         if (cancelled) return;
-        const menuJson = (await menuRes.json()) as { items?: MenuItem[] };
-        if (Array.isArray(menuJson.items) && menuJson.items.length > 0) {
-          setMenuSource(menuJson.items);
+        const mergedItems = new Map<string, MenuItem>(staticMenuItems.map((item) => [item.id, item]));
+
+        if (menuRes.status === "fulfilled" && menuRes.value.ok) {
+          const menuJson = (await menuRes.value.json()) as { items?: MenuItem[] };
+          for (const item of menuJson.items ?? []) {
+            mergedItems.set(item.id, item);
+          }
         }
-        const roomsJson = (await roomsRes.json()) as {
-          rooms?: { id: string; name: string; pricePerNight: number; image: string }[];
-        };
-        if (Array.isArray(roomsJson.rooms) && roomsJson.rooms.length > 0) {
-          setRooms(
-            roomsJson.rooms.map((r) => ({
-              id: r.id,
-              name: r.name,
-              price: r.pricePerNight,
-              image: r.image,
-            }))
-          );
+
+        if (barBrandsRes.status === "fulfilled" && barBrandsRes.value.ok) {
+          const barBrandsJson = (await barBrandsRes.value.json()) as { brands?: BarBrandRecord[] };
+          for (const brand of barBrandsJson.brands ?? []) {
+            mergedItems.set(brand.id, {
+              id: brand.id,
+              name: brand.name,
+              description: brand.description,
+              price: brand.price,
+              image: brand.imageUrl,
+              category: brand.category,
+            });
+          }
+        }
+
+        setMenuSource(Array.from(mergedItems.values()));
+
+        if (roomsRes.status === "fulfilled" && roomsRes.value.ok) {
+          const roomsJson = (await roomsRes.value.json()) as {
+            rooms?: { id: string; name: string; pricePerNight: number; image: string }[];
+          };
+          if (Array.isArray(roomsJson.rooms) && roomsJson.rooms.length > 0) {
+            setRooms(
+              roomsJson.rooms.map((r) => ({
+                id: r.id,
+                name: r.name,
+                price: r.pricePerNight,
+                image: r.image,
+              }))
+            );
+          }
         }
       } catch {
         /* keep static fallback */
@@ -184,14 +283,12 @@ function SignageContent() {
 
   const foods = useMemo(() => {
     return menuSource.filter((item) => {
-      const cat = (item.category ?? "").trim().toLowerCase();
-      return cat !== "beverages";
+      return !isDrinkCategory(item.category);
     });
   }, [menuSource]);
   const drinks = useMemo(() => {
     return menuSource.filter((item) => {
-      const cat = (item.category ?? "").trim().toLowerCase();
-      return cat === "beverages";
+      return isDrinkCategory(item.category);
     });
   }, [menuSource]);
   const tickerItems = useMemo(() => menuSource, [menuSource]);
@@ -346,7 +443,7 @@ function SignageContent() {
                   Change featured video
                 </h2>
                 <p className="mt-1 text-sm text-gray-600">
-                  Paste a YouTube URL or video ID. The page stays here—nothing opens in a new tab.
+                  Paste one or multiple YouTube URLs/IDs (separated by spaces, commas, or new lines).
                 </p>
               </div>
               <button
@@ -366,7 +463,7 @@ function SignageContent() {
               </p>
             ) : null}
             <label htmlFor="signage-youtube-input" className="mt-4 block text-xs font-medium text-gray-700">
-              YouTube link or ID
+              YouTube links or IDs
             </label>
             <input
               id="signage-youtube-input"
@@ -377,7 +474,7 @@ function SignageContent() {
                 setVideoInputError("");
               }}
               className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#fe0000] focus:outline-none focus:ring-2 focus:ring-[#fe0000]/25"
-              placeholder="https://www.youtube.com/watch?v=… or youtu.be/…"
+              placeholder="https://www.youtube.com/watch?v=... https://youtu.be/..."
               autoComplete="off"
             />
             {videoInputError ? (
@@ -455,7 +552,7 @@ function SignageContent() {
             >
               <div className="relative z-0 h-full min-h-[100px] isolate overflow-hidden rounded-xl border border-gray-200 bg-black shadow-md sm:rounded-2xl">
                 <iframe
-                  key={youtubeId}
+                  key={`${videoSearchQuery || youtubeId}-${youtubeIndexSafe(videoIndex, youtubeIds.length)}`}
                   title="Lemach digital signage — YouTube"
                   src={embedSrc}
                   className="block h-full w-full border-0"
@@ -463,6 +560,84 @@ function SignageContent() {
                   allowFullScreen
                   referrerPolicy="strict-origin-when-cross-origin"
                 />
+                <div className="pointer-events-none absolute left-2 top-2 z-20 right-2 sm:left-3 sm:top-3 sm:right-auto">
+                  <div className="pointer-events-auto w-full rounded-xl bg-black/60 p-2 backdrop-blur-sm sm:w-[24rem]">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="search"
+                        value={videoSearchDraft}
+                        onChange={(e) => {
+                          setVideoSearchDraft(e.target.value);
+                          setVideoSearchError("");
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            applyVideoSearch();
+                          }
+                        }}
+                        className="w-full rounded-lg border border-white/25 bg-black/35 px-3 py-2 text-xs text-white placeholder:text-white/60 focus:border-white/45 focus:outline-none"
+                        placeholder="Search music on YouTube..."
+                        aria-label="Search music on YouTube"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => applyVideoSearch()}
+                        className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100"
+                      >
+                        Search
+                      </button>
+                      {videoSearchQuery ? (
+                        <button
+                          type="button"
+                          onClick={() => clearVideoSearch()}
+                          className="rounded-lg border border-white/30 px-2.5 py-2 text-xs font-semibold text-white hover:bg-white/10"
+                        >
+                          Clear
+                        </button>
+                      ) : null}
+                    </div>
+                    {videoSearchError ? (
+                      <p className="mt-1 text-[11px] text-amber-200">{videoSearchError}</p>
+                    ) : null}
+                    {videoSearchQuery ? (
+                      <p className="mt-1 text-[11px] text-white/85">
+                        Showing results for: <span className="font-semibold">{videoSearchQuery}</span>
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+                {youtubeIds.length > 1 && !videoSearchQuery ? (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-2 z-20 flex items-center justify-between px-2 sm:px-3">
+                    <button
+                      type="button"
+                      className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/75"
+                      onClick={() =>
+                        setVideoIndex((v) =>
+                          youtubeIds.length === 0 ? 0 : (v - 1 + youtubeIds.length) % youtubeIds.length
+                        )
+                      }
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Prev
+                    </button>
+                    <span className="rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white/95">
+                      Video {youtubeIndexSafe(videoIndex, youtubeIds.length) + 1} / {youtubeIds.length}
+                    </span>
+                    <button
+                      type="button"
+                      className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/75"
+                      onClick={() =>
+                        setVideoIndex((v) =>
+                          youtubeIds.length === 0 ? 0 : (v + 1) % youtubeIds.length
+                        )
+                      }
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </section>
           ) : null}

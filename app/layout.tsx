@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import SiteChrome from "@/components/SiteChrome";
+import DrinksQrBanner from "@/components/DrinksQrBanner";
 import { getSiteUrl, SITE_LOGO_ICON_URL, SITE_OG_IMAGE_URL } from "@/lib/site";
 
 const siteUrl = getSiteUrl();
@@ -69,6 +70,7 @@ export default function RootLayout({
       <body className="antialiased overflow-x-hidden">
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
+          <DrinksQrBanner />
         </CartProvider>
       </body>
     </html>
