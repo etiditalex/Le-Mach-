@@ -43,17 +43,3 @@ export function youtubeSignageEmbedUrl(videoId: string, playlistVideoIds: string
   }
   return `https://www.youtube-nocookie.com/embed/${videoId}?${q.toString()}`;
 }
-
-/** Embed URL for YouTube search results in signage. */
-export function youtubeSignageSearchEmbedUrl(searchQuery: string): string {
-  const q = new URLSearchParams({
-    autoplay: "1",
-    playsinline: "1",
-    rel: "0",
-    modestbranding: "1",
-    controls: "1",
-    listType: "search",
-    list: searchQuery.trim(),
-  });
-  return `https://www.youtube-nocookie.com/embed?${q.toString()}`;
-}

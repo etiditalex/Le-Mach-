@@ -9,12 +9,7 @@ import { menuItems as staticMenuItems } from "@/data/menuItems";
 import type { MenuItem } from "@/context/CartContext";
 import type { BarBrandRecord } from "@/lib/hotel-types";
 import { DEFAULT_SIGNAGE_YOUTUBE } from "@/lib/site";
-import {
-  youtubeVideoIdFromInput,
-  youtubeVideoIdsFromInput,
-  youtubeSignageEmbedUrl,
-  youtubeSignageSearchEmbedUrl,
-} from "@/lib/youtube";
+import { youtubeVideoIdFromInput, youtubeVideoIdsFromInput, youtubeSignageEmbedUrl } from "@/lib/youtube";
 
 /** Browser-only override for featured video (no navigation away from /signage). */
 const SIGNAGE_YOUTUBE_STORAGE_KEY = "lemach_signage_youtube";
@@ -129,6 +124,9 @@ function SignageContent() {
   const [videoSearchDraft, setVideoSearchDraft] = useState("");
   const [videoSearchQuery, setVideoSearchQuery] = useState("");
   const [videoSearchError, setVideoSearchError] = useState("");
+  const [searchVideoIds, setSearchVideoIds] = useState<string[]>([]);
+  const [searchPlaylistIndex, setSearchPlaylistIndex] = useState(0);
+  const [videoSearchLoading, setVideoSearchLoading] = useState(false);
 
   useEffect(() => {
     try {
@@ -158,10 +156,21 @@ function SignageContent() {
   }, [youtubeIds]);
 
   const embedSrc = useMemo(() => {
-    if (videoSearchQuery.trim()) return youtubeSignageSearchEmbedUrl(videoSearchQuery.trim());
+    if (searchVideoIds.length > 0) {
+      const idx = youtubeIndexSafe(searchPlaylistIndex, searchVideoIds.length);
+      const id = searchVideoIds[idx];
+      return youtubeSignageEmbedUrl(id, searchVideoIds);
+    }
     if (!youtubeId) return null;
     return youtubeSignageEmbedUrl(youtubeId, youtubeIds);
-  }, [videoSearchQuery, youtubeId, youtubeIds]);
+  }, [searchVideoIds, searchPlaylistIndex, youtubeId, youtubeIds]);
+
+  const inSearchPlayback = searchVideoIds.length > 0;
+  const playlistForNav = inSearchPlayback ? searchVideoIds : youtubeIds;
+  const playlistNavCount = playlistForNav.length;
+  const playlistNavIndex = inSearchPlayback ? searchPlaylistIndex : videoIndex;
+  const navVideoId =
+    playlistNavCount > 0 ? playlistForNav[youtubeIndexSafe(playlistNavIndex, playlistNavCount)] : null;
 
   const openVideoPicker = () => {
     const currentRaw =
@@ -204,19 +213,41 @@ function SignageContent() {
   };
 
   const applyVideoSearch = () => {
-    const q = videoSearchDraft.trim();
-    if (q.length < 2) {
-      setVideoSearchError("Type at least 2 characters to search music.");
-      return;
-    }
-    setVideoSearchError("");
-    setVideoSearchQuery(q);
+    void (async () => {
+      const q = videoSearchDraft.trim();
+      if (q.length < 2) {
+        setVideoSearchError("Type at least 2 characters to search music.");
+        return;
+      }
+      setVideoSearchLoading(true);
+      setVideoSearchError("");
+      try {
+        const res = await fetch(`/api/public/youtube-search?q=${encodeURIComponent(q)}`, {
+          cache: "no-store",
+        });
+        const data = (await res.json()) as { videoIds?: string[]; error?: string };
+        if (!res.ok) throw new Error(data.error || "Search failed.");
+        const ids = data.videoIds ?? [];
+        if (ids.length === 0) throw new Error("No videos found.");
+        setSearchVideoIds(ids);
+        setSearchPlaylistIndex(0);
+        setVideoSearchQuery(q);
+      } catch (e) {
+        setSearchVideoIds([]);
+        setVideoSearchQuery("");
+        setVideoSearchError(e instanceof Error ? e.message : "Search failed.");
+      } finally {
+        setVideoSearchLoading(false);
+      }
+    })();
   };
 
   const clearVideoSearch = () => {
     setVideoSearchDraft("");
     setVideoSearchQuery("");
     setVideoSearchError("");
+    setSearchVideoIds([]);
+    setSearchPlaylistIndex(0);
   };
 
   const [menuSource, setMenuSource] = useState<MenuItem[]>(staticMenuItems);
@@ -552,7 +583,7 @@ function SignageContent() {
             >
               <div className="relative z-0 h-full min-h-[100px] isolate overflow-hidden rounded-xl border border-gray-200 bg-black shadow-md sm:rounded-2xl">
                 <iframe
-                  key={`${videoSearchQuery || youtubeId}-${youtubeIndexSafe(videoIndex, youtubeIds.length)}`}
+                  key={`${inSearchPlayback ? "search" : "saved"}-${navVideoId ?? youtubeId}-${playlistNavIndex}`}
                   title="Lemach digital signage — YouTube"
                   src={embedSrc}
                   className="block h-full w-full border-0"
@@ -582,12 +613,13 @@ function SignageContent() {
                       />
                       <button
                         type="button"
+                        disabled={videoSearchLoading}
                         onClick={() => applyVideoSearch()}
-                        className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100"
+                        className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Search
+                        {videoSearchLoading ? "Searching…" : "Search"}
                       </button>
-                      {videoSearchQuery ? (
+                      {videoSearchQuery || searchVideoIds.length > 0 ? (
                         <button
                           type="button"
                           onClick={() => clearVideoSearch()}
@@ -607,31 +639,43 @@ function SignageContent() {
                     ) : null}
                   </div>
                 </div>
-                {youtubeIds.length > 1 && !videoSearchQuery ? (
+                {playlistNavCount > 1 ? (
                   <div className="pointer-events-none absolute inset-x-0 bottom-2 z-20 flex items-center justify-between px-2 sm:px-3">
                     <button
                       type="button"
                       className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/75"
-                      onClick={() =>
-                        setVideoIndex((v) =>
-                          youtubeIds.length === 0 ? 0 : (v - 1 + youtubeIds.length) % youtubeIds.length
-                        )
-                      }
+                      onClick={() => {
+                        if (inSearchPlayback) {
+                          setSearchPlaylistIndex((v) =>
+                            searchVideoIds.length === 0 ? 0 : (v - 1 + searchVideoIds.length) % searchVideoIds.length
+                          );
+                        } else {
+                          setVideoIndex((v) =>
+                            youtubeIds.length === 0 ? 0 : (v - 1 + youtubeIds.length) % youtubeIds.length
+                          );
+                        }
+                      }}
                     >
                       <ChevronLeft className="h-4 w-4" />
                       Prev
                     </button>
                     <span className="rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white/95">
-                      Video {youtubeIndexSafe(videoIndex, youtubeIds.length) + 1} / {youtubeIds.length}
+                      Video {youtubeIndexSafe(playlistNavIndex, playlistNavCount) + 1} / {playlistNavCount}
                     </span>
                     <button
                       type="button"
                       className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-black/75"
-                      onClick={() =>
-                        setVideoIndex((v) =>
-                          youtubeIds.length === 0 ? 0 : (v + 1) % youtubeIds.length
-                        )
-                      }
+                      onClick={() => {
+                        if (inSearchPlayback) {
+                          setSearchPlaylistIndex((v) =>
+                            searchVideoIds.length === 0 ? 0 : (v + 1) % searchVideoIds.length
+                          );
+                        } else {
+                          setVideoIndex((v) =>
+                            youtubeIds.length === 0 ? 0 : (v + 1) % youtubeIds.length
+                          );
+                        }
+                      }}
                     >
                       Next
                       <ChevronRight className="h-4 w-4" />
