@@ -24,7 +24,20 @@ export function mpesaBaseUrl(): string {
 
 function mpesaOAuthUrl(): string {
   const fromEnv = process.env.MPESA_OAUTH_URL?.trim();
-  if (fromEnv) return fromEnv;
+  if (fromEnv) {
+    try {
+      const url = new URL(fromEnv);
+      if (!url.searchParams.get("grant_type")) {
+        url.searchParams.set("grant_type", "client_credentials");
+      }
+      return url.toString();
+    } catch {
+      const joiner = fromEnv.includes("?") ? "&" : "?";
+      return fromEnv.includes("grant_type=")
+        ? fromEnv
+        : `${fromEnv}${joiner}grant_type=client_credentials`;
+    }
+  }
   return `${mpesaBaseUrl()}/oauth/v1/generate?grant_type=client_credentials`;
 }
 
