@@ -56,7 +56,15 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target, id: entityId, phone }),
       });
-      const data = (await res.json()) as { error?: string; message?: string };
+      const data = (await (async () => {
+        const txt = await res.text();
+        if (!txt) return {} as { error?: string; message?: string };
+        try {
+          return JSON.parse(txt) as { error?: string; message?: string };
+        } catch {
+          return { error: txt.slice(0, 200) };
+        }
+      })()) as { error?: string; message?: string };
       if (!res.ok) throw new Error(data.error || "M-Pesa request failed");
       setMsg(data.message || "Check your phone and enter your M-Pesa PIN.");
       void poll();
