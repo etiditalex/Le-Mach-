@@ -121,6 +121,24 @@ export type StkQueryResult =
   | { ok: true; status: "success" | "pending" | "failed"; resultCode?: number; resultDesc?: string; raw?: string }
   | { ok: false; error: string; raw?: string };
 
+const MPESA_RESULT_CODE_HINTS: Record<number, string> = {
+  1: "Rejected by M-Pesa. Common causes: invalid shortcode/passkey, unsupported transaction type, or unresolved payer account state.",
+  1001: "Subscriber is locked or cannot transact. Ask customer to contact Safaricom/M-Pesa support.",
+  1019: "Transaction expired before completion (timeout).",
+  1025: "Push request failed to complete. Retry after a short delay.",
+  1032: "Customer cancelled the STK prompt.",
+  1037: "STK prompt not reached or phone unreachable/offline.",
+  2001: "Invalid initiator information or security credentials.",
+  2006: "Insufficient balance or payer account restrictions.",
+};
+
+function explainMpesaResult(resultCode: number | undefined, resultDesc: string | undefined): string {
+  const base = (resultDesc || "M-Pesa transaction failed").trim();
+  if (resultCode === undefined || Number.isNaN(resultCode)) return base;
+  const hint = MPESA_RESULT_CODE_HINTS[resultCode];
+  return hint ? `M-Pesa ${resultCode}: ${base}. ${hint}` : `M-Pesa ${resultCode}: ${base}`;
+}
+
 export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult> {
   const shortcode = readEnv("MPESA_SHORTCODE");
   const passkey = readEnv("MPESA_PASSKEY");
@@ -276,7 +294,7 @@ export async function mpesaStkQuery(checkoutRequestId: string): Promise<StkQuery
     ok: true,
     status: "failed",
     resultCode,
-    resultDesc: root.ResultDesc || root.ResponseDescription || "M-Pesa transaction failed",
+    resultDesc: explainMpesaResult(resultCode, root.ResultDesc || root.ResponseDescription),
     raw: text,
   };
 }
