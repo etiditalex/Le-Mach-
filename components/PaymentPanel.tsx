@@ -24,9 +24,20 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
   const poll = useCallback(async () => {
     const res = await fetch(pollUrl, { cache: "no-store" });
     if (!res.ok) return;
-    const data = (await res.json()) as { status?: string; paymentProvider?: string };
+    const data = (await res.json()) as {
+      status?: string;
+      paymentProvider?: string;
+      lastError?: string | null;
+    };
     if (data.status === "paid") onPaid();
+    if (data.status === "failed") {
+      setMsg(null);
+      setErr(data.lastError || "M-Pesa payment failed. Please retry.");
+      return;
+    }
     if (data.status === "processing_mpesa" && data.paymentProvider === "mpesa") {
+      setErr(null);
+      setMsg((prev) => prev || "STK sent. Waiting for phone prompt/approval...");
       const now = Date.now();
       // Rate limit STK query requests while waiting for callback.
       if (now - lastMpesaQueryAtRef.current < 15_000) return;

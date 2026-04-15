@@ -103,6 +103,11 @@ export type StkPushParams = {
   transactionDesc: string;
 };
 
+function mpesaTransactionType(): "CustomerPayBillOnline" | "CustomerBuyGoodsOnline" {
+  const tx = readEnv("MPESA_TRANSACTION_TYPE");
+  return tx === "CustomerBuyGoodsOnline" ? "CustomerBuyGoodsOnline" : "CustomerPayBillOnline";
+}
+
 export type StkPushResult =
   | {
       ok: true;
@@ -137,7 +142,7 @@ export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult
     BusinessShortCode: shortcode,
     Password: password(shortcode, passkey, ts),
     Timestamp: ts,
-    TransactionType: "CustomerPayBillOnline",
+    TransactionType: mpesaTransactionType(),
     Amount: Math.round(params.amountKes),
     PartyA: params.phone254,
     PartyB: shortcode,
