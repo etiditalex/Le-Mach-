@@ -1,6 +1,20 @@
 const SANDBOX = "https://sandbox.safaricom.co.ke";
 const PRODUCTION = "https://api.safaricom.co.ke";
 
+function readEnv(name: string): string {
+  return process.env[name]?.trim() || "";
+}
+
+function resolveMpesaCallbackUrl(): string {
+  const explicit = readEnv("MPESA_CALLBACK_URL");
+  if (explicit) return explicit;
+  const appUrl = readEnv("NEXT_PUBLIC_APP_URL").replace(/\/$/, "");
+  if (appUrl) return `${appUrl}/api/webhooks/mpesa`;
+  const vercel = readEnv("VERCEL_URL").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  if (vercel) return `https://${vercel}/api/webhooks/mpesa`;
+  return "";
+}
+
 export function mpesaBaseUrl(): string {
   const fromEnv = process.env.MPESA_BASE_URL?.trim().replace(/\/$/, "");
   if (fromEnv) return fromEnv;
@@ -45,9 +59,14 @@ function password(shortcode: string, passkey: string, ts: string): string {
 }
 
 export async function mpesaGetAccessToken(): Promise<string> {
-  const key = process.env.MPESA_CONSUMER_KEY;
-  const secret = process.env.MPESA_CONSUMER_SECRET;
-  if (!key || !secret) throw new Error("MPESA_CONSUMER_KEY and MPESA_CONSUMER_SECRET are required");
+  const key = readEnv("MPESA_CONSUMER_KEY");
+  const secret = readEnv("MPESA_CONSUMER_SECRET");
+  if (!key || !secret) {
+    const missing: string[] = [];
+    if (!key) missing.push("MPESA_CONSUMER_KEY");
+    if (!secret) missing.push("MPESA_CONSUMER_SECRET");
+    throw new Error(`${missing.join(", ")} must be set`);
+  }
 
   const auth = Buffer.from(`${key}:${secret}`, "utf-8").toString("base64");
   const url = mpesaOAuthUrl();
@@ -85,13 +104,17 @@ export type StkQueryResult =
   | { ok: false; error: string; raw?: string };
 
 export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult> {
-  const shortcode = process.env.MPESA_SHORTCODE;
-  const passkey = process.env.MPESA_PASSKEY;
-  const callbackUrl = process.env.MPESA_CALLBACK_URL;
+  const shortcode = readEnv("MPESA_SHORTCODE");
+  const passkey = readEnv("MPESA_PASSKEY");
+  const callbackUrl = resolveMpesaCallbackUrl();
   if (!shortcode || !passkey || !callbackUrl) {
+    const missing: string[] = [];
+    if (!shortcode) missing.push("MPESA_SHORTCODE");
+    if (!passkey) missing.push("MPESA_PASSKEY");
+    if (!callbackUrl) missing.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_APP_URL / VERCEL_URL)");
     return {
       ok: false,
-      error: "MPESA_SHORTCODE, MPESA_PASSKEY, and MPESA_CALLBACK_URL must be set",
+      error: `${missing.join(", ")} must be set`,
     };
   }
 
@@ -154,12 +177,15 @@ export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult
 }
 
 export async function mpesaStkQuery(checkoutRequestId: string): Promise<StkQueryResult> {
-  const shortcode = process.env.MPESA_SHORTCODE;
-  const passkey = process.env.MPESA_PASSKEY;
+  const shortcode = readEnv("MPESA_SHORTCODE");
+  const passkey = readEnv("MPESA_PASSKEY");
   if (!shortcode || !passkey) {
+    const missing: string[] = [];
+    if (!shortcode) missing.push("MPESA_SHORTCODE");
+    if (!passkey) missing.push("MPESA_PASSKEY");
     return {
       ok: false,
-      error: "MPESA_SHORTCODE and MPESA_PASSKEY must be set",
+      error: `${missing.join(", ")} must be set`,
     };
   }
 
