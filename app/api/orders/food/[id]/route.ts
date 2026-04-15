@@ -12,6 +12,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     return NextResponse.json({
       id: order.id,
       status: order.status,
+      paymentProvider: order.paymentProvider,
       totalKes: order.totalKes,
       receiptKey: order.receiptKey,
       guestName: order.guestName,

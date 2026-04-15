@@ -12,12 +12,14 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     return NextResponse.json({
       id: booking.id,
       status: booking.status,
+      paymentProvider: booking.paymentProvider,
       totalKes: booking.totalKes,
       receiptKey: booking.receiptKey,
       roomName: booking.roomName,
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
       lastError: booking.lastError,
+      mpesa: booking.mpesa,
     });
   } catch (e) {
     console.error(e);

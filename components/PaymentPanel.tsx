@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CreditCard, Smartphone } from "lucide-react";
 
 type Target = "food" | "booking";
@@ -17,15 +17,27 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
+  const lastMpesaQueryAtRef = useRef(0);
   const pollUrl =
     target === "food" ? `/api/orders/food/${entityId}` : `/api/bookings/${entityId}`;
 
   const poll = useCallback(async () => {
     const res = await fetch(pollUrl, { cache: "no-store" });
     if (!res.ok) return;
-    const data = (await res.json()) as { status?: string };
+    const data = (await res.json()) as { status?: string; paymentProvider?: string };
     if (data.status === "paid") onPaid();
-  }, [onPaid, pollUrl]);
+    if (data.status === "processing_mpesa" && data.paymentProvider === "mpesa") {
+      const now = Date.now();
+      // Rate limit STK query requests while waiting for callback.
+      if (now - lastMpesaQueryAtRef.current < 15_000) return;
+      lastMpesaQueryAtRef.current = now;
+      await fetch("/api/payments/mpesa/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target, id: entityId }),
+      });
+    }
+  }, [entityId, onPaid, pollUrl, target]);
 
   useEffect(() => {
     const t = setInterval(() => {
