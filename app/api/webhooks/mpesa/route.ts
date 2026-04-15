@@ -15,6 +15,15 @@ import {
 
 export const runtime = "nodejs";
 
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    service: "mpesa-webhook",
+    callbackUrl: "https://lemach.co.ke/api/webhooks/mpesa",
+    message: "Use POST for Daraja STK callbacks.",
+  });
+}
+
 export async function POST(req: Request) {
   let json: unknown;
   try {
