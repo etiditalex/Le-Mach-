@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { mpesaStkPush, normalizeMsisdnKenya } from "@/lib/mpesa";
-import { getBookingById, updateBooking } from "@/lib/repositories/bookings";
-import { getFoodOrderById, updateFoodOrder } from "@/lib/repositories/food-orders";
+import { mpesaStkPush, mpesaStkQuery, normalizeMsisdnKenya } from "@/lib/mpesa";
+import { getBookingById, markBookingPaidWithNotify, updateBooking } from "@/lib/repositories/bookings";
+import { getFoodOrderById, markFoodOrderPaidWithNotify, updateFoodOrder } from "@/lib/repositories/food-orders";
 
 export const runtime = "nodejs";
 
@@ -82,7 +82,32 @@ export async function POST(req: Request) {
       if (!push.ok) {
         return NextResponse.json({ error: push.error, raw: push.raw }, { status: 502 });
       }
-      return NextResponse.json({ ok: true, message: push.customerMessage });
+      const immediateQuery = await mpesaStkQuery(push.checkoutRequestId);
+      if (immediateQuery.ok && immediateQuery.status === "failed") {
+        await updateFoodOrder(id, {
+          status: "failed",
+          lastError: immediateQuery.resultDesc || "M-Pesa transaction failed",
+        });
+        return NextResponse.json(
+          { error: immediateQuery.resultDesc || "M-Pesa transaction failed", raw: immediateQuery.raw },
+          { status: 502 }
+        );
+      }
+      if (immediateQuery.ok && immediateQuery.status === "success") {
+        const latest = await getFoodOrderById(id);
+        if (latest && latest.status !== "paid") {
+          await markFoodOrderPaidWithNotify(latest, {
+            paymentProvider: "mpesa",
+            mpesa: latest.mpesa,
+          });
+        }
+        return NextResponse.json({ ok: true, message: "M-Pesa payment confirmed." });
+      }
+      return NextResponse.json({
+        ok: true,
+        pending: true,
+        message: "STK sent. Waiting for phone prompt/approval...",
+      });
     }
 
     const booking = await getBookingById(id);
@@ -132,7 +157,32 @@ export async function POST(req: Request) {
     if (!push.ok) {
       return NextResponse.json({ error: push.error, raw: push.raw }, { status: 502 });
     }
-    return NextResponse.json({ ok: true, message: push.customerMessage });
+    const immediateQuery = await mpesaStkQuery(push.checkoutRequestId);
+    if (immediateQuery.ok && immediateQuery.status === "failed") {
+      await updateBooking(id, {
+        status: "failed",
+        lastError: immediateQuery.resultDesc || "M-Pesa transaction failed",
+      });
+      return NextResponse.json(
+        { error: immediateQuery.resultDesc || "M-Pesa transaction failed", raw: immediateQuery.raw },
+        { status: 502 }
+      );
+    }
+    if (immediateQuery.ok && immediateQuery.status === "success") {
+      const latest = await getBookingById(id);
+      if (latest && latest.status !== "paid") {
+        await markBookingPaidWithNotify(latest, {
+          paymentProvider: "mpesa",
+          mpesa: latest.mpesa,
+        });
+      }
+      return NextResponse.json({ ok: true, message: "M-Pesa payment confirmed." });
+    }
+    return NextResponse.json({
+      ok: true,
+      pending: true,
+      message: "STK sent. Waiting for phone prompt/approval...",
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "M-Pesa STK request failed";
     return NextResponse.json({ error: msg }, { status: 500 });
