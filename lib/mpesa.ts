@@ -42,13 +42,13 @@ function mpesaOAuthUrl(): string {
 }
 
 function mpesaStkPushUrl(): string {
-  const fromEnv = process.env.MPESA_STK_PUSH_URL?.trim();
+  const fromEnv = process.env.MPESA_STKPUSH_URL?.trim() || process.env.MPESA_STK_PUSH_URL?.trim();
   if (fromEnv) return fromEnv;
   return `${mpesaBaseUrl()}/mpesa/stkpush/v1/processrequest`;
 }
 
 function mpesaStkQueryUrl(): string {
-  const fromEnv = process.env.MPESA_STK_QUERY_URL?.trim();
+  const fromEnv = process.env.MPESA_STKPUSH_QUERY_URL?.trim() || process.env.MPESA_STK_QUERY_URL?.trim();
   if (fromEnv) return fromEnv;
   return `${mpesaBaseUrl()}/mpesa/stkpushquery/v1/query`;
 }
