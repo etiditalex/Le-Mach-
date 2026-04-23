@@ -71,6 +71,55 @@ function password(shortcode: string, passkey: string, ts: string): string {
   return Buffer.from(`${shortcode}${passkey}${ts}`, "utf-8").toString("base64");
 }
 
+function explainOAuthFailure(status: number, raw: string): string {
+  const lower = raw.toLowerCase();
+  if (
+    status === 401 ||
+    lower.includes("invalid consumer") ||
+    lower.includes("invalid key") ||
+    lower.includes("invalid credentials") ||
+    lower.includes("consumer key") ||
+    lower.includes("consumer secret")
+  ) {
+    return "Daraja OAuth failed: MPESA_CONSUMER_KEY or MPESA_CONSUMER_SECRET is invalid for the selected MPESA_ENV.";
+  }
+  if (status === 403 || lower.includes("forbidden")) {
+    return "Daraja OAuth failed: app is not authorized for this environment. Confirm sandbox/production app settings in Safaricom Daraja.";
+  }
+  return `Daraja OAuth failed (${status}). ${raw || "No details returned by Daraja."}`;
+}
+
+function validateShortcode(shortcode: string): string | null {
+  if (!/^\d{5,7}$/.test(shortcode)) {
+    return "MPESA_SHORTCODE must be 5-7 digits (no spaces).";
+  }
+  return null;
+}
+
+function explainStkFailure(rawError: string): string {
+  const lower = rawError.toLowerCase();
+  if (lower.includes("shortcode") || lower.includes("businessshortcode")) {
+    return `${rawError}. Check MPESA_SHORTCODE and MPESA_TRANSACTION_TYPE (paybill vs till).`;
+  }
+  if (lower.includes("password") || lower.includes("passkey")) {
+    return `${rawError}. Check MPESA_PASSKEY for the same shortcode and environment.`;
+  }
+  if (lower.includes("callback")) {
+    return `${rawError}. Check MPESA_CALLBACK_URL is public https and reachable.`;
+  }
+  if (lower.includes("credential") || lower.includes("token") || lower.includes("authorization")) {
+    return `${rawError}. Check MPESA_CONSUMER_KEY/MPESA_CONSUMER_SECRET and MPESA_ENV.`;
+  }
+  return rawError;
+}
+
+function maskValue(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  if (v.length <= 6) return `${"*".repeat(v.length)}`;
+  return `${v.slice(0, 3)}${"*".repeat(Math.max(0, v.length - 6))}${v.slice(-3)}`;
+}
+
 export async function mpesaGetAccessToken(): Promise<string> {
   const key = readEnv("MPESA_CONSUMER_KEY");
   const secret = readEnv("MPESA_CONSUMER_SECRET");
@@ -89,11 +138,104 @@ export async function mpesaGetAccessToken(): Promise<string> {
   });
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`Daraja OAuth failed: ${res.status} ${t}`);
+    throw new Error(explainOAuthFailure(res.status, t));
   }
   const data = (await res.json()) as { access_token?: string };
   if (!data.access_token) throw new Error("Daraja OAuth: missing access_token");
   return data.access_token;
+}
+
+export type MpesaDiagnosticResult = {
+  ok: boolean;
+  summary: string;
+  env: {
+    mpesaEnv: string;
+    transactionType: "CustomerPayBillOnline" | "CustomerBuyGoodsOnline";
+    callbackUrl: string;
+    callbackUrlHttps: boolean;
+    configured: {
+      consumerKey: boolean;
+      consumerSecret: boolean;
+      shortcode: boolean;
+      passkey: boolean;
+    };
+    masked: {
+      shortcode: string | null;
+      consumerKey: string | null;
+      consumerSecret: string | null;
+      passkey: string | null;
+    };
+    checks: string[];
+  };
+  oauth: {
+    ok: boolean;
+    message: string;
+  };
+};
+
+export async function diagnoseMpesaConfig(): Promise<MpesaDiagnosticResult> {
+  const mpesaEnv = readEnv("MPESA_ENV") || "sandbox";
+  const consumerKey = readEnv("MPESA_CONSUMER_KEY");
+  const consumerSecret = readEnv("MPESA_CONSUMER_SECRET");
+  const shortcode = readEnv("MPESA_SHORTCODE");
+  const passkey = readEnv("MPESA_PASSKEY");
+  const callbackUrl = resolveMpesaCallbackUrl();
+  const txType = mpesaTransactionType();
+
+  const checks: string[] = [];
+  if (!consumerKey) checks.push("MPESA_CONSUMER_KEY is missing");
+  if (!consumerSecret) checks.push("MPESA_CONSUMER_SECRET is missing");
+  if (!shortcode) checks.push("MPESA_SHORTCODE is missing");
+  if (!passkey) checks.push("MPESA_PASSKEY is missing");
+  if (!callbackUrl) checks.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_APP_URL / VERCEL_URL fallback) is missing");
+  if (callbackUrl && !/^https:\/\//i.test(callbackUrl)) checks.push("Callback URL should be https in production");
+  const shortcodeError = shortcode ? validateShortcode(shortcode) : null;
+  if (shortcodeError) checks.push(shortcodeError);
+
+  let oauthOk = false;
+  let oauthMessage = "Skipped OAuth probe because required credentials are missing.";
+  if (consumerKey && consumerSecret) {
+    try {
+      await mpesaGetAccessToken();
+      oauthOk = true;
+      oauthMessage = "OAuth success. Consumer key/secret and MPESA_ENV are valid.";
+    } catch (e) {
+      oauthMessage = e instanceof Error ? e.message : "OAuth probe failed.";
+    }
+  }
+
+  const ok = checks.length === 0 && oauthOk;
+  const summary = ok
+    ? "M-Pesa configuration looks valid. If STK still fails, likely shortcode/passkey/transaction-type mismatch at STK stage."
+    : "M-Pesa configuration has issues. Review checks and OAuth message.";
+
+  return {
+    ok,
+    summary,
+    env: {
+      mpesaEnv,
+      transactionType: txType,
+      callbackUrl,
+      callbackUrlHttps: /^https:\/\//i.test(callbackUrl),
+      configured: {
+        consumerKey: Boolean(consumerKey),
+        consumerSecret: Boolean(consumerSecret),
+        shortcode: Boolean(shortcode),
+        passkey: Boolean(passkey),
+      },
+      masked: {
+        shortcode: maskValue(shortcode),
+        consumerKey: maskValue(consumerKey),
+        consumerSecret: maskValue(consumerSecret),
+        passkey: maskValue(passkey),
+      },
+      checks,
+    },
+    oauth: {
+      ok: oauthOk,
+      message: oauthMessage,
+    },
+  };
 }
 
 export type StkPushParams = {
@@ -153,6 +295,8 @@ export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult
       error: `${missing.join(", ")} must be set`,
     };
   }
+  const shortcodeError = validateShortcode(shortcode);
+  if (shortcodeError) return { ok: false, error: shortcodeError };
 
   const ts = timestamp();
   const token = await mpesaGetAccessToken();
@@ -207,7 +351,7 @@ export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult
 
   return {
     ok: false,
-    error: root.errorMessage || root.ResponseDescription || root.ResponseCode || "STK request failed",
+    error: explainStkFailure(root.errorMessage || root.ResponseDescription || root.ResponseCode || "STK request failed"),
     raw: text,
   };
 }
