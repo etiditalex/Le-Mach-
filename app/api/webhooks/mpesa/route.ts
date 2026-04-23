@@ -15,11 +15,24 @@ import {
 
 export const runtime = "nodejs";
 
+function callbackUrlFromEnv(): string {
+  const explicit = process.env.MPESA_CALLBACK_URL?.trim();
+  if (explicit) return explicit;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
+  if (appUrl) return `${appUrl}/api/webhooks/mpesa`;
+
+  const vercel = process.env.VERCEL_URL?.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+  if (vercel) return `https://${vercel}/api/webhooks/mpesa`;
+
+  return "/api/webhooks/mpesa";
+}
+
 export async function GET() {
   return NextResponse.json({
     ok: true,
     service: "mpesa-webhook",
-    callbackUrl: "https://lemach.co.ke/api/webhooks/mpesa",
+    callbackUrl: callbackUrlFromEnv(),
     message: "Use POST for Daraja STK callbacks.",
   });
 }
@@ -43,7 +56,9 @@ export async function POST(req: Request) {
       const latest = (await getFoodOrderById(order.id)) ?? order;
       if (parsed.resultCode === 0) {
         if (latest.status !== "paid") {
-          if (parsed.amount !== undefined && parsed.amount !== latest.totalKes) {
+          if (parsed.amount === undefined || !parsed.receipt) {
+            await setFoodOrderFailed(latest.id, "Incomplete M-Pesa callback metadata");
+          } else if (Math.round(parsed.amount) !== latest.totalKes) {
             await setFoodOrderFailed(latest.id, `M-Pesa amount mismatch (expected ${latest.totalKes})`);
           } else {
             await markFoodOrderPaidWithNotify(latest, {
@@ -67,7 +82,9 @@ export async function POST(req: Request) {
         const latest = (await getBookingById(booking.id)) ?? booking;
         if (parsed.resultCode === 0) {
           if (latest.status !== "paid") {
-            if (parsed.amount !== undefined && parsed.amount !== latest.totalKes) {
+            if (parsed.amount === undefined || !parsed.receipt) {
+              await setBookingFailed(latest.id, "Incomplete M-Pesa callback metadata");
+            } else if (Math.round(parsed.amount) !== latest.totalKes) {
               await setBookingFailed(latest.id, `M-Pesa amount mismatch (expected ${latest.totalKes})`);
             } else {
               await markBookingPaidWithNotify(latest, {

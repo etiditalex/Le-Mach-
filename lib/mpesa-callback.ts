@@ -22,14 +22,21 @@ export function parseMpesaStkCallback(body: unknown): ParsedStkCallback | null {
 
   if (!checkoutRequestId || !merchantRequestId || Number.isNaN(resultCode)) return null;
 
-  const meta = cb.CallbackMetadata as { Item?: { Name: string; Value: string | number }[] } | undefined;
+  const meta = cb.CallbackMetadata as { Item?: { Name?: unknown; Value?: unknown }[] } | undefined;
   const items = meta?.Item ?? [];
   const map: Record<string, string | number | undefined> = {};
   for (const it of items) {
-    map[it.Name] = it.Value;
+    if (!it || typeof it !== "object") continue;
+    const name = typeof it.Name === "string" ? it.Name : null;
+    if (!name) continue;
+    const value = it.Value;
+    if (typeof value === "string" || typeof value === "number") {
+      map[name] = value;
+    }
   }
 
-  const amount = map.Amount !== undefined ? Number(map.Amount) : undefined;
+  const amountRaw = map.Amount !== undefined ? Number(map.Amount) : undefined;
+  const amount = amountRaw !== undefined && Number.isFinite(amountRaw) ? amountRaw : undefined;
   const receipt = map.MpesaReceiptNumber !== undefined ? String(map.MpesaReceiptNumber) : undefined;
   const phone = map.PhoneNumber !== undefined ? String(map.PhoneNumber) : undefined;
 
