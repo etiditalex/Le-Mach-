@@ -265,6 +265,7 @@ export type StkQueryResult =
 
 const MPESA_RESULT_CODE_HINTS: Record<number, string> = {
   1: "Rejected by M-Pesa. Common causes: invalid shortcode/passkey, unsupported transaction type, or unresolved payer account state.",
+  4999: "Transaction is still processing in M-Pesa. Wait briefly and query again.",
   1001: "Subscriber is locked or cannot transact. Ask customer to contact Safaricom/M-Pesa support.",
   1019: "Transaction expired before completion (timeout).",
   1025: "Push request failed to complete. Retry after a short delay.",
@@ -430,6 +431,16 @@ export async function mpesaStkQuery(checkoutRequestId: string): Promise<StkQuery
       status: "success",
       resultCode,
       resultDesc: root.ResultDesc || root.ResponseDescription,
+      raw: text,
+    };
+  }
+
+  if (resultCode === 4999) {
+    return {
+      ok: true,
+      status: "pending",
+      resultCode,
+      resultDesc: explainMpesaResult(resultCode, root.ResultDesc || root.ResponseDescription),
       raw: text,
     };
   }

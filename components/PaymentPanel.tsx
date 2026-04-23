@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CreditCard, Smartphone } from "lucide-react";
+import { Smartphone } from "lucide-react";
 
 type Target = "food" | "booking";
 
@@ -13,7 +13,7 @@ type Props = {
 
 export default function PaymentPanel({ target, entityId, onPaid }: Props) {
   const [phone, setPhone] = useState("");
-  const [busy, setBusy] = useState<"mpesa" | "paystack" | null>(null);
+  const [busy, setBusy] = useState<"mpesa" | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -86,31 +86,9 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
     }
   };
 
-  const payPaystack = async () => {
-    setErr(null);
-    setMsg(null);
-    setBusy("paystack");
-    try {
-      const res = await fetch("/api/payments/paystack/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target, id: entityId }),
-      });
-      const data = (await res.json()) as { authorizationUrl?: string; error?: string };
-      if (!res.ok || !data.authorizationUrl) {
-        throw new Error(data.error || "Could not start card payment");
-      }
-      window.location.href = data.authorizationUrl;
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "Paystack failed");
-    } finally {
-      setBusy(null);
-    }
-  };
-
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50/80 p-5 space-y-4">
-      <p className="text-sm font-semibold text-gray-800">Pay with M-Pesa or card (Paystack)</p>
+      <p className="text-sm font-semibold text-gray-800">Pay securely with M-Pesa (Daraja STK Push)</p>
 
       <div>
         <label htmlFor="mpesa-phone" className="block text-xs font-medium text-gray-600 mb-1">
@@ -127,7 +105,7 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <button
           type="button"
           onClick={() => void payMpesa()}
@@ -137,23 +115,14 @@ export default function PaymentPanel({ target, entityId, onPaid }: Props) {
           <Smartphone className="w-5 h-5" />
           {busy === "mpesa" ? "Sending…" : "Pay with M-Pesa"}
         </button>
-        <button
-          type="button"
-          onClick={() => void payPaystack()}
-          disabled={!!busy}
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary text-white py-3 font-semibold hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <CreditCard className="w-5 h-5" />
-          {busy === "paystack" ? "Redirecting…" : "Pay with card"}
-        </button>
       </div>
 
       {msg && <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">{msg}</p>}
       {err && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{err}</p>}
 
       <p className="text-xs text-gray-500 leading-relaxed">
-        M-Pesa uses Safaricom Daraja (STK Push). Card payments go through Paystack in Kenyan Shillings (KES). You can
-        configure both in your environment variables.
+        M-Pesa uses Safaricom Daraja STK Push in Kenyan Shillings (KES). Enter an active Safaricom number and approve
+        the phone prompt to complete payment.
       </p>
     </div>
   );

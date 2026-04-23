@@ -12,7 +12,6 @@ export type FoodOrderRow = {
   receipt_key: string;
   payment_provider: string | null;
   mpesa: FoodOrder["mpesa"] | null;
-  paystack: FoodOrder["paystack"] | null;
   last_error: string | null;
   created_at: string;
   paid_at: string | null;
@@ -34,7 +33,6 @@ export function rowToFoodOrder(r: FoodOrderRow): FoodOrder {
     paidAt: r.paid_at ?? undefined,
     paymentProvider: (r.payment_provider as PaymentProvider) ?? undefined,
     mpesa: r.mpesa ?? undefined,
-    paystack: r.paystack ?? undefined,
     lastError: r.last_error ?? undefined,
   };
 }
@@ -58,7 +56,6 @@ export type BookingRow = {
   receipt_key: string;
   payment_provider: string | null;
   mpesa: BookingRecord["mpesa"] | null;
-  paystack: BookingRecord["paystack"] | null;
   last_error: string | null;
   created_at: string;
   paid_at: string | null;
@@ -87,7 +84,6 @@ export function rowToBooking(r: BookingRow): BookingRecord {
     paidAt: r.paid_at ?? undefined,
     paymentProvider: (r.payment_provider as PaymentProvider) ?? undefined,
     mpesa: r.mpesa ?? undefined,
-    paystack: r.paystack ?? undefined,
     lastError: r.last_error ?? undefined,
   };
 }

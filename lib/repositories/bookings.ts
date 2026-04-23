@@ -44,7 +44,6 @@ export async function insertBooking(booking: BookingRecord): Promise<void> {
     receipt_key: booking.receiptKey,
     payment_provider: booking.paymentProvider ?? null,
     mpesa: booking.mpesa ?? null,
-    paystack: booking.paystack ?? null,
     last_error: booking.lastError ?? null,
     paid_at: booking.paidAt ?? null,
   });
@@ -56,7 +55,6 @@ export async function updateBooking(
   patch: Partial<{
     status: BookingRecord["status"];
     mpesa: BookingRecord["mpesa"];
-    paystack: BookingRecord["paystack"];
     paymentProvider: BookingRecord["paymentProvider"];
     lastError: string | null;
     paidAt: string | null;
@@ -66,7 +64,6 @@ export async function updateBooking(
   const row: Record<string, unknown> = {};
   if (patch.status !== undefined) row.status = patch.status;
   if (patch.mpesa !== undefined) row.mpesa = patch.mpesa;
-  if (patch.paystack !== undefined) row.paystack = patch.paystack;
   if (patch.paymentProvider !== undefined) row.payment_provider = patch.paymentProvider;
   if (patch.lastError !== undefined) row.last_error = patch.lastError;
   if (patch.paidAt !== undefined) row.paid_at = patch.paidAt;
@@ -81,10 +78,7 @@ export async function setBookingFailed(id: string, lastError: string): Promise<v
 
 export async function markBookingPaidWithNotify(
   booking: BookingRecord,
-  patch: Pick<BookingRecord, "paymentProvider"> & {
-    mpesa?: BookingRecord["mpesa"];
-    paystack?: BookingRecord["paystack"];
-  }
+  patch: Pick<BookingRecord, "paymentProvider"> & { mpesa?: BookingRecord["mpesa"] }
 ): Promise<void> {
   if (booking.status === "paid") return;
   const paidAt = new Date().toISOString();
@@ -96,7 +90,6 @@ export async function markBookingPaidWithNotify(
       paid_at: paidAt,
       payment_provider: patch.paymentProvider,
       mpesa: patch.mpesa ?? booking.mpesa ?? null,
-      paystack: patch.paystack ?? booking.paystack ?? null,
       last_error: null,
     })
     .eq("id", booking.id)

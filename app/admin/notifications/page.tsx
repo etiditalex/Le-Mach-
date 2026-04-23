@@ -16,7 +16,7 @@ export default async function AdminNotificationsPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-        <p className="text-gray-600 mt-1">Payment and booking alerts from M-Pesa / Paystack.</p>
+        <p className="text-gray-600 mt-1">Payment and booking alerts from M-Pesa Daraja.</p>
       </div>
 
       {error && (

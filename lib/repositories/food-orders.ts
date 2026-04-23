@@ -37,7 +37,6 @@ export async function insertFoodOrder(order: FoodOrder): Promise<void> {
     receipt_key: order.receiptKey,
     payment_provider: order.paymentProvider ?? null,
     mpesa: order.mpesa ?? null,
-    paystack: order.paystack ?? null,
     last_error: order.lastError ?? null,
     paid_at: order.paidAt ?? null,
   });
@@ -49,7 +48,6 @@ export async function updateFoodOrder(
   patch: Partial<{
     status: FoodOrder["status"];
     mpesa: FoodOrder["mpesa"];
-    paystack: FoodOrder["paystack"];
     paymentProvider: FoodOrder["paymentProvider"];
     lastError: string | null;
     paidAt: string | null;
@@ -59,7 +57,6 @@ export async function updateFoodOrder(
   const row: Record<string, unknown> = {};
   if (patch.status !== undefined) row.status = patch.status;
   if (patch.mpesa !== undefined) row.mpesa = patch.mpesa;
-  if (patch.paystack !== undefined) row.paystack = patch.paystack;
   if (patch.paymentProvider !== undefined) row.payment_provider = patch.paymentProvider;
   if (patch.lastError !== undefined) row.last_error = patch.lastError;
   if (patch.paidAt !== undefined) row.paid_at = patch.paidAt;
@@ -74,10 +71,7 @@ export async function setFoodOrderFailed(id: string, lastError: string): Promise
 
 export async function markFoodOrderPaidWithNotify(
   order: FoodOrder,
-  patch: Pick<FoodOrder, "paymentProvider"> & {
-    mpesa?: FoodOrder["mpesa"];
-    paystack?: FoodOrder["paystack"];
-  }
+  patch: Pick<FoodOrder, "paymentProvider"> & { mpesa?: FoodOrder["mpesa"] }
 ): Promise<void> {
   if (order.status === "paid") return;
   const paidAt = new Date().toISOString();
@@ -89,7 +83,6 @@ export async function markFoodOrderPaidWithNotify(
       paid_at: paidAt,
       payment_provider: patch.paymentProvider,
       mpesa: patch.mpesa ?? order.mpesa ?? null,
-      paystack: patch.paystack ?? order.paystack ?? null,
       last_error: null,
     })
     .eq("id", order.id)

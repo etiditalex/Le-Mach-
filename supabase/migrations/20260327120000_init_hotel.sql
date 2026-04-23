@@ -31,7 +31,6 @@ create table if not exists public.food_orders (
   receipt_key text not null,
   payment_provider text,
   mpesa jsonb,
-  paystack jsonb,
   last_error text,
   created_at timestamptz not null default now(),
   paid_at timestamptz
@@ -57,7 +56,6 @@ create table if not exists public.bookings (
   receipt_key text not null,
   payment_provider text,
   mpesa jsonb,
-  paystack jsonb,
   last_error text,
   created_at timestamptz not null default now(),
   paid_at timestamptz

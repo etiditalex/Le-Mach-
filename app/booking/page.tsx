@@ -175,8 +175,7 @@ function BookingForm() {
                 {step === "pay" && bookingId ? (
                   <div className="space-y-4">
                     <p className="text-gray-600">
-                      Total due: <strong>KSh {totalPrice.toLocaleString()}</strong>. Pay with M-Pesa (Daraja STK) or
-                      card via Paystack.
+                      Total due: <strong>KSh {totalPrice.toLocaleString()}</strong>. Pay with M-Pesa (Daraja STK Push).
                     </p>
                     <PaymentPanel
                       target="booking"

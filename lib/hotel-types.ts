@@ -1,4 +1,4 @@
-export type PaymentProvider = "mpesa" | "paystack";
+export type PaymentProvider = "mpesa";
 
 export type PaymentStatus =
   | "awaiting_payment"
@@ -62,10 +62,6 @@ export type FoodOrder = {
     receiptNumber?: string;
     phone?: string;
   };
-  paystack?: {
-    reference?: string;
-    accessCode?: string;
-  };
   lastError?: string;
 };
 
@@ -91,7 +87,6 @@ export type BookingRecord = {
   paidAt?: string;
   paymentProvider?: PaymentProvider;
   mpesa?: FoodOrder["mpesa"];
-  paystack?: FoodOrder["paystack"];
   lastError?: string;
 };
 
