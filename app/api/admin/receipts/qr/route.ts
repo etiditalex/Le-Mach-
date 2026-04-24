@@ -53,7 +53,7 @@ export async function GET(req: Request) {
     errorCorrectionLevel: "M",
   });
 
-  return new NextResponse(png, {
+  return new NextResponse(new Uint8Array(png), {
     status: 200,
     headers: {
       "Content-Type": "image/png",
