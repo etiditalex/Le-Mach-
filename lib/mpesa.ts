@@ -8,10 +8,10 @@ function readEnv(name: string): string {
 function resolveMpesaCallbackUrl(): string {
   const explicit = readEnv("MPESA_CALLBACK_URL");
   if (explicit) return explicit;
-  const appUrl = readEnv("NEXT_PUBLIC_APP_URL").replace(/\/$/, "");
-  if (appUrl) return `${appUrl}/api/webhooks/mpesa`;
+  const appUrl = (readEnv("NEXT_PUBLIC_SITE_URL") || readEnv("NEXT_PUBLIC_APP_URL")).replace(/\/$/, "");
+  if (appUrl) return `${appUrl}/api/daraja/callback`;
   const vercel = readEnv("VERCEL_URL").replace(/^https?:\/\//, "").replace(/\/$/, "");
-  if (vercel) return `https://${vercel}/api/webhooks/mpesa`;
+  if (vercel) return `https://${vercel}/api/daraja/callback`;
   return "";
 }
 
@@ -187,7 +187,7 @@ export async function diagnoseMpesaConfig(): Promise<MpesaDiagnosticResult> {
   if (!consumerSecret) checks.push("MPESA_CONSUMER_SECRET is missing");
   if (!shortcode) checks.push("MPESA_SHORTCODE is missing");
   if (!passkey) checks.push("MPESA_PASSKEY is missing");
-  if (!callbackUrl) checks.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_APP_URL / VERCEL_URL fallback) is missing");
+  if (!callbackUrl) checks.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_SITE_URL / NEXT_PUBLIC_APP_URL / VERCEL_URL fallback) is missing");
   if (callbackUrl && !/^https:\/\//i.test(callbackUrl)) checks.push("Callback URL should be https in production");
   const shortcodeError = shortcode ? validateShortcode(shortcode) : null;
   if (shortcodeError) checks.push(shortcodeError);
@@ -284,13 +284,15 @@ function explainMpesaResult(resultCode: number | undefined, resultDesc: string |
 
 export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult> {
   const shortcode = readEnv("MPESA_SHORTCODE");
+  const partyB = readEnv("MPESA_PARTY_B") || shortcode;
   const passkey = readEnv("MPESA_PASSKEY");
   const callbackUrl = resolveMpesaCallbackUrl();
-  if (!shortcode || !passkey || !callbackUrl) {
+  if (!shortcode || !partyB || !passkey || !callbackUrl) {
     const missing: string[] = [];
     if (!shortcode) missing.push("MPESA_SHORTCODE");
+    if (!partyB) missing.push("MPESA_PARTY_B or MPESA_SHORTCODE");
     if (!passkey) missing.push("MPESA_PASSKEY");
-    if (!callbackUrl) missing.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_APP_URL / VERCEL_URL)");
+    if (!callbackUrl) missing.push("MPESA_CALLBACK_URL (or NEXT_PUBLIC_SITE_URL / NEXT_PUBLIC_APP_URL / VERCEL_URL)");
     return {
       ok: false,
       error: `${missing.join(", ")} must be set`,
@@ -308,7 +310,7 @@ export async function mpesaStkPush(params: StkPushParams): Promise<StkPushResult
     TransactionType: mpesaTransactionType(),
     Amount: Math.round(params.amountKes),
     PartyA: params.phone254,
-    PartyB: shortcode,
+    PartyB: partyB,
     PhoneNumber: params.phone254,
     CallBackURL: callbackUrl,
     AccountReference: params.accountReference.slice(0, 12),

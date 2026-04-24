@@ -1,17 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseMpesaStkCallback } from "@/lib/mpesa-callback";
-import {
-  getBookingByMpesaCheckout,
-  getBookingById,
-  markBookingPaidWithNotify,
-  setBookingFailed,
-} from "@/lib/repositories/bookings";
-import {
-  getFoodOrderById,
-  getFoodOrderByMpesaCheckout,
-  markFoodOrderPaidWithNotify,
-  setFoodOrderFailed,
-} from "@/lib/repositories/food-orders";
+import { finalizeDarajaStkFromItems } from "@/lib/daraja-finalize-stk-from-items";
 
 export const runtime = "nodejs";
 
@@ -19,13 +8,16 @@ function callbackUrlFromEnv(): string {
   const explicit = process.env.MPESA_CALLBACK_URL?.trim();
   if (explicit) return explicit;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
-  if (appUrl) return `${appUrl}/api/webhooks/mpesa`;
+  const appUrl = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.NEXT_PUBLIC_APP_URL?.trim() || "").replace(
+    /\/$/,
+    ""
+  );
+  if (appUrl) return `${appUrl}/api/daraja/callback`;
 
   const vercel = process.env.VERCEL_URL?.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
-  if (vercel) return `https://${vercel}/api/webhooks/mpesa`;
+  if (vercel) return `https://${vercel}/api/daraja/callback`;
 
-  return "/api/webhooks/mpesa";
+  return "/api/daraja/callback";
 }
 
 export async function GET() {
@@ -51,59 +43,16 @@ export async function POST(req: Request) {
   }
 
   try {
-    const order = await getFoodOrderByMpesaCheckout(parsed.checkoutRequestId);
-    if (order) {
-      const latest = (await getFoodOrderById(order.id)) ?? order;
-      if (parsed.resultCode === 0) {
-        if (latest.status !== "paid") {
-          if (parsed.amount === undefined || !parsed.receipt) {
-            await setFoodOrderFailed(latest.id, "Incomplete M-Pesa callback metadata");
-          } else if (Math.round(parsed.amount) !== latest.totalKes) {
-            await setFoodOrderFailed(latest.id, `M-Pesa amount mismatch (expected ${latest.totalKes})`);
-          } else {
-            await markFoodOrderPaidWithNotify(latest, {
-              paymentProvider: "mpesa",
-              mpesa: {
-                ...latest.mpesa,
-                checkoutRequestId: parsed.checkoutRequestId,
-                merchantRequestId: parsed.merchantRequestId,
-                receiptNumber: parsed.receipt,
-                phone: parsed.phone || latest.mpesa?.phone,
-              },
-            });
-          }
-        }
-      } else {
-        await setFoodOrderFailed(latest.id, parsed.resultDesc || "M-Pesa cancelled or failed");
-      }
-    } else {
-      const booking = await getBookingByMpesaCheckout(parsed.checkoutRequestId);
-      if (booking) {
-        const latest = (await getBookingById(booking.id)) ?? booking;
-        if (parsed.resultCode === 0) {
-          if (latest.status !== "paid") {
-            if (parsed.amount === undefined || !parsed.receipt) {
-              await setBookingFailed(latest.id, "Incomplete M-Pesa callback metadata");
-            } else if (Math.round(parsed.amount) !== latest.totalKes) {
-              await setBookingFailed(latest.id, `M-Pesa amount mismatch (expected ${latest.totalKes})`);
-            } else {
-              await markBookingPaidWithNotify(latest, {
-                paymentProvider: "mpesa",
-                mpesa: {
-                  ...latest.mpesa,
-                  checkoutRequestId: parsed.checkoutRequestId,
-                  merchantRequestId: parsed.merchantRequestId,
-                  receiptNumber: parsed.receipt,
-                  phone: parsed.phone || latest.mpesa?.phone,
-                },
-              });
-            }
-          }
-        } else {
-          await setBookingFailed(latest.id, parsed.resultDesc || "M-Pesa cancelled or failed");
-        }
-      }
-    }
+    await finalizeDarajaStkFromItems({
+      checkoutRequestId: parsed.checkoutRequestId,
+      merchantRequestId: parsed.merchantRequestId,
+      resultCode: parsed.resultCode,
+      resultDesc: parsed.resultDesc,
+      amount: parsed.amount,
+      receipt: parsed.receipt,
+      phone: parsed.phone,
+      source: "callback",
+    });
   } catch (e) {
     console.error("mpesa webhook", e);
   }

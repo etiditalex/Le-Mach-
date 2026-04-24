@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Pencil, Trash2, Loader2 } from "lucide-react";
+import { Download, Loader2, Pencil, QrCode, Trash2 } from "lucide-react";
 
 type Item = {
   id: string;
@@ -134,6 +134,16 @@ export default function MenuItemsPanel() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Menu items</h1>
         <p className="text-gray-600 mt-1">Create, edit, and remove dishes shown on the public menu.</p>
+        <div className="mt-4">
+          <a
+            href="/api/admin/menu/qr"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+          >
+            <QrCode className="w-4 h-4" />
+            <Download className="w-4 h-4" />
+            Download menu QR
+          </a>
+        </div>
       </div>
 
       {err && (

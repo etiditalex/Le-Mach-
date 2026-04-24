@@ -1,17 +1,8 @@
 import { NextResponse } from "next/server";
 import { mpesaStkQuery } from "@/lib/mpesa";
-import {
-  getBookingById,
-  markBookingPaidWithNotify,
-  setBookingFailed,
-  updateBooking,
-} from "@/lib/repositories/bookings";
-import {
-  getFoodOrderById,
-  markFoodOrderPaidWithNotify,
-  setFoodOrderFailed,
-  updateFoodOrder,
-} from "@/lib/repositories/food-orders";
+import { getBookingById, setBookingFailed, updateBooking } from "@/lib/repositories/bookings";
+import { getFoodOrderById, setFoodOrderFailed, updateFoodOrder } from "@/lib/repositories/food-orders";
+import { finalizeDarajaStkFromItems } from "@/lib/daraja-finalize-stk-from-items";
 
 export const runtime = "nodejs";
 
@@ -50,13 +41,12 @@ export async function POST(req: Request) {
     }
 
     if (query.status === "success") {
-      const latest = (await getFoodOrderById(order.id)) ?? order;
-      if (latest.status !== "paid") {
-        await markFoodOrderPaidWithNotify(latest, {
-          paymentProvider: "mpesa",
-          mpesa: latest.mpesa,
-        });
-      }
+      await finalizeDarajaStkFromItems({
+        checkoutRequestId,
+        resultCode: 0,
+        resultDesc: query.resultDesc,
+        source: "query",
+      });
       return NextResponse.json({ ok: true, status: "paid" });
     }
 
@@ -84,13 +74,12 @@ export async function POST(req: Request) {
   }
 
   if (query.status === "success") {
-    const latest = (await getBookingById(booking.id)) ?? booking;
-    if (latest.status !== "paid") {
-      await markBookingPaidWithNotify(latest, {
-        paymentProvider: "mpesa",
-        mpesa: latest.mpesa,
-      });
-    }
+    await finalizeDarajaStkFromItems({
+      checkoutRequestId,
+      resultCode: 0,
+      resultDesc: query.resultDesc,
+      source: "query",
+    });
     return NextResponse.json({ ok: true, status: "paid" });
   }
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Printer } from "lucide-react";
+import { Bug, Download, Printer } from "lucide-react";
 import { getServiceSupabase } from "@/lib/supabase/service";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +46,7 @@ export default async function AdminOrdersPage() {
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Created</th>
-                <th className="px-4 py-3 font-medium w-40">Receipt</th>
+                <th className="px-4 py-3 font-medium w-64">Receipt & tools</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -62,6 +62,8 @@ export default async function AdminOrdersPage() {
                   const status = String(row.status);
                   const key = row.receipt_key != null ? String(row.receipt_key) : "";
                   const canPrint = status === "paid" && key.length > 0;
+                  const traceHref = `/api/admin/daraja/trace?target=food&id=${encodeURIComponent(id)}`;
+                  const qrHref = `/api/admin/receipts/qr?target=food&id=${encodeURIComponent(id)}`;
                   return (
                     <tr key={id} className="hover:bg-gray-50/80">
                       <td className="px-4 py-3">
@@ -77,19 +79,39 @@ export default async function AdminOrdersPage() {
                         {new Date(String(row.created_at)).toLocaleString()}
                       </td>
                       <td className="px-4 py-3">
-                        {canPrint ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          {canPrint ? (
+                            <>
+                              <Link
+                                href={`/receipt/food/${id}?key=${encodeURIComponent(key)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                              >
+                                <Printer className="w-4 h-4 shrink-0" aria-hidden />
+                                Print
+                              </Link>
+                              <Link
+                                href={qrHref}
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                              >
+                                <Download className="w-4 h-4 shrink-0" aria-hidden />
+                                QR
+                              </Link>
+                            </>
+                          ) : (
+                            <span className="text-xs text-gray-400">After payment</span>
+                          )}
                           <Link
-                            href={`/receipt/food/${id}?key=${encodeURIComponent(key)}`}
+                            href={traceHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 hover:underline"
                           >
-                            <Printer className="w-4 h-4 shrink-0" aria-hidden />
-                            Print
+                            <Bug className="w-4 h-4 shrink-0" aria-hidden />
+                            Trace
                           </Link>
-                        ) : (
-                          <span className="text-xs text-gray-400">After payment</span>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -112,7 +134,7 @@ export default async function AdminOrdersPage() {
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Created</th>
-                <th className="px-4 py-3 font-medium w-40">Receipt</th>
+                <th className="px-4 py-3 font-medium w-64">Receipt & tools</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -128,6 +150,8 @@ export default async function AdminOrdersPage() {
                   const status = String(row.status);
                   const key = row.receipt_key != null ? String(row.receipt_key) : "";
                   const canPrint = status === "paid" && key.length > 0;
+                  const traceHref = `/api/admin/daraja/trace?target=booking&id=${encodeURIComponent(id)}`;
+                  const qrHref = `/api/admin/receipts/qr?target=booking&id=${encodeURIComponent(id)}`;
                   return (
                     <tr key={id} className="hover:bg-gray-50/80">
                       <td className="px-4 py-3">
@@ -148,19 +172,39 @@ export default async function AdminOrdersPage() {
                         {new Date(String(row.created_at)).toLocaleString()}
                       </td>
                       <td className="px-4 py-3">
-                        {canPrint ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          {canPrint ? (
+                            <>
+                              <Link
+                                href={`/receipt/booking/${id}?key=${encodeURIComponent(key)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                              >
+                                <Printer className="w-4 h-4 shrink-0" aria-hidden />
+                                Print
+                              </Link>
+                              <Link
+                                href={qrHref}
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                              >
+                                <Download className="w-4 h-4 shrink-0" aria-hidden />
+                                QR
+                              </Link>
+                            </>
+                          ) : (
+                            <span className="text-xs text-gray-400">After payment</span>
+                          )}
                           <Link
-                            href={`/receipt/booking/${id}?key=${encodeURIComponent(key)}`}
+                            href={traceHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 hover:underline"
                           >
-                            <Printer className="w-4 h-4 shrink-0" aria-hidden />
-                            Print
+                            <Bug className="w-4 h-4 shrink-0" aria-hidden />
+                            Trace
                           </Link>
-                        ) : (
-                          <span className="text-xs text-gray-400">After payment</span>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   );
