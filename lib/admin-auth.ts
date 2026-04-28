@@ -15,7 +15,7 @@ export async function requireAdminUser(): Promise<User> {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect("/login?redirect=/admin");
+    redirect("/admin-login?redirect=/admin");
   }
 
   const raw = process.env.ADMIN_EMAILS?.trim();

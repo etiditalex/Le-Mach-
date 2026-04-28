@@ -3,29 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Menu, X, ShoppingCart, ChevronDown, LogIn, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
-import { useSupabaseUser } from "@/hooks/useSupabaseUser";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import CartDrawer from "./CartDrawer";
 import { SITE_LOGO_URL } from "@/lib/site";
 
 export default function Header() {
-  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalItems } = useCart();
-  const { user, loading: authLoading } = useSupabaseUser();
-  const loginHref = "/login?redirect=/admin";
-
-  const handleSignOut = async () => {
-    const supabase = createBrowserSupabaseClient();
-    await supabase.auth.signOut();
-    router.refresh();
-    setIsMenuOpen(false);
-  };
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -113,37 +100,6 @@ export default function Header() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
-              {!authLoading && user ? (
-                <div className="hidden md:flex items-center gap-3">
-                  <span className="text-sm text-gray-600 max-w-[140px] truncate" title={user.email ?? undefined}>
-                    {user.email?.split("@")[0]}
-                  </span>
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-1.5 text-sm font-medium text-white bg-primary hover:opacity-95 px-3 py-2 rounded-full transition-opacity"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Admin
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => void handleSignOut()}
-                    className="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-primary px-3 py-2 rounded-full border border-gray-200 hover:border-primary/40 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign out
-                  </button>
-                </div>
-              ) : !authLoading ? (
-                <Link
-                  href={loginHref}
-                  className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-primary px-3 py-2 rounded-full border border-gray-200 hover:border-primary/40 transition-colors"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Log in
-                </Link>
-              ) : null}
-
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-2 text-gray-700 hover:text-primary transition-colors"
@@ -162,16 +118,6 @@ export default function Header() {
               >
                 Book Now
               </Link>
-
-              {!authLoading && !user && (
-                <Link
-                  href={loginHref}
-                  className="lg:hidden p-2 text-gray-700 hover:text-primary"
-                  aria-label="Log in"
-                >
-                  <LogIn className="w-6 h-6" />
-                </Link>
-              )}
 
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -220,38 +166,6 @@ export default function Header() {
                     )}
                   </div>
                 ))}
-                {!authLoading && user ? (
-                  <div className="pt-4 border-t space-y-3">
-                    <p className="text-sm text-gray-600 truncate" title={user.email ?? undefined}>
-                      Signed in as {user.email}
-                    </p>
-                    <Link
-                      href="/admin"
-                      className="flex w-full items-center justify-center gap-2 py-2.5 rounded-full bg-primary text-white font-medium hover:opacity-95"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="w-4 h-4" />
-                      Admin dashboard
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => void handleSignOut()}
-                      className="flex w-full items-center justify-center gap-2 py-2.5 rounded-full border border-gray-200 font-medium text-gray-800 hover:border-primary hover:text-primary"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign out
-                    </button>
-                  </div>
-                ) : !authLoading ? (
-                  <Link
-                    href={loginHref}
-                    className="flex items-center justify-center gap-2 py-2.5 rounded-full border border-gray-200 font-medium text-gray-800 hover:border-primary hover:text-primary"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <LogIn className="w-4 h-4" />
-                    Log in
-                  </Link>
-                ) : null}
                 <Link
                   href="/booking"
                   className="block mt-4 bg-logo text-primary px-6 py-2 rounded-full font-medium text-center hover:bg-primary hover:text-white transition-all shadow-md"
