@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 type Body = {
   items: { id: string; quantity: number }[];
-  roomNumber: string;
+  roomNumber?: string;
   guestName: string;
   guestEmail: string;
   guestPhone: string;
@@ -27,8 +27,8 @@ export async function POST(req: Request) {
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "items required" }, { status: 400 });
   }
-  if (!roomNumber?.trim() || !guestName?.trim() || !guestEmail?.trim() || !guestPhone?.trim()) {
-    return NextResponse.json({ error: "Guest and room details are required" }, { status: 400 });
+  if (!guestName?.trim() || !guestEmail?.trim() || !guestPhone?.trim()) {
+    return NextResponse.json({ error: "Guest details are required" }, { status: 400 });
   }
 
   try {
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       status: "awaiting_payment" as const,
       lines,
       totalKes,
-      roomNumber: roomNumber.trim(),
+      roomNumber: roomNumber?.trim() ? roomNumber.trim() : null,
       guestName: guestName.trim(),
       guestEmail: guestEmail.trim(),
       guestPhone: guestPhone.trim(),

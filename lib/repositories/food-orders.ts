@@ -95,7 +95,7 @@ export async function markFoodOrderPaidWithNotify(
   await insertAdminNotification({
     kind: "food_paid",
     title: "Food order paid",
-    body: `${order.guestName} · Room ${order.roomNumber} · KSh ${order.totalKes.toLocaleString()}`,
+    body: `${order.guestName} · ${order.roomNumber ? `Room ${order.roomNumber}` : "No room"} · KSh ${order.totalKes.toLocaleString()}`,
     entityId: order.id,
   });
 }

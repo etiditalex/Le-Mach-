@@ -31,7 +31,7 @@ export default async function FoodReceiptPage({ params, searchParams }: Props) {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Room</span>
-          <span className="font-medium">{order.roomNumber}</span>
+          <span className="font-medium">{order.roomNumber || "—"}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Payment</span>

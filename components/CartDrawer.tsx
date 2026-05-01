@@ -36,8 +36,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   const createOrder = async () => {
     setFormErr(null);
-    if (!roomNumber.trim() || !guestName.trim() || !guestEmail.trim() || !guestPhone.trim()) {
-      setFormErr("Please fill in room number and guest details.");
+    if (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim()) {
+      setFormErr("Please fill in guest details.");
       return;
     }
     setCreating(true);
@@ -47,7 +47,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: cart.map((c) => ({ id: c.id, quantity: c.quantity })),
-          roomNumber: roomNumber.trim(),
+          roomNumber: roomNumber.trim() || undefined,
           guestName: guestName.trim(),
           guestEmail: guestEmail.trim(),
           guestPhone: guestPhone.trim(),
@@ -190,7 +190,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     Add your room and contact details so kitchen staff can confirm delivery.
                   </p>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Room number</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Room number (optional)</label>
                     <input
                       value={roomNumber}
                       onChange={(e) => setRoomNumber(e.target.value)}

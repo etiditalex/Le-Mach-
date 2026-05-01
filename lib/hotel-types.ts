@@ -48,7 +48,7 @@ export type FoodOrder = {
   status: PaymentStatus;
   lines: OrderLine[];
   totalKes: number;
-  roomNumber: string;
+  roomNumber: string | null;
   guestName: string;
   guestEmail: string;
   guestPhone: string;

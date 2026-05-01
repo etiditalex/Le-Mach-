@@ -5,7 +5,7 @@ export type FoodOrderRow = {
   status: string;
   lines: OrderLine[] | null;
   total_kes: number;
-  room_number: string;
+  room_number: string | null;
   guest_name: string;
   guest_email: string;
   guest_phone: string;
@@ -24,7 +24,7 @@ export function rowToFoodOrder(r: FoodOrderRow): FoodOrder {
     status: r.status as PaymentStatus,
     lines: (r.lines ?? []) as OrderLine[],
     totalKes: r.total_kes,
-    roomNumber: r.room_number,
+    roomNumber: r.room_number ?? null,
     guestName: r.guest_name,
     guestEmail: r.guest_email,
     guestPhone: r.guest_phone,
