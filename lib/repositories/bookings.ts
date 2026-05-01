@@ -48,6 +48,13 @@ export async function insertBooking(booking: BookingRecord): Promise<void> {
     paid_at: booking.paidAt ?? null,
   });
   if (error) throw error;
+
+  await insertAdminNotification({
+    kind: "booking_created",
+    title: "New booking",
+    body: `${booking.firstName} ${booking.lastName} · ${booking.roomName} · KSh ${booking.totalKes.toLocaleString()}`,
+    entityId: booking.id,
+  });
 }
 
 export async function updateBooking(

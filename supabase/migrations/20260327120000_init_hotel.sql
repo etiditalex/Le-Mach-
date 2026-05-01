@@ -63,7 +63,7 @@ create table if not exists public.bookings (
 
 create table if not exists public.admin_notifications (
   id uuid primary key default gen_random_uuid(),
-  kind text not null check (kind in ('food_paid', 'booking_paid')),
+  kind text not null check (kind in ('food_created', 'booking_created', 'food_paid', 'booking_paid')),
   title text not null,
   body text not null,
   entity_id text not null,

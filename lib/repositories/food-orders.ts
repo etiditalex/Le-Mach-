@@ -41,6 +41,13 @@ export async function insertFoodOrder(order: FoodOrder): Promise<void> {
     paid_at: order.paidAt ?? null,
   });
   if (error) throw error;
+
+  await insertAdminNotification({
+    kind: "food_created",
+    title: "New food order",
+    body: `${order.guestName} · ${order.roomNumber ? `Room ${order.roomNumber}` : "No room"} · KSh ${order.totalKes.toLocaleString()}`,
+    entityId: order.id,
+  });
 }
 
 export async function updateFoodOrder(

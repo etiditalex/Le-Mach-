@@ -92,7 +92,7 @@ export type BookingRecord = {
 
 export type AdminNotification = {
   id: string;
-  kind: "food_paid" | "booking_paid";
+  kind: "food_created" | "booking_created" | "food_paid" | "booking_paid";
   title: string;
   body: string;
   entityId: string;

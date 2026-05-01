@@ -5,7 +5,7 @@ export type FoodOrderSummary = {
   status: string;
   total_kes: number;
   guest_name: string;
-  room_number: string;
+  room_number: string | null;
   created_at: string;
 };
 

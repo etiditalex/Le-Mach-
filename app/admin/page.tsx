@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { fetchAdminOverview } from "@/lib/repositories/admin-overview";
+import NotificationsWidgetClient from "@/app/admin/NotificationsWidgetClient";
+import { NotificationsListClient } from "@/app/admin/NotificationsWidgetClient";
 
 export const dynamic = "force-dynamic";
 
@@ -52,13 +54,10 @@ export default async function AdminDashboardPage() {
             Open summary report
           </Link>
         </div>
-        <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Unread notifications</p>
-          <p className="text-3xl font-bold text-primary mt-1">{overview.unreadNotifications}</p>
-          <Link href="/admin/notifications" className="text-sm text-primary mt-2 inline-block hover:underline">
-            View all →
-          </Link>
-        </div>
+        <NotificationsWidgetClient
+          initialUnread={overview.unreadNotifications}
+          initialNotifications={overview.recentNotifications as never}
+        />
         <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
           <p className="text-sm text-gray-500">Food orders (total)</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{overview.foodOrdersTotal}</p>
@@ -89,7 +88,7 @@ export default async function AdminDashboardPage() {
                   </div>
                   <div className="flex justify-between text-gray-500 text-xs mt-1">
                     <span>
-                      Room {o.room_number} · {o.status}
+                      {o.room_number ? `Room ${o.room_number}` : "No room"} · {o.status}
                     </span>
                     <span>{new Date(o.created_at).toLocaleString()}</span>
                   </div>
@@ -130,6 +129,18 @@ export default async function AdminDashboardPage() {
           </ul>
         </section>
       </div>
+
+      <section className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+          <h2 className="font-semibold text-gray-900">Recent notifications</h2>
+          <Link href="/admin/notifications" className="text-sm text-primary hover:underline">
+            View all
+          </Link>
+        </div>
+        <div className="p-5">
+          <NotificationsListClient initialNotifications={overview.recentNotifications as never} limit={10} />
+        </div>
+      </section>
     </div>
   );
 }
