@@ -45,9 +45,19 @@ export async function GET(req: Request) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      const safeEnqueue = (chunk: Uint8Array) => {
+        if (closed) return;
+        try {
+          controller.enqueue(chunk);
+        } catch {
+          closed = true;
+        }
+      };
+
       const send = (event: string, data: unknown) => {
+        if (closed) return;
         const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-        controller.enqueue(encoder.encode(payload));
+        safeEnqueue(encoder.encode(payload));
       };
 
       // Initial payload.
@@ -61,21 +71,25 @@ export async function GET(req: Request) {
 
       // Poll loop (SSE keeps connection open; dashboard updates in near real-time).
       const intervalMs = 1500;
-      const t = setInterval(async () => {
-        if (closed) return;
-        try {
-          const snap = await fetchSnapshot();
-          const json = JSON.stringify(snap);
-          if (json !== lastJson) {
-            lastJson = json;
-            send("snapshot", snap);
-          } else {
-            // keep-alive so proxies don't close the stream
-            controller.enqueue(encoder.encode(`: ping\n\n`));
+      const t = setInterval(() => {
+        void (async () => {
+          if (closed) return;
+          try {
+            const snap = await fetchSnapshot();
+            if (closed) return;
+            const json = JSON.stringify(snap);
+            if (json !== lastJson) {
+              lastJson = json;
+              send("snapshot", snap);
+            } else {
+              // keep-alive so proxies don't close the stream
+              safeEnqueue(encoder.encode(`: ping\n\n`));
+            }
+          } catch (e) {
+            if (closed) return;
+            send("error", { error: e instanceof Error ? e.message : "Stream error" });
           }
-        } catch (e) {
-          send("error", { error: e instanceof Error ? e.message : "Stream error" });
-        }
+        })();
       }, intervalMs);
 
       req.signal.addEventListener("abort", () => {
@@ -90,8 +104,13 @@ export async function GET(req: Request) {
 
       // Safety close after 10 minutes (client will reconnect automatically).
       setTimeout(() => {
+        closed = true;
         clearInterval(t);
-        if (!closed) controller.close();
+        try {
+          controller.close();
+        } catch {
+          // ignore
+        }
       }, 10 * 60 * 1000);
     },
     cancel() {
