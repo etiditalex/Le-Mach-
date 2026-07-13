@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Download, Loader2, Pencil, QrCode, Trash2 } from "lucide-react";
 
 type Item = {
@@ -14,6 +15,18 @@ type Item = {
 
 const CATEGORIES = ["breakfast", "lunch", "dinner", "desserts", "beverages", "alcohol", "juice"] as const;
 
+async function uploadMenuImage(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.set("file", file);
+  const res = await fetch("/api/admin/menu-items/upload", {
+    method: "POST",
+    body: fd,
+  });
+  const data = (await res.json()) as { url?: string; error?: string };
+  if (!res.ok || !data.url) throw new Error(data.error || "Upload failed");
+  return data.url;
+}
+
 export default function MenuItemsPanel() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,10 +39,25 @@ export default function MenuItemsPanel() {
     name: "",
     description: "",
     price: "",
-    image: "",
     category: "lunch",
   };
   const [form, setForm] = useState(emptyForm);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const clearFile = useCallback(() => {
+    setImageFile(null);
+    setPreviewUrl((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const load = useCallback(async () => {
     setErr(null);
@@ -49,37 +77,61 @@ export default function MenuItemsPanel() {
   }, [load]);
 
   const startEdit = (it: Item) => {
+    clearFile();
     setEditingId(it.id);
     setForm({
       id: it.id,
       name: it.name,
       description: it.description,
       price: String(it.price),
-      image: it.image,
       category: it.category,
     });
+    setPreviewUrl(it.image);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
+    clearFile();
+    setPreviewUrl(null);
+  };
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    clearFile();
+    setImageFile(f);
+    setPreviewUrl(URL.createObjectURL(f));
   };
 
   const save = async () => {
     setSaving(true);
     setErr(null);
     try {
+      let imageUrl: string;
+
+      if (imageFile) {
+        imageUrl = await uploadMenuImage(imageFile);
+      } else if (editingId && previewUrl && !previewUrl.startsWith("blob:")) {
+        imageUrl = previewUrl;
+      } else {
+        throw new Error("Choose an image from your device");
+      }
+
       if (editingId) {
+        const payload: Record<string, unknown> = {
+          name: form.name,
+          description: form.description,
+          price: Number(form.price),
+          category: form.category,
+        };
+        if (imageFile) payload.image = imageUrl;
+
         const res = await fetch(`/api/admin/menu-items/${encodeURIComponent(editingId)}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: form.name,
-            description: form.description,
-            price: Number(form.price),
-            image: form.image,
-            category: form.category,
-          }),
+          body: JSON.stringify(payload),
         });
         const data = (await res.json()) as { error?: string };
         if (!res.ok) throw new Error(data.error || "Save failed");
@@ -92,7 +144,7 @@ export default function MenuItemsPanel() {
             name: form.name,
             description: form.description,
             price: Number(form.price),
-            image: form.image,
+            image: imageUrl,
             category: form.category,
           }),
         });
@@ -133,7 +185,10 @@ export default function MenuItemsPanel() {
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Menu items</h1>
-        <p className="text-gray-600 mt-1">Create, edit, and remove dishes shown on the public menu.</p>
+        <p className="text-gray-600 mt-1">
+          Create, edit, and remove dishes shown on the public menu. Images are uploaded from your device to Supabase
+          Storage.
+        </p>
         <div className="mt-4">
           <a
             href="/api/admin/menu/qr"
@@ -203,13 +258,26 @@ export default function MenuItemsPanel() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Image URL</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Image (from device)</label>
             <input
-              value={form.image}
-              onChange={(e) => setForm({ ...form, image: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={onPickFile}
+              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
             />
+            {editingId && !imageFile && (
+              <p className="text-xs text-gray-500 mt-1">
+                Leave unchanged to keep the current photo, or pick a new file to replace it.
+              </p>
+            )}
           </div>
+          {previewUrl && (
+            <div className="md:col-span-2 flex items-start gap-4">
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0">
+                <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+              </div>
+            </div>
+          )}
           <div className="md:col-span-2">
             <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
             <textarea
@@ -243,7 +311,7 @@ export default function MenuItemsPanel() {
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Item</th>
                 <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Price</th>
                 <th className="px-4 py-3 font-medium w-24" />
@@ -253,8 +321,15 @@ export default function MenuItemsPanel() {
               {items.map((it) => (
                 <tr key={it.id} className={editingId === it.id ? "bg-amber-50/50" : ""}>
                   <td className="px-4 py-3">
-                    <span className="font-medium text-gray-900">{it.name}</span>
-                    <p className="text-xs text-gray-500 truncate max-w-xs">{it.description}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden bg-gray-100 shrink-0">
+                        <Image src={it.image} alt="" fill className="object-cover" unoptimized />
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-900">{it.name}</span>
+                        <p className="text-xs text-gray-500 truncate max-w-xs">{it.description}</p>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">{it.category}</td>
                   <td className="px-4 py-3 tabular-nums">KSh {it.price.toLocaleString()}</td>

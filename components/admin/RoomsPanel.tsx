@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
 
 type Room = {
@@ -10,6 +11,18 @@ type Room = {
   price_per_night: number;
   image: string;
 };
+
+async function uploadRoomImage(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.set("file", file);
+  const res = await fetch("/api/admin/rooms/upload", {
+    method: "POST",
+    body: fd,
+  });
+  const data = (await res.json()) as { url?: string; error?: string };
+  if (!res.ok || !data.url) throw new Error(data.error || "Upload failed");
+  return data.url;
+}
 
 export default function RoomsPanel() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -23,9 +36,24 @@ export default function RoomsPanel() {
     name: "",
     description: "",
     price_per_night: "",
-    image: "",
   };
   const [form, setForm] = useState(emptyForm);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const clearFile = useCallback(() => {
+    setImageFile(null);
+    setPreviewUrl((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const load = useCallback(async () => {
     setErr(null);
@@ -45,35 +73,59 @@ export default function RoomsPanel() {
   }, [load]);
 
   const startEdit = (r: Room) => {
+    clearFile();
     setEditingId(r.id);
     setForm({
       id: r.id,
       name: r.name,
       description: r.description ?? "",
       price_per_night: String(r.price_per_night),
-      image: r.image,
     });
+    setPreviewUrl(r.image);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
+    clearFile();
+    setPreviewUrl(null);
+  };
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    clearFile();
+    setImageFile(f);
+    setPreviewUrl(URL.createObjectURL(f));
   };
 
   const save = async () => {
     setSaving(true);
     setErr(null);
     try {
+      let imageUrl: string;
+
+      if (imageFile) {
+        imageUrl = await uploadRoomImage(imageFile);
+      } else if (editingId && previewUrl && !previewUrl.startsWith("blob:")) {
+        imageUrl = previewUrl;
+      } else {
+        throw new Error("Choose an image from your device");
+      }
+
       if (editingId) {
+        const payload: Record<string, unknown> = {
+          name: form.name,
+          description: form.description,
+          price_per_night: Number(form.price_per_night),
+        };
+        if (imageFile) payload.image = imageUrl;
+
         const res = await fetch(`/api/admin/rooms/${encodeURIComponent(editingId)}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: form.name,
-            description: form.description,
-            price_per_night: Number(form.price_per_night),
-            image: form.image,
-          }),
+          body: JSON.stringify(payload),
         });
         const data = (await res.json()) as { error?: string };
         if (!res.ok) throw new Error(data.error || "Save failed");
@@ -86,7 +138,7 @@ export default function RoomsPanel() {
             name: form.name,
             description: form.description,
             price_per_night: Number(form.price_per_night),
-            image: form.image,
+            image: imageUrl,
           }),
         });
         const data = (await res.json()) as { error?: string };
@@ -127,7 +179,8 @@ export default function RoomsPanel() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Rooms</h1>
         <p className="text-gray-600 mt-1">
-          Manage room types, rates, images, and descriptions. Used for bookings and public listings.
+          Manage room types, rates, images, and descriptions. Images are uploaded from your device to Supabase
+          Storage.
         </p>
       </div>
 
@@ -174,13 +227,26 @@ export default function RoomsPanel() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Image URL</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Image (from device)</label>
             <input
-              value={form.image}
-              onChange={(e) => setForm({ ...form, image: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={onPickFile}
+              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
             />
+            {editingId && !imageFile && (
+              <p className="text-xs text-gray-500 mt-1">
+                Leave unchanged to keep the current photo, or pick a new file to replace it.
+              </p>
+            )}
           </div>
+          {previewUrl && (
+            <div className="md:col-span-2 flex items-start gap-4">
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0">
+                <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+              </div>
+            </div>
+          )}
           <div className="md:col-span-2">
             <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
             <textarea
@@ -214,8 +280,8 @@ export default function RoomsPanel() {
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
+                <th className="px-4 py-3 font-medium">Room</th>
                 <th className="px-4 py-3 font-medium">Id</th>
-                <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Price / night</th>
                 <th className="px-4 py-3 font-medium w-24" />
               </tr>
@@ -223,8 +289,15 @@ export default function RoomsPanel() {
             <tbody className="divide-y divide-gray-100">
               {rooms.map((r) => (
                 <tr key={r.id} className={editingId === r.id ? "bg-amber-50/50" : ""}>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden bg-gray-100 shrink-0">
+                        <Image src={r.image} alt="" fill className="object-cover" unoptimized />
+                      </div>
+                      <span className="font-medium text-gray-900">{r.name}</span>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs">{r.id}</td>
-                  <td className="px-4 py-3 font-medium">{r.name}</td>
                   <td className="px-4 py-3 tabular-nums">KSh {r.price_per_night.toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
