@@ -33,47 +33,52 @@ const showcaseItems = [
 
 export default function RoomsShowcase() {
   return (
-    <section className="bg-white py-12 md:py-16">
+    <section className="bg-white py-8 sm:py-12 md:py-16">
       {showcaseItems.map((item, index) => (
         <div key={item.id} className="container mx-auto px-4">
-          <div className={index % 2 === 0 ? "flex flex-col md:flex-row max-w-7xl mx-auto" : "flex flex-col md:flex-row-reverse max-w-7xl mx-auto"}>
-            {/* Text Section - Left */}
+          <div
+            className={
+              index % 2 === 0
+                ? "flex flex-col md:flex-row max-w-7xl mx-auto"
+                : "flex flex-col md:flex-row-reverse max-w-7xl mx-auto"
+            }
+          >
             <motion.div
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full md:w-1/2 bg-white flex items-center justify-center p-8 md:p-12 lg:p-16"
+              className="w-full md:w-1/2 bg-white flex items-center justify-center p-5 sm:p-8 md:p-12 lg:p-16"
             >
               <div className="max-w-xl mx-auto md:mx-0 w-full text-center md:text-left">
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-sans">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 font-sans text-balance leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-900 text-lg md:text-xl leading-relaxed mb-6 font-sans">
+                <p className="text-gray-900 text-base sm:text-lg md:text-xl leading-relaxed mb-5 sm:mb-6 font-sans">
                   {item.text}
                 </p>
                 <Link
                   href={item.link}
-                  className="text-primary underline font-semibold text-lg hover:text-secondary transition-colors font-sans inline-block"
+                  className="inline-flex items-center min-h-[44px] text-primary underline font-semibold text-base sm:text-lg hover:text-secondary transition-colors font-sans"
                 >
                   {item.linkText}
                 </Link>
               </div>
             </motion.div>
 
-            {/* Image Section - Right */}
             <motion.div
-              initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
+              initial={{ opacity: 0, x: index % 2 === 0 ? 40 : -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="w-full md:w-1/2 relative h-96 md:h-[600px]"
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="w-full md:w-1/2 relative h-64 sm:h-80 md:h-[600px]"
             >
               <Image
                 src={item.image}
                 alt="Le Mach Hotel"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
                 priority={index === 0}
               />
             </motion.div>

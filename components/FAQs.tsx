@@ -55,7 +55,7 @@ export default function FAQs() {
   };
 
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className="bg-white py-10 sm:py-16 md:py-24">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
@@ -63,13 +63,13 @@ export default function FAQs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-8 sm:mb-12 md:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 font-sans">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-3 sm:mb-4 font-sans text-balance leading-tight">
             FREQUENTLY ASKED QUESTIONS
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-6"></div>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-sans">
+          <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-4 sm:mb-6"></div>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-sans px-1">
             Find answers to common questions about Le Mach Hotel & Accommodations
           </p>
         </motion.div>
@@ -82,16 +82,16 @@ export default function FAQs() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="mb-4"
+              transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3) }}
+              className="mb-3 sm:mb-4"
             >
               <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                 {/* Question */}
                 <button
                   onClick={() => toggleFAQ(faq.id)}
-                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
+                  className="w-full min-h-[52px] px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
                 >
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 font-sans pr-4">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 font-sans pr-3 sm:pr-4">
                     {faq.question}
                   </h3>
                   <ChevronDown
@@ -111,8 +111,8 @@ export default function FAQs() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 py-5 border-t border-gray-200">
-                        <p className="text-gray-700 leading-relaxed font-sans">
+                      <div className="px-4 sm:px-6 py-4 sm:py-5 border-t border-gray-200">
+                        <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-sans">
                           {faq.answer}
                         </p>
                       </div>
@@ -129,15 +129,15 @@ export default function FAQs() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center mt-12"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-center mt-8 sm:mt-12"
         >
-          <p className="text-gray-600 mb-4 font-sans">
+          <p className="text-gray-600 mb-4 font-sans text-sm sm:text-base">
             Still have questions? We're here to help!
           </p>
           <a
             href="/contact"
-            className="inline-block bg-logo text-primary px-8 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300 font-sans shadow-md"
+            className="inline-flex items-center justify-center min-h-[44px] bg-logo text-primary px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300 font-sans shadow-md"
           >
             Contact Us
           </a>
