@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Introduction from "@/components/Introduction";
+import CrispyFoodShowcase from "@/components/CrispyFoodShowcase";
 import RoomsShowcase from "@/components/RoomsShowcase";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import WhyBookDirectly from "@/components/WhyBookDirectly";
@@ -26,6 +27,7 @@ export default function Home() {
       <Header />
       <Hero />
       <Introduction />
+      <CrispyFoodShowcase />
       <RoomsShowcase />
       <PhotoCarousel />
       <WhyBookDirectly />
