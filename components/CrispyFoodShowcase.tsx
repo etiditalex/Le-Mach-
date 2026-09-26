@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-/** High-res Cloudinary delivery — fit full plate in frame, no aggressive crop */
+/** Tall crop so the plate fills the showcase instead of sitting as a thin strip */
 const cld = (src: string) =>
   src.replace(
     "/image/upload/",
-    "/image/upload/f_auto,q_auto:best,w_1400,c_fit,b_rgb:ffffff/"
+    "/image/upload/f_auto,q_auto:best,c_fill,g_auto,w_1200,h_1600/"
   );
 
 const leftImage = {
@@ -44,15 +44,16 @@ function PlateImage({
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay }}
-      className={`relative aspect-[4/5] sm:aspect-square md:aspect-auto md:h-[600px] overflow-hidden bg-[#FDFBF8] ${className ?? ""}`}
+      className={`relative w-full h-72 sm:h-96 md:h-[600px] overflow-hidden bg-[#FDFBF8] ${className ?? ""}`}
     >
       <Image
         src={src}
         alt={alt}
         fill
-        quality={95}
-        className="object-contain object-center p-1.5 sm:p-2 md:object-cover md:p-0"
-        sizes="(max-width: 768px) 50vw, 33vw"
+        quality={75}
+        className="object-cover object-center"
+        style={{ objectFit: "cover" }}
+        sizes="(max-width: 768px) 50vw, 40vw"
         priority
       />
     </motion.div>
