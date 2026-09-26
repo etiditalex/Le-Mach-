@@ -13,14 +13,14 @@ const cld = (src: string) =>
 
 const leftImage = {
   src: cld(
-    "https://res.cloudinary.com/dyfnobo9r/image/upload/v1784096510/WhatsApp_Image_2026-07-11_at_23.25.15_qigvra.jpg"
+    "https://res.cloudinary.com/dyfnobo9r/image/upload/v1790422520/lemach_food_landscape_1-150kb_k9vmzh.jpg"
   ),
   alt: "Crispy chicken platter with golden potato rounds at Lemach Hotel",
 };
 
 const rightImage = {
   src: cld(
-    "https://res.cloudinary.com/dyfnobo9r/image/upload/v1783941369/WhatsApp_Image_2026-07-11_at_23.25.17_1_liwd9z.jpg"
+    "https://res.cloudinary.com/dyfnobo9r/image/upload/v1790422520/lemach_food_landscape_2-150kb_n3jmfa.jpg"
   ),
   alt: "Crispy fried plantains with savoury meat at Lemach Hotel",
 };
@@ -44,14 +44,14 @@ function PlateImage({
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay }}
-      className={`relative aspect-[4/5] sm:aspect-square md:aspect-auto md:h-full min-h-0 overflow-hidden bg-[#FDFBF8] ${className ?? ""}`}
+      className={`relative aspect-[4/5] sm:aspect-square md:aspect-auto md:h-[600px] overflow-hidden bg-[#FDFBF8] ${className ?? ""}`}
     >
       <Image
         src={src}
         alt={alt}
         fill
         quality={95}
-        className="object-contain object-center p-1.5 sm:p-2 md:p-3"
+        className="object-contain object-center p-1.5 sm:p-2 md:object-cover md:p-0"
         sizes="(max-width: 768px) 50vw, 33vw"
         priority
       />
@@ -61,7 +61,7 @@ function PlateImage({
 
 export default function CrispyFoodShowcase() {
   return (
-    <section className="bg-white py-8 sm:py-10 md:py-14">
+    <section className="bg-white py-8 sm:py-12 md:py-16">
       <div className="container mx-auto px-4 sm:px-5 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 md:gap-6 max-w-7xl mx-auto md:items-stretch">
           {/* On mobile: description first, then both plates side-by-side */}
