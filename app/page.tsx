@@ -2,22 +2,37 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import Introduction from "@/components/Introduction";
-import CrispyFoodShowcase from "@/components/CrispyFoodShowcase";
-import RoomsShowcase from "@/components/RoomsShowcase";
-import PhotoCarousel from "@/components/PhotoCarousel";
-import WhyBookDirectly from "@/components/WhyBookDirectly";
-import FAQs from "@/components/FAQs";
+import AvailabilitySearch from "@/components/AvailabilitySearch";
+import AboutTheHotel from "@/components/AboutTheHotel";
+import Accommodation from "@/components/Accommodation";
+import StayQuote from "@/components/StayQuote";
+import DiningVenues from "@/components/DiningVenues";
+import Experiences from "@/components/Experiences";
+import GalleryGlimpse from "@/components/GalleryGlimpse";
+import BookYourStay from "@/components/BookYourStay";
 
 export const metadata: Metadata = {
-  title: "Home",
+  title: {
+    absolute: "Lemach Hotel Kilifi | Hotel in Kilifi County, Kenya",
+  },
   description:
-    "Lemach Hotel & Accommodations - Luxury hotel in Kilifi County, Kenya. Rooms, dining, events, and hospitality.",
+    "Stay at Lemach Hotel in Kilifi, Kenya. Rooms, a restaurant and bar, meetings, gardens, and a pool, just off the B69 Highway in Kilifi County.",
+  keywords: [
+    "Lemach Hotel Kilifi",
+    "hotel in Kilifi",
+    "Kilifi hotel",
+    "where to stay in Kilifi",
+    "accommodation in Kilifi County",
+    "Lemach Hotel",
+  ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
+    title: "Lemach Hotel Kilifi | Hotel in Kilifi County, Kenya",
     description:
-      "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
-    url: "https://lemach.co.ke",
+      "Stay at Lemach Hotel in Kilifi, Kenya. Rooms, dining, meetings, gardens, and a pool, just off the B69 Highway.",
+    url: "/",
   },
 };
 
@@ -26,12 +41,14 @@ export default function Home() {
     <main className="w-full min-w-0 overflow-x-hidden">
       <Header />
       <Hero />
-      <Introduction />
-      <CrispyFoodShowcase />
-      <RoomsShowcase />
-      <PhotoCarousel />
-      <WhyBookDirectly />
-      <FAQs />
+      <AvailabilitySearch />
+      <AboutTheHotel />
+      <Accommodation />
+      <StayQuote />
+      <DiningVenues />
+      <Experiences />
+      <GalleryGlimpse />
+      <BookYourStay />
       <Footer />
     </main>
   );

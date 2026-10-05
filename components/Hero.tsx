@@ -58,7 +58,7 @@ export default function Hero() {
 
       {/* Overlay: pinned to bottom-left corner (absolute so it stays bottom, not top) */}
       <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
-        <div className="pointer-events-auto container mx-auto px-4 md:px-6 lg:px-8 pb-14 sm:pb-16 md:pb-20 text-white">
+        <div className="pointer-events-auto container mx-auto px-4 md:px-6 lg:px-8 pb-24 sm:pb-28 md:pb-32 text-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -109,7 +109,7 @@ export default function Hero() {
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {slides.map((_, index) => (
           <button
             key={index}

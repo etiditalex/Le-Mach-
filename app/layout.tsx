@@ -4,6 +4,7 @@ import { CartProvider } from "@/context/CartContext";
 import SiteChrome from "@/components/SiteChrome";
 import DrinksQrBanner from "@/components/DrinksQrBanner";
 import { getSiteUrl, SITE_LOGO_ICON_URL, SITE_OG_IMAGE_URL } from "@/lib/site";
+import HotelJsonLd from "@/components/HotelJsonLd";
 
 const siteUrl = getSiteUrl();
 
@@ -18,18 +19,33 @@ export const metadata: Metadata = {
     template: "%s | Lemach Hotel",
   },
   description:
-    "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
-  keywords: ["Lemach Hotel", "Kilifi County", "Kenya hotel", "accommodation", "luxury hotel", "Lemach"],
+    "Lemach Hotel in Kilifi, Kenya. Stay just off the B69 Highway in Kilifi County for rooms, dining, meetings, gardens, and a pool.",
+  keywords: [
+    "Lemach Hotel",
+    "Lemach Hotel Kilifi",
+    "hotel in Kilifi",
+    "Kilifi hotel",
+    "accommodation in Kilifi",
+    "Kilifi County hotel",
+    "Le Mach Hotel",
+    "hotel off B69 Kilifi",
+    "where to stay in Kilifi",
+  ],
+  category: "hotel",
+  other: {
+    "geo.region": "KE-14",
+    "geo.placename": "Kilifi",
+  },
   authors: [{ name: "Lemach Hotel & Accommodations" }],
   creator: "Lemach Hotel & Accommodations",
   openGraph: {
     type: "website",
     locale: "en_KE",
     url: siteUrl,
-    siteName: "Lemach Hotel & Accommodations",
-    title: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
+    siteName: "Lemach Hotel Kilifi",
+    title: "Lemach Hotel Kilifi | Hotel in Kilifi County, Kenya",
     description:
-      "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
+      "Lemach Hotel in Kilifi, Kenya. Stay just off the B69 Highway in Kilifi County for rooms, dining, meetings, gardens, and a pool.",
     images: [
       {
         url: SITE_OG_IMAGE_URL,
@@ -41,9 +57,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lemach Hotel & Accommodations - Kilifi County, Kenya",
+    title: "Lemach Hotel Kilifi | Hotel in Kilifi County, Kenya",
     description:
-      "Luxury hotel and accommodations in Kilifi County, Kenya. Experience world-class hospitality, dining, and events.",
+      "Lemach Hotel in Kilifi, Kenya. Stay just off the B69 Highway in Kilifi County for rooms, dining, meetings, gardens, and a pool.",
     images: [SITE_OG_IMAGE_URL],
   },
   icons: {
@@ -68,6 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased overflow-x-hidden">
+        <HotelJsonLd />
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
           <DrinksQrBanner />

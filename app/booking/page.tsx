@@ -12,6 +12,9 @@ import type { RoomRecord } from "@/lib/hotel-types";
 function BookingForm() {
   const searchParams = useSearchParams();
   const roomParam = searchParams.get("room");
+  const checkInParam = searchParams.get("checkIn");
+  const checkOutParam = searchParams.get("checkOut");
+  const guestsParam = searchParams.get("guests");
   const [roomsList, setRoomsList] = useState<RoomRecord[]>([]);
   const [roomsLoading, setRoomsLoading] = useState(true);
   const [roomsError, setRoomsError] = useState<string | null>(null);
@@ -68,6 +71,16 @@ function BookingForm() {
       roomType: fromUrl || prev.roomType || roomsList[0].id,
     }));
   }, [roomsList, roomParam]);
+
+  useEffect(() => {
+    const allowedGuests = ["1", "2", "3", "4", "5"];
+    setFormData((prev) => ({
+      ...prev,
+      ...(checkInParam ? { checkIn: checkInParam } : {}),
+      ...(checkOutParam ? { checkOut: checkOutParam } : {}),
+      ...(guestsParam && allowedGuests.includes(guestsParam) ? { guests: guestsParam } : {}),
+    }));
+  }, [checkInParam, checkOutParam, guestsParam]);
 
   useEffect(() => {
     if (formData.checkIn && formData.checkOut) {
