@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bed, Droplet, Leaf, Users, Utensils, Wifi, Wind } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import AccommodationHero from "@/components/AccommodationHero";
 
-const cld = (src: string) =>
-  src.replace("/image/upload/", "/image/upload/f_auto,q_auto,w_1200/");
+const cld = (src: string, width = "w_1200") =>
+  src.replace("/image/upload/", `/image/upload/f_auto,q_auto,${width}/`);
 
 type Amenity = { icon: LucideIcon; label: string };
 
@@ -25,9 +26,7 @@ const rooms: {
     description:
       "Comfortable rooms for couples and solo travelers, with a king bed and the essentials for a relaxing stay in Kilifi.",
     price: 4500,
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS7of562_cohiqd.jpg"
-    ),
+    image: cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773837495/LEMACHGARDENS7of562_cohiqd.jpg"),
     alt: "Standard room at Lemach Hotel with a canopy bed and smart TV",
     amenities: [
       { icon: Wind, label: "Air Conditioning" },
@@ -43,9 +42,7 @@ const rooms: {
     description:
       "A two-bedroom room with extra space for families and small groups. Offered without bed and breakfast.",
     price: 8000,
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773405758/LEMACHGARDENS272of562_oerxub.jpg"
-    ),
+    image: cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773405758/LEMACHGARDENS272of562_oerxub.jpg"),
     alt: "Deluxe room at Lemach Hotel with a king bed and seating area",
     amenities: [
       { icon: Bed, label: "2 Bedrooms" },
@@ -61,9 +58,7 @@ const rooms: {
     description:
       "A spacious suite with two bedrooms and a living area. Bed and breakfast is included for a comfortable family stay.",
     price: 10000,
-    image: cld(
-      "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg"
-    ),
+    image: cld("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS301of562_w5lzhz.jpg"),
     alt: "Family suite bedroom at Lemach Hotel",
     amenities: [
       { icon: Bed, label: "2 Bedrooms" },
@@ -76,26 +71,15 @@ const rooms: {
 
 export default function Accommodation() {
   return (
-    <section id="accommodation" className="bg-white py-16 sm:py-20 lg:py-24">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-[#C99700] sm:text-xs">
-            Accommodation
-          </p>
-          <h2 className="mt-4 font-serif leading-[1.05] text-[#1C2430]">
-            <span className="block text-[2.6rem] font-medium sm:text-5xl lg:text-[3.4rem]">
-              Your home
-            </span>
-            <span className="mt-1 block text-[2.75rem] font-medium italic text-primary sm:text-[3.15rem] lg:text-[3.6rem]">
-              in Kilifi
-            </span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-[#6B6B6B] sm:text-base">
-            Every room includes free WiFi, air conditioning, a private bathroom with hot
-            water, and a smart TV. Some rooms also have a private balcony with views across
-            Kilifi County.
-          </p>
-        </div>
+    <section id="accommodation" className="bg-white">
+      <AccommodationHero />
+
+      <div className="container mx-auto px-4 py-16 sm:py-20 md:px-6 lg:px-8 lg:py-24">
+        <p className="mx-auto max-w-xl text-center text-[15px] leading-relaxed text-[#6B6B6B] sm:text-base">
+          Every room includes free WiFi, air conditioning, a private bathroom with hot
+          water, and a smart TV. Some rooms also have a private balcony looking over the
+          Lemach gardens in Kilifi County.
+        </p>
 
         <div className="mx-auto mt-12 grid max-w-6xl grid-cols-1 gap-6 md:mt-16 md:grid-cols-3 md:gap-5 lg:gap-6">
           {rooms.map((room) => (

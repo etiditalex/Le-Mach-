@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Users, Tv, Coffee, Utensils, Wifi, Music, CheckCircle, Calendar, Clock, MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+import { Users, Tv, Coffee, Utensils, Wifi, Music, CheckCircle, Calendar, Clock, MapPin, Phone, Mail, ArrowRight, Bookmark, Sun, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -67,62 +67,55 @@ const eventSpaces = [
 
 const services = [
   {
+    icon: Tv,
+    title: "Projectors & Screens",
+    description: "Projectors and screens in the conference hall, boardroom, and meeting room.",
+  },
+  {
+    icon: Wifi,
+    title: "High-Speed WiFi",
+    description: "WiFi for presentations and guest devices throughout the event spaces.",
+  },
+  {
+    icon: Music,
+    title: "Sound & AV",
+    description: "A sound system and video conferencing, with on-site support for the equipment.",
+  },
+  {
     icon: Utensils,
-    title: "Catering Services",
-    description: "Customized menus for all event types, from coffee breaks to full-course meals.",
+    title: "In-house Catering",
+    description: "Menus for coffee breaks, working lunches, and full meals.",
   },
   {
     icon: Coffee,
     title: "Refreshments",
-    description: "Premium coffee, tea, and refreshments served throughout your event.",
-  },
-  {
-    icon: Wifi,
-    title: "Technical Support",
-    description: "On-site technical support for all audiovisual equipment and connectivity needs.",
+    description: "Coffee, tea, and refreshments served through the event.",
   },
   {
     icon: Users,
     title: "Event Planning",
-    description: "Dedicated event coordinator to help plan and execute your perfect event.",
+    description: "A coordinator to help plan the day and see it through.",
   },
 ];
 
 const packages = [
   {
+    icon: Clock,
     name: "Half Day Package",
-    duration: "4 hours",
-    price: "KSh 15,000",
-    includes: [
-      "Room rental",
-      "Basic AV equipment",
-      "Coffee break",
-      "WiFi access",
-    ],
+    description:
+      "Room rental for 4 hours, with basic AV equipment, a coffee break, and WiFi. KSh 15,000.",
   },
   {
+    icon: Sun,
     name: "Full Day Package",
-    duration: "8 hours",
-    price: "KSh 25,000",
-    includes: [
-      "Room rental",
-      "Full AV equipment",
-      "Coffee breaks & lunch",
-      "WiFi access",
-      "Event coordinator",
-    ],
+    description:
+      "Room rental for 8 hours, with full AV equipment, coffee breaks and lunch, WiFi, and an event coordinator. KSh 25,000.",
   },
   {
+    icon: Sparkles,
     name: "Premium Package",
-    duration: "Custom",
-    price: "Custom Quote",
-    includes: [
-      "Exclusive venue access",
-      "Premium AV equipment",
-      "Full catering service",
-      "Dedicated event team",
-      "Customized setup",
-    ],
+    description:
+      "Exclusive venue access with premium AV, full catering, a dedicated event team, and a customized setup. Custom quote.",
   },
 ];
 
@@ -174,160 +167,226 @@ export default function MeetingsEventsPage() {
   return (
     <main>
       <Header />
-      <div className="pt-24 pb-12 min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <div
-              className="relative overflow-hidden rounded-none"
-              style={{
-                backgroundImage:
-                  "url(https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841224/Boardroom_2_ybp800.jpg)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                  filter: "brightness(0.95) contrast(1.25) saturate(1.08)",
-                minHeight: 260,
-              }}
-            >
-                {/* Dark overlay reduced since there is no hero text */}
-                <div className="absolute inset-0 bg-primary/25" />
+      <div className="min-h-screen bg-gray-50 pt-24">
+        <section className="relative min-h-[220px] overflow-hidden sm:min-h-[280px] lg:min-h-[320px]">
+          <Image
+            src={cld(
+              "https://res.cloudinary.com/dyfnobo9r/image/upload/v1773841224/Boardroom_2_ybp800.jpg",
+              "f_auto,q_auto,w_2200"
+            )}
+            alt="Lemach Hotel conference and event space in Kilifi County"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(18, 10, 12, 0.68) 0%, rgba(16, 12, 16, 0.55) 46%, rgba(14, 12, 14, 0.48) 100%)",
+            }}
+          />
+          <div className="relative z-10 flex min-h-[220px] items-center px-5 py-10 sm:min-h-[280px] sm:px-12 lg:min-h-[320px] lg:px-16 xl:px-20">
+            <div className="max-w-3xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary sm:text-xs sm:tracking-[0.28em]">
+                Meetings &amp; Events
+              </p>
+              <h1 className="mt-3 font-serif text-[2.15rem] font-medium leading-[1.05] text-white sm:mt-4 sm:text-5xl lg:text-[3.35rem]">
+                Conferences and
+                <span className="mt-1 block">celebrations</span>
+              </h1>
             </div>
-          </motion.div>
-
-          {/* Event Spaces */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-20"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Our Event Spaces
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {eventSpaces.map((space, index) => (
-                <motion.div
-                  key={space.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+          </div>
+        </section>
+        <section className="bg-white px-5 py-14 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
+          <div className="mx-auto grid max-w-6xl items-start gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.85fr)] lg:gap-16">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.28em]">
+                Conference &amp; events
+              </p>
+              <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:text-5xl lg:text-[3.25rem]">
+                Versatile spaces
+                <span className="mt-1 block italic text-primary">for every occasion</span>
+              </h2>
+              <div className="mt-6 max-w-xl space-y-4 text-[15px] leading-relaxed text-[#5A5A5A] sm:text-base">
+                <p>
+                  Lemach has a conference hall for up to 100 guests, a boardroom for
+                  executive meetings, and a meeting room for teams and workshops, in
+                  Kilifi County just off the B69 Highway.
+                </p>
+                <p>
+                  Each space includes audiovisual equipment, WiFi, and comfortable
+                  seating. Catering runs from coffee breaks to full meals, and an event
+                  coordinator can help plan the day.
+                </p>
+              </div>
+              <div className="mt-8 max-w-md bg-primary px-5 py-6 text-white sm:px-6">
+                <div className="flex gap-3">
+                  <Bookmark className="mt-0.5 h-5 w-5 shrink-0" />
+                  <div>
+                    <p className="font-semibold leading-snug">
+                      Explore our event packages for tailored solutions
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-white/90">
+                      Half-day, full-day, and premium options, from a coffee break to a
+                      dedicated event team.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="#event-packages"
+                  className="mt-5 flex min-h-11 w-full items-center justify-center bg-white px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:bg-logo"
                 >
-                  <div className="relative h-48">
-                    <Image
-                      src={space.image}
-                      alt={space.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-sans font-bold text-gray-800 mb-2">
-                      {space.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">{space.description}</p>
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Users className="w-4 h-4 text-primary" />
-                        <span>{space.capacity}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPin className="w-4 h-4 text-primary" />
-                        <span>{space.size}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      {space.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center gap-1 text-xs text-gray-600">
-                          <feature.icon className="w-3 h-3 text-primary" />
-                          <span>{feature.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  View event packages
+                </Link>
+              </div>
             </div>
-          </motion.div>
-
-          {/* Services */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-lg shadow-md p-8 mb-20"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Event Services
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {services.map((service, index) => (
-                <div
-                  key={service.title}
-                  className="text-center"
-                >
-                  <div className="bg-gradient-to-r from-primary to-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <service.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">{service.title}</h3>
-                  <p className="text-sm text-gray-600">{service.description}</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 bg-logo px-4 py-8 sm:gap-x-6 sm:gap-y-10 sm:px-10 sm:py-12">
+              {[
+                { value: "100", label: "Max. guest capacity" },
+                { value: "3", label: "Meeting & event spaces" },
+                { value: "1", label: "Boardroom" },
+                { value: "3", label: "Event packages" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="font-serif text-4xl font-medium text-primary sm:text-5xl">{stat.value}</p>
+                  <p className="mt-2 text-[10px] font-medium uppercase leading-snug tracking-[0.08em] text-[#6A6A6A] sm:text-[11px] sm:tracking-[0.14em]">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </div>
-          </motion.div>
-
-          {/* Packages */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-20"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Event Packages
+          </div>
+        </section>
+        <section className="bg-[#F7F4EE] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.28em]">
+              Facilities &amp; equipment
+            </p>
+            <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:text-5xl lg:text-[3.25rem]">
+              Everything you need
+              <span className="mt-1 block italic text-primary">for a successful event</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {packages.map((pkg, index) => (
-                <motion.div
-                  key={pkg.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow"
-                >
-                  <h3 className="text-2xl font-sans font-bold text-primary mb-2">
-                    {pkg.name}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{pkg.duration}</p>
-                  <div className="text-3xl font-bold text-primary mb-6">
-                    {pkg.price}
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    {pkg.includes.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <button className="w-full bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md">
-                    Book Package
-                  </button>
-                </motion.div>
+            <ul className="mt-10 grid grid-cols-1 gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+              {services.map((service) => (
+                <li key={service.title} className="bg-white px-5 py-8 sm:px-6 sm:py-10">
+                  <service.icon className="mx-auto h-6 w-6 text-primary" strokeWidth={1.5} />
+                  <h3 className="mt-4 text-sm font-semibold text-primary">{service.title}</h3>
+                  <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#6A6A6A]">
+                    {service.description}
+                  </p>
+                </li>
               ))}
+            </ul>
+          </div>
+        </section>
+        <section className="bg-white px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.28em]">
+              The venues
+            </p>
+            <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:text-5xl lg:text-[3.25rem]">
+              Spaces as impressive
+              <span className="mt-1 block italic text-primary">as your agenda</span>
+            </h2>
+            <ul className="mt-10 grid grid-cols-1 gap-6 sm:mt-12 sm:grid-cols-3 sm:gap-3">
+              {eventSpaces.map((space) => (
+                <li key={space.id}>
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={space.image}
+                      alt={`${space.name}, ${space.capacity}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                    />
+                  </div>
+                  <h3 className="mt-3 text-sm font-semibold text-primary-dark">{space.name}</h3>
+                  <p className="mt-1 text-xs text-[#6A6A6A]">{space.capacity}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+        <section className="bg-[#F7F4EE] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.28em]">
+              Room capacities
+            </p>
+            <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:text-5xl lg:text-[3.25rem]">
+              Find the right space
+              <span className="mt-1 block italic text-primary">for your group</span>
+            </h2>
+            <div className="mt-10 overflow-x-auto sm:mt-12">
+              <table className="w-full min-w-[280px] text-left text-sm">
+                <thead>
+                  <tr className="bg-primary-dark text-[11px] font-semibold uppercase tracking-[0.14em] text-white">
+                    <th className="px-4 py-3.5 sm:px-6">Venue</th>
+                    <th className="px-4 py-3.5 text-center sm:px-6">
+                      <span className="inline-flex items-center justify-center gap-1.5">
+                        <Users className="h-3.5 w-3.5" />
+                        Guests
+                      </span>
+                    </th>
+                    <th className="px-4 py-3.5 text-center sm:px-6">Size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {eventSpaces.map((space) => {
+                    const featured = space.id === "conference";
+                    const guests = space.capacity.replace(/\D/g, "");
+                    return (
+                      <tr
+                        key={space.id}
+                        className={featured ? "bg-logo text-primary-dark" : "bg-white text-[#3A3A3A]"}
+                      >
+                        <td className="px-4 py-4 font-medium sm:px-6">{space.name}</td>
+                        <td className={`px-4 py-4 text-center font-semibold sm:px-6 ${featured ? "text-primary" : ""}`}>
+                          {guests}
+                        </td>
+                        <td className="px-4 py-4 text-center sm:px-6">{space.size}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          </motion.div>
-
+            <p className="mx-auto mt-6 max-w-2xl text-xs italic leading-relaxed text-[#7A7A7A] sm:text-sm">
+              Guest numbers are the maximum for each room. Contact the events team for a setup
+              that fits your group.
+            </p>
+          </div>
+        </section>
+        <section id="event-packages" className="scroll-mt-28 bg-white px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.28em]">
+              Events &amp; banqueting
+            </p>
+            <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:text-5xl lg:text-[3.25rem]">
+              Tailored packages
+              <span className="mt-1 block italic text-primary">for every event</span>
+            </h2>
+            <ul className="mt-10 grid grid-cols-1 gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+              {packages.map((pkg) => (
+                <li key={pkg.name} className="border border-[#E7E1D8] bg-white px-5 py-8 sm:px-6 sm:py-10">
+                  <pkg.icon className="mx-auto h-6 w-6 text-primary" strokeWidth={1.5} />
+                  <h3 className="mt-4 text-sm font-semibold text-primary">{pkg.name}</h3>
+                  <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-[#6A6A6A]">
+                    {pkg.description}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+        <div className="container mx-auto px-4 pb-10 pt-10 sm:pb-12 sm:pt-12">
           {/* Contact & Inquiry Form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20"
+            className="mb-10 grid grid-cols-1 gap-8 lg:mb-20 lg:grid-cols-2 lg:gap-12"
           >
             {/* Contact Info */}
             <div>
@@ -355,7 +414,7 @@ export default function MeetingsEventsPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                    <a href="mailto:lemachstudios@gmail.com" className="text-gray-600 hover:text-primary transition-colors">
+                    <a href="mailto:lemachstudios@gmail.com" className="break-all text-gray-600 hover:text-primary transition-colors sm:break-normal">
                       lemachstudios@gmail.com
                     </a>
                   </div>
@@ -386,7 +445,7 @@ export default function MeetingsEventsPage() {
             </div>
 
             {/* Inquiry Form */}
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="rounded-lg bg-white p-5 shadow-md sm:p-8">
               <h2 className="text-2xl font-sans font-bold text-primary mb-6">
                 Request a Quote
               </h2>
@@ -446,7 +505,7 @@ export default function MeetingsEventsPage() {
                     </select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
                         Event Date *
@@ -459,7 +518,7 @@ export default function MeetingsEventsPage() {
                         min={new Date().toISOString().split("T")[0]}
                         value={formData.date}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -494,7 +553,7 @@ export default function MeetingsEventsPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email *

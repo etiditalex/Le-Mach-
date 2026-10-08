@@ -1,34 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Bed, Users, Wifi, Wind, Tv, Coffee, Droplet, Bell, ArrowRight } from "lucide-react";
-import Image from "next/image";
+import { Wifi, Wind, Tv, Coffee, Droplet, Bell } from "lucide-react";
 import type { RoomRecord } from "@/lib/hotel-types";
+import AccommodationHero from "@/components/AccommodationHero";
+import AccommodationRoomList from "@/components/AccommodationRoomList";
 
-/** Shown on cards; full detail pages can use richer legacy data when available. */
-const quickFeatures = [
-  { icon: Bed, text: "Comfortable stay" },
-  { icon: Users, text: "Spacious for guests" },
-  { icon: Wifi, text: "Free WiFi" },
-  { icon: Droplet, text: "Private bathroom" },
-];
-
-const amenities = [
-  { icon: Wifi, title: "Free WiFi", description: "High-speed internet access throughout the hotel" },
-  { icon: Wind, title: "Air Conditioning", description: "Climate control for your comfort" },
-  { icon: Tv, title: "Smart TV", description: "Entertainment with streaming services" },
-  { icon: Coffee, title: "Coffee Maker", description: "In-room coffee and tea facilities" },
-  { icon: Droplet, title: "Private Bathroom", description: "En-suite bathrooms with hot water" },
-  { icon: Bell, title: "Room Service", description: "24/7 room service available" },
+const included = [
+  { icon: Wifi, label: "Free WiFi" },
+  { icon: Wind, label: "Air Conditioning" },
+  { icon: Tv, label: "Smart TV" },
+  { icon: Coffee, label: "Tea & Coffee" },
+  { icon: Droplet, label: "En-suite Bathroom" },
+  { icon: Bell, label: "Room Service" },
 ];
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState<RoomRecord[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/public/rooms")
@@ -36,167 +27,75 @@ export default function RoomsPage() {
         const data = (await r.json()) as { rooms?: RoomRecord[]; error?: string };
         if (!r.ok) throw new Error(data.error || "Could not load rooms");
         setRooms(data.rooms ?? []);
-        setLoadError(null);
       })
-      .catch((e) => setLoadError(e instanceof Error ? e.message : "Could not load rooms"));
+      .catch(() => setRooms([]));
   }, []);
 
   return (
     <main>
       <Header />
-      <div className="pt-24 pb-12 min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden mb-16"
-          >
-            {/* Hero background image (no text per request) */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage:
-                  'url("https://res.cloudinary.com/dyfnobo9r/image/upload/v1773839988/LEMACHGARDENS300of562_uhl0eq.jpg")',
-                // Improve contrast/clarity while keeping colors natural.
-                filter: "brightness(0.88) contrast(1.30) saturate(1.10)",
-              }}
-            />
-
-            {/* Lightweight overlay so the background reads clearly */}
-            <div aria-hidden="true" className="absolute inset-0 bg-primary/20" />
-
-            {/* Keep hero area visible even without text */}
-            <div className="relative z-10 h-56 sm:h-64 lg:h-72" />
-          </motion.div>
-
-          {/* Rooms Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-            {loadError ? (
-              <p className="text-red-600 md:col-span-2 text-center">{loadError}</p>
-            ) : null}
-            {!loadError && rooms.length === 0 ? (
-              <p className="text-gray-600 md:col-span-2 text-center">No rooms available yet.</p>
-            ) : null}
-            {rooms.map((room, index) => (
-              <motion.div
-                key={room.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="relative h-64">
-                  <Image
-                    src={room.image}
-                    alt={room.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    priority={index === 0}
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h2 className="text-2xl font-sans font-bold text-gray-800 mb-2">
-                        {room.name}
-                      </h2>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-sm text-gray-500">From</span>
-                        <span className="text-3xl font-bold text-primary">
-                          KSh {room.pricePerNight.toLocaleString()}
-                        </span>
-                        <span className="text-gray-500">per night</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 mb-6">{room.description ?? ""}</p>
-
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {quickFeatures.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-gray-700">
-                        <feature.icon className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">{feature.text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/booking?room=${room.id}`}
-                      className="flex-1 bg-logo text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all shadow-md text-center"
-                    >
-                      Book Now
-                    </Link>
-                    <Link
-                      href={`/rooms/${room.id}`}
-                      className="px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary hover:text-white transition-colors text-center"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Room Amenities Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-lg shadow-md p-8 mb-20"
-          >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-8 text-center">
-              Room Amenities
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {amenities.map((amenity, index) => (
-                <motion.div
-                  key={amenity.title}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-4"
-                >
-                  <div className="bg-gradient-to-r from-primary to-secondary p-3 rounded-lg flex-shrink-0">
-                    <amenity.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-1">{amenity.title}</h3>
-                    <p className="text-gray-600 text-sm">{amenity.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Call to Action Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary to-secondary rounded-lg p-12 text-center text-white"
-          >
-            <h2 className="text-4xl font-sans font-bold mb-4">
-              Ready to Book Your Stay?
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Experience the perfect blend of comfort and luxury at Lemach Hotel
+      <div className="min-h-screen bg-gray-50 pt-24">
+        <AccommodationHero titleAs="h1" />
+        <section className="bg-white px-5 py-16 sm:px-6 sm:py-36 lg:py-44">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-secondary-dark sm:text-xs sm:tracking-[0.32em]">
+              Garden rooms
             </p>
-            <Link
-              href="/booking"
-              className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors text-lg"
-            >
-              Book Your Room Now
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
+            <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-[1.05] text-primary-dark sm:mt-5 sm:text-5xl sm:leading-[1.02] lg:text-[3.5rem]">
+              <span className="block">Quiet rooms</span>
+              <span className="mt-1 block italic text-primary">in the gardens</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#6A6A6A] sm:mt-10 sm:text-lg">
+              Lemach has a standard room, a deluxe room, and a family suite in Kilifi
+              County, just off the B69 Highway. Each stay includes free WiFi, air
+              conditioning, a private bathroom with hot water, and a smart TV. Some rooms
+              have a balcony over the gardens, and the family suite includes breakfast.
+            </p>
+          </div>
+        </section>
+        <AccommodationRoomList rooms={rooms} />
+        <section className="bg-primary-dark px-4 py-14 text-center sm:px-6 sm:py-24 lg:py-32">
+          <div className="mx-auto max-w-5xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary sm:text-xs sm:tracking-[0.32em]">
+              Every room includes
+            </p>
+            <ul className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-x-4 gap-y-8 sm:mt-14 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-6">
+              {included.map((item) => (
+                <li key={item.label} className="flex flex-col items-center gap-3">
+                  <item.icon className="h-6 w-6 text-secondary" strokeWidth={1.5} />
+                  <span className="text-xs leading-snug text-white/90">{item.label}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mx-auto mt-16 max-w-2xl sm:mt-28 lg:mt-32">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary sm:text-xs sm:tracking-[0.32em]">
+                Ready to book?
+              </p>
+              <h2 className="mt-4 font-serif text-[2.15rem] font-medium leading-tight text-white sm:mt-5 sm:text-5xl lg:text-6xl">
+                Reserve your room at Lemach
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-white/85 sm:text-base">
+                Reserve directly with us for the best available rates and personal support
+                throughout your stay.
+              </p>
+              <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                <Link
+                  href="/booking"
+                  className="inline-flex min-h-11 w-full items-center justify-center bg-secondary px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-dark transition-colors hover:bg-logo sm:w-auto sm:min-w-[210px] sm:tracking-[0.16em]"
+                >
+                  Check availability
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-11 w-full items-center justify-center border border-white/75 px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-white hover:text-primary-dark sm:w-auto sm:min-w-[210px] sm:tracking-[0.16em]"
+                >
+                  Contact reservations
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
       <Footer />
     </main>

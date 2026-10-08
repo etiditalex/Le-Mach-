@@ -17,12 +17,9 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Home" },
     {
-      href: "#",
-      label: "Rooms",
-      submenu: [
-        { href: "/rooms", label: "View Rooms" },
-        { href: "/gallery", label: "Gallery" },
-      ],
+      href: "/rooms",
+      label: "Accommodation",
+      submenu: [{ href: "/gallery", label: "Gallery" }],
     },
     { href: "/deals", label: "Deals" },
     {
@@ -64,13 +61,23 @@ export default function Header() {
                 <div key={link.label} className="relative group">
                   {link.submenu ? (
                     <>
-                      <button 
-                        type="button"
-                        className="text-gray-700 hover:text-primary font-medium flex items-center gap-1 cursor-pointer"
-                      >
-                        {link.label}
-                        <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
-                      </button>
+                      {link.href !== "#" ? (
+                        <Link
+                          href={link.href}
+                          className="text-gray-700 hover:text-primary font-medium flex items-center gap-1"
+                        >
+                          {link.label}
+                          <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-gray-700 hover:text-primary font-medium flex items-center gap-1 cursor-pointer"
+                        >
+                          {link.label}
+                          <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                        </button>
+                      )}
                       <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
                         <div className="w-48 bg-white rounded-lg shadow-xl border border-gray-200">
                           <div className="py-1">
@@ -143,7 +150,17 @@ export default function Header() {
                   <div key={link.label}>
                     {link.submenu ? (
                       <div className="space-y-2">
-                        <div className="font-medium text-gray-700">{link.label}</div>
+                        {link.href !== "#" ? (
+                          <Link
+                            href={link.href}
+                            className="block py-2 font-medium text-gray-700 hover:text-primary"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            {link.label}
+                          </Link>
+                        ) : (
+                          <div className="font-medium text-gray-700">{link.label}</div>
+                        )}
                         {link.submenu.map((sub) => (
                           <Link
                             key={sub.href}
