@@ -34,13 +34,9 @@ function ReviewCard({ review }: { review: GoogleReview }) {
       <p className="mt-4 flex-1 text-sm leading-relaxed text-[#3A3A3A]">{review.text}</p>
       <div className="mt-6 flex items-center gap-3">
         {review.authorPhoto ? (
-          <Image
-            src={review.authorPhoto}
-            alt=""
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-full object-cover"
-          />
+          // Google profile photos use several hosts, so a plain image avoids a failed optimizer taking down the section.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={review.authorPhoto} alt="" width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
         ) : (
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-logo font-serif text-lg text-primary">
             {review.author.slice(0, 1)}
