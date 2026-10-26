@@ -116,13 +116,9 @@ export default function BarRestaurantPage() {
             transition={{ delay: 0.35 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-sans font-bold text-primary mb-3 text-center">
+            <h2 className="text-3xl font-sans font-bold text-primary mb-10 text-center">
               Our bar offers from the given selection
             </h2>
-            <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10">
-              Selection and prices for our bar — updated from the admin dashboard. Ask our staff for today&apos;s full list
-              and specials.
-            </p>
             <div className="max-w-5xl mx-auto mb-8 space-y-4">
               <input
                 type="search"
