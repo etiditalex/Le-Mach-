@@ -1,17 +1,39 @@
 /**
- * Public site URL for metadata (Open Graph, canonical) and env-aware links.
- * On Vercel set NEXT_PUBLIC_APP_URL to your production domain (e.g. https://lemach.co.ke).
+ * Public site URL for metadata, sitemap, and canonical links.
+ * Prefer an explicit https domain. Ignore localhost and one-off Vercel
+ * deployment hosts so Google always sees https://lemach.co.ke.
  */
+const CANONICAL_SITE_URL = "https://lemach.co.ke";
 const CLOUD = "https://res.cloudinary.com/dyfnobo9r/image/upload";
 /** Official Le Mach Hotel & Conferences wordmark (PNG). */
 const SITE_LOGO_PATH = "v1774878083/Le_mach_hotel_and_apartment-logo_stscc5.png";
 
+function publicSiteUrl(raw: string | undefined): string | null {
+  const value = raw?.trim().replace(/\/$/, "");
+  if (!value) return null;
+
+  let url: URL;
+  try {
+    url = new URL(value.includes("://") ? value : `https://${value}`);
+  } catch {
+    return null;
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) return null;
+  // Per-deployment hosts such as le-mach-abc-team-projects.vercel.app are not the public site.
+  if (host.endsWith(".vercel.app") && host.includes("-projects")) return null;
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+
+  return `https://${host}`;
+}
+
 export function getSiteUrl(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
-  const vercel = process.env.VERCEL_URL?.replace(/^https?:\/\//, "").trim();
-  if (vercel) return `https://${vercel}`;
-  return "https://lemach.co.ke";
+  return (
+    publicSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) ||
+    publicSiteUrl(process.env.NEXT_PUBLIC_APP_URL) ||
+    CANONICAL_SITE_URL
+  );
 }
 
 /** Full wordmark — header, marketing, anywhere the horizontal logo is shown */
