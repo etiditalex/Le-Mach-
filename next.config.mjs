@@ -8,6 +8,14 @@ const remotePatterns = [
     protocol: 'https',
     hostname: 'res.cloudinary.com',
   },
+  {
+    protocol: 'https',
+    hostname: 'lh3.googleusercontent.com',
+  },
+  {
+    protocol: 'https',
+    hostname: 'maps.gstatic.com',
+  },
 ];
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

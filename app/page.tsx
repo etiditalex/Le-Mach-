@@ -9,6 +9,7 @@ import StayQuote from "@/components/StayQuote";
 import DiningVenues from "@/components/DiningVenues";
 import Experiences from "@/components/Experiences";
 import GalleryGlimpse from "@/components/GalleryGlimpse";
+import GoogleReviews from "@/components/GoogleReviews";
 import BookYourStay from "@/components/BookYourStay";
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default function Home() {
       <DiningVenues />
       <Experiences />
       <GalleryGlimpse />
+      <GoogleReviews />
       <BookYourStay />
       <Footer />
     </main>
