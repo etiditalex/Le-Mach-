@@ -25,14 +25,20 @@ export type GoogleReview = {
   text: string;
   relativeTime: string;
   reviewUri: string | null;
+  publishedAt: number | null;
 };
 
 export type GoogleReviews = {
   rating: number | null;
   reviewCount: number | null;
   mapsUri: string | null;
+  writeReviewUri: string;
   reviews: GoogleReview[];
 };
+
+export function writeReviewUrl(id = process.env.GOOGLE_PLACE_ID?.trim() || DEFAULT_PLACE_ID): string {
+  return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(id)}`;
+}
 
 type PlacesReview = {
   name?: string;
@@ -96,9 +102,9 @@ function clampRating(rating: number | undefined): number {
   return Math.max(1, Math.min(5, Math.round(rating ?? 0)));
 }
 
-async function fromPlacesNew(key: string, id: string): Promise<GoogleReviews | null> {
+async function fromPlacesNew(key: string, id: string, languageCode: string): Promise<GoogleReviews | null> {
   const url = new URL(`https://places.googleapis.com/v1/places/${encodeURIComponent(id)}`);
-  url.searchParams.set("languageCode", "en");
+  url.searchParams.set("languageCode", languageCode);
 
   const response = await fetch(url, {
     headers: {
@@ -127,6 +133,7 @@ async function fromPlacesNew(key: string, id: string): Promise<GoogleReviews | n
         text,
         relativeTime: review.relativePublishTimeDescription?.trim() || "",
         reviewUri: review.googleMapsUri ?? null,
+        publishedAt: review.publishTime ? Date.parse(review.publishTime) || null : null,
       };
     })
     .filter((review): review is GoogleReview => review !== null);
@@ -136,6 +143,7 @@ async function fromPlacesNew(key: string, id: string): Promise<GoogleReviews | n
     rating: typeof data.rating === "number" ? data.rating : null,
     reviewCount: typeof data.userRatingCount === "number" ? data.userRatingCount : null,
     mapsUri: data.googleMapsUri ?? `https://search.google.com/local/reviews?placeid=${id}`,
+    writeReviewUri: writeReviewUrl(id),
     reviews,
   };
 }
@@ -153,27 +161,33 @@ function mergeReviews(...groups: Array<GoogleReviews | null>): GoogleReviews | n
     if (reviewCount === null) reviewCount = group.reviewCount;
     if (!mapsUri) mapsUri = group.mapsUri;
     for (const review of group.reviews) {
-      const key = `${review.author.toLowerCase()}|${review.text.slice(0, 80).toLowerCase()}`;
+      const key = review.publishedAt
+        ? `${review.author.toLowerCase()}|${review.publishedAt}`
+        : `${review.author.toLowerCase()}|${review.text.slice(0, 80).toLowerCase()}`;
       if (seen.has(key)) continue;
       seen.add(key);
       reviews.push(review);
     }
   }
 
+  reviews.sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0));
   if (reviews.length === 0) return null;
-  return { rating, reviewCount, mapsUri, reviews };
+  return { rating, reviewCount, mapsUri, writeReviewUri: writeReviewUrl(), reviews };
 }
 
 async function fromLegacyPlaces(
   key: string,
   id: string,
-  sort: "newest" | "most_relevant"
+  sort: "newest" | "most_relevant",
+  language: string,
+  originalText: boolean
 ): Promise<GoogleReviews | null> {
   const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
   url.searchParams.set("place_id", id);
   url.searchParams.set("fields", "rating,user_ratings_total,url,reviews");
   url.searchParams.set("reviews_sort", sort);
-  url.searchParams.set("language", "en");
+  url.searchParams.set("language", language);
+  if (originalText) url.searchParams.set("reviews_no_translations", "true");
   url.searchParams.set("key", key);
 
   const response = await fetch(url, { cache: "no-store" });
@@ -197,6 +211,7 @@ async function fromLegacyPlaces(
         text,
         relativeTime: review.relative_time_description?.trim() || "",
         reviewUri: review.author_url ?? null,
+        publishedAt: typeof review.time === "number" ? review.time * 1000 : null,
       };
     })
     .filter((review): review is GoogleReview => review !== null);
@@ -206,6 +221,7 @@ async function fromLegacyPlaces(
     rating: typeof data.result?.rating === "number" ? data.result.rating : null,
     reviewCount: typeof data.result?.user_ratings_total === "number" ? data.result.user_ratings_total : null,
     mapsUri: data.result?.url ?? `https://search.google.com/local/reviews?placeid=${id}`,
+    writeReviewUri: writeReviewUrl(id),
     reviews,
   };
 }
@@ -224,12 +240,15 @@ export async function getGoogleReviews(): Promise<GoogleReviews | null> {
 
   const id = placeId();
   try {
-    const [primary, newest, relevant] = await Promise.all([
-      fromPlacesNew(key, id).catch(() => null),
-      fromLegacyPlaces(key, id, "newest").catch(() => null),
-      fromLegacyPlaces(key, id, "most_relevant").catch(() => null),
+    const groups = await Promise.all([
+      fromPlacesNew(key, id, "en").catch(() => null),
+      fromPlacesNew(key, id, "sw").catch(() => null),
+      fromLegacyPlaces(key, id, "newest", "en", false).catch(() => null),
+      fromLegacyPlaces(key, id, "most_relevant", "en", false).catch(() => null),
+      fromLegacyPlaces(key, id, "newest", "en", true).catch(() => null),
+      fromLegacyPlaces(key, id, "most_relevant", "sw", true).catch(() => null),
     ]);
-    const data = mergeReviews(primary, relevant, newest);
+    const data = mergeReviews(...groups);
     if (data) cached = { at: Date.now(), data };
     return data;
   } catch (error) {
