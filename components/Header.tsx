@@ -31,13 +31,12 @@ export default function Header() {
       ],
     },
     { href: "/meetings-events", label: "Meetings & Events" },
-    {
-      href: "/reviews",
-      label: "Testimonials/Reviews",
-      submenu: [{ href: "/reviews", label: "Google reviews" }],
-    },
     { href: "/signage", label: "Digital Signage" },
-    { href: "/about", label: "About Us" },
+    {
+      href: "/about",
+      label: "About Us",
+      submenu: [{ href: "/reviews", label: "Testimonials/Reviews" }],
+    },
     { href: "/contact", label: "Contact Us" },
   ];
 
@@ -61,7 +60,7 @@ export default function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-4 xl:gap-6">
+            <div className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <div key={link.label} className="relative group">
                   {link.submenu ? (
@@ -84,7 +83,7 @@ export default function Header() {
                         </button>
                       )}
                       <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
-                        <div className="w-48 bg-white rounded-lg shadow-xl border border-gray-200">
+                        <div className="min-w-48 w-max bg-white rounded-lg shadow-xl border border-gray-200">
                           <div className="py-1">
                             {link.submenu.map((sub) => (
                               <Link
