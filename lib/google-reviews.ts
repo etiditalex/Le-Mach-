@@ -140,11 +140,39 @@ async function fromPlacesNew(key: string, id: string): Promise<GoogleReviews | n
   };
 }
 
-async function fromLegacyPlaces(key: string, id: string): Promise<GoogleReviews | null> {
+function mergeReviews(...groups: Array<GoogleReviews | null>): GoogleReviews | null {
+  const reviews: GoogleReview[] = [];
+  const seen = new Set<string>();
+  let rating: number | null = null;
+  let reviewCount: number | null = null;
+  let mapsUri: string | null = null;
+
+  for (const group of groups) {
+    if (!group) continue;
+    if (rating === null) rating = group.rating;
+    if (reviewCount === null) reviewCount = group.reviewCount;
+    if (!mapsUri) mapsUri = group.mapsUri;
+    for (const review of group.reviews) {
+      const key = `${review.author.toLowerCase()}|${review.text.slice(0, 80).toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      reviews.push(review);
+    }
+  }
+
+  if (reviews.length === 0) return null;
+  return { rating, reviewCount, mapsUri, reviews };
+}
+
+async function fromLegacyPlaces(
+  key: string,
+  id: string,
+  sort: "newest" | "most_relevant"
+): Promise<GoogleReviews | null> {
   const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
   url.searchParams.set("place_id", id);
   url.searchParams.set("fields", "rating,user_ratings_total,url,reviews");
-  url.searchParams.set("reviews_sort", "newest");
+  url.searchParams.set("reviews_sort", sort);
   url.searchParams.set("language", "en");
   url.searchParams.set("key", key);
 
@@ -196,7 +224,12 @@ export async function getGoogleReviews(): Promise<GoogleReviews | null> {
 
   const id = placeId();
   try {
-    const data = (await fromPlacesNew(key, id)) ?? (await fromLegacyPlaces(key, id));
+    const [primary, newest, relevant] = await Promise.all([
+      fromPlacesNew(key, id).catch(() => null),
+      fromLegacyPlaces(key, id, "newest").catch(() => null),
+      fromLegacyPlaces(key, id, "most_relevant").catch(() => null),
+    ]);
+    const data = mergeReviews(primary, relevant, newest);
     if (data) cached = { at: Date.now(), data };
     return data;
   } catch (error) {

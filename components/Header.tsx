@@ -31,6 +31,11 @@ export default function Header() {
       ],
     },
     { href: "/meetings-events", label: "Meetings & Events" },
+    {
+      href: "/reviews",
+      label: "Testimonials/Reviews",
+      submenu: [{ href: "/reviews", label: "Google reviews" }],
+    },
     { href: "/signage", label: "Digital Signage" },
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact Us" },
@@ -56,7 +61,7 @@ export default function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-4 xl:gap-6">
               {navLinks.map((link) => (
                 <div key={link.label} className="relative group">
                   {link.submenu ? (

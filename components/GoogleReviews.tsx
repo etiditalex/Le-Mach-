@@ -19,7 +19,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function ReviewCard({ review }: { review: GoogleReview }) {
+export function ReviewCard({ review }: { review: GoogleReview }) {
   const author = review.authorUri ? (
     <a href={review.authorUri} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
       {review.author}
@@ -61,9 +61,10 @@ function ReviewCard({ review }: { review: GoogleReview }) {
   );
 }
 
-export default async function GoogleReviews() {
+export default async function GoogleReviews({ limit = 3 }: { limit?: number }) {
   const data = await getGoogleReviews();
   if (!data) return null;
+  const reviews = data.reviews.slice(0, limit);
 
   const ratingLabel =
     data.rating !== null ? data.rating.toFixed(1).replace(/\.0$/, "") : null;
@@ -93,7 +94,7 @@ export default async function GoogleReviews() {
         </div>
 
         <ul className="mt-10 grid grid-cols-1 gap-4 sm:mt-12 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-          {data.reviews.map((review) => (
+          {reviews.map((review) => (
             <li key={review.id} className="h-full">
               <ReviewCard review={review} />
             </li>
@@ -103,12 +104,10 @@ export default async function GoogleReviews() {
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
           {data.mapsUri ? (
             <a
-              href={data.mapsUri}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/reviews"
               className="inline-flex min-h-11 items-center justify-center bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-primary-dark"
             >
-              See all Google reviews
+              Testimonials / Reviews
             </a>
           ) : null}
           <Image

@@ -17,6 +17,7 @@ const staticPages: { path: string; priority: number; changeFrequency: ChangeFreq
   { path: "/bar-restaurant", priority: 0.7, changeFrequency: "weekly" },
   { path: "/contact", priority: 0.6, changeFrequency: "monthly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/reviews", priority: 0.6, changeFrequency: "weekly" },
   { path: "/gallery", priority: 0.5, changeFrequency: "monthly" },
   { path: "/cookies", priority: 0.2, changeFrequency: "yearly" },
 ];
