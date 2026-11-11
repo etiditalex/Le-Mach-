@@ -27,7 +27,10 @@ export default async function AdminOrdersPage() {
     <div className="max-w-6xl mx-auto space-y-10">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Orders & bookings</h1>
-        <p className="text-gray-600 mt-1">Latest room service orders and room reservations.</p>
+        <p className="text-gray-600 mt-1">
+          Latest room service orders and room reservations. Delete a row to remove a test so only real ones stay on the
+          dashboard.
+        </p>
       </div>
       <OrdersRealtimeClient initialFood={food as never} initialBookings={bookings as never} />
     </div>

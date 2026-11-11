@@ -1,5 +1,6 @@
 import type { FoodOrder } from "@/lib/hotel-types";
-import { insertAdminNotification } from "@/lib/repositories/notifications";
+import { deleteAdminNotificationsForEntity, insertAdminNotification } from "@/lib/repositories/notifications";
+import { foodOrderWhatsAppText, notifyHotelWhatsApp } from "@/lib/whatsapp";
 import { rowToFoodOrder, type FoodOrderRow } from "@/lib/repositories/mappers";
 import { getServiceSupabase } from "@/lib/supabase/service";
 
@@ -48,6 +49,7 @@ export async function insertFoodOrder(order: FoodOrder): Promise<void> {
     body: `${order.guestName} · ${order.roomNumber ? `Room ${order.roomNumber}` : "No room"} · KSh ${order.totalKes.toLocaleString()}`,
     entityId: order.id,
   });
+  await notifyHotelWhatsApp(foodOrderWhatsAppText(order, "new"));
 }
 
 export async function updateFoodOrder(
@@ -105,4 +107,19 @@ export async function markFoodOrderPaidWithNotify(
     body: `${order.guestName} · ${order.roomNumber ? `Room ${order.roomNumber}` : "No room"} · KSh ${order.totalKes.toLocaleString()}`,
     entityId: order.id,
   });
+  await notifyHotelWhatsApp(
+    foodOrderWhatsAppText(
+      { ...order, status: "paid", mpesa: patch.mpesa ?? order.mpesa, paymentProvider: patch.paymentProvider },
+      "paid"
+    )
+  );
+}
+
+export async function deleteFoodOrder(id: string): Promise<boolean> {
+  const sb = getServiceSupabase();
+  const { data, error } = await sb.from("food_orders").delete().eq("id", id).select("id").maybeSingle();
+  if (error) throw error;
+  if (!data) return false;
+  await deleteAdminNotificationsForEntity(id);
+  return true;
 }

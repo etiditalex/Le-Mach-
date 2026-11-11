@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchAdminOverview } from "@/lib/repositories/admin-overview";
+import { HOTEL_WHATSAPP_DISPLAY, isHotelWhatsAppConfigured } from "@/lib/whatsapp";
 import NotificationsWidgetClient from "@/app/admin/NotificationsWidgetClient";
 import { NotificationsListClient } from "@/app/admin/NotificationsWidgetClient";
 
@@ -30,8 +31,19 @@ export default async function AdminDashboardPage() {
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Overview of guest orders, bookings, and alerts.</p>
+        <p className="text-gray-600 mt-1">
+          Overview of guest orders, bookings, and alerts. New orders and bookings are also sent to WhatsApp{" "}
+          {HOTEL_WHATSAPP_DISPLAY}.
+        </p>
       </div>
+
+      {!isHotelWhatsAppConfigured() && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
+          WhatsApp delivery to {HOTEL_WHATSAPP_DISPLAY} is not switched on yet. Add{" "}
+          <code className="bg-amber-100 px-1 rounded">CALLMEBOT_APIKEY</code> (or the WhatsApp Cloud API keys) in the
+          server environment, then restart the app. Orders still appear here.
+        </div>
+      )}
 
       {err && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">

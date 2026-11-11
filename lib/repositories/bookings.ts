@@ -1,5 +1,6 @@
 import type { BookingRecord } from "@/lib/hotel-types";
-import { insertAdminNotification } from "@/lib/repositories/notifications";
+import { deleteAdminNotificationsForEntity, insertAdminNotification } from "@/lib/repositories/notifications";
+import { bookingWhatsAppText, notifyHotelWhatsApp } from "@/lib/whatsapp";
 import { rowToBooking, type BookingRow } from "@/lib/repositories/mappers";
 import { getServiceSupabase } from "@/lib/supabase/service";
 
@@ -55,6 +56,7 @@ export async function insertBooking(booking: BookingRecord): Promise<void> {
     body: `${booking.firstName} ${booking.lastName} · ${booking.roomName} · KSh ${booking.totalKes.toLocaleString()}`,
     entityId: booking.id,
   });
+  await notifyHotelWhatsApp(bookingWhatsAppText(booking, "new"));
 }
 
 export async function updateBooking(
@@ -112,4 +114,19 @@ export async function markBookingPaidWithNotify(
     body: `${booking.firstName} ${booking.lastName} · ${booking.roomName} · KSh ${booking.totalKes.toLocaleString()}`,
     entityId: booking.id,
   });
+  await notifyHotelWhatsApp(
+    bookingWhatsAppText(
+      { ...booking, status: "paid", mpesa: patch.mpesa ?? booking.mpesa, paymentProvider: patch.paymentProvider },
+      "paid"
+    )
+  );
+}
+
+export async function deleteBooking(id: string): Promise<boolean> {
+  const sb = getServiceSupabase();
+  const { data, error } = await sb.from("bookings").delete().eq("id", id).select("id").maybeSingle();
+  if (error) throw error;
+  if (!data) return false;
+  await deleteAdminNotificationsForEntity(id);
+  return true;
 }

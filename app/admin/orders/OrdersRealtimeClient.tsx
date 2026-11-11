@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bug, Download, Printer } from "lucide-react";
+import { Bug, Download, Printer, Trash2 } from "lucide-react";
 
 type FoodRow = {
   id: string;
@@ -45,9 +45,12 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
   const [food, setFood] = useState<FoodRow[]>(props.initialFood);
   const [bookings, setBookings] = useState<BookingRow[]>(props.initialBookings);
   const [streamErr, setStreamErr] = useState<string | null>(null);
+  const [actionErr, setActionErr] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [serverTime, setServerTime] = useState<string | null>(null);
 
   const esRef = useRef<EventSource | null>(null);
+  const deletedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const es = new EventSource("/api/admin/orders/stream");
@@ -56,8 +59,11 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
     const onSnapshot = (ev: MessageEvent<string>) => {
       try {
         const snap = JSON.parse(ev.data) as Snapshot;
-        setFood(Array.isArray(snap.food) ? snap.food : []);
-        setBookings(Array.isArray(snap.bookings) ? snap.bookings : []);
+        const gone = deletedRef.current;
+        setFood((Array.isArray(snap.food) ? snap.food : []).filter((row) => !gone.has(`food:${row.id}`)));
+        setBookings(
+          (Array.isArray(snap.bookings) ? snap.bookings : []).filter((row) => !gone.has(`booking:${row.id}`))
+        );
         setServerTime(typeof snap.serverTime === "string" ? snap.serverTime : null);
         setStreamErr(null);
       } catch {
@@ -90,6 +96,26 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
     };
   }, []);
 
+  const removeRow = async (kind: "food" | "booking", id: string, label: string) => {
+    const noun = kind === "food" ? "food order" : "booking";
+    if (!confirm(`Delete this ${noun} for ${label}? It will be removed from the dashboard.`)) return;
+    setActionErr(null);
+    setDeletingId(`${kind}:${id}`);
+    try {
+      const path = kind === "food" ? "food-orders" : "bookings";
+      const res = await fetch(`/api/admin/${path}/${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      deletedRef.current.add(`${kind}:${id}`);
+      if (kind === "food") setFood((rows) => rows.filter((row) => String(row.id) !== id));
+      else setBookings((rows) => rows.filter((row) => String(row.id) !== id));
+    } catch (e) {
+      setActionErr(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const lastUpdatedLabel = useMemo(() => {
     if (!serverTime) return null;
     const d = new Date(serverTime);
@@ -103,6 +129,9 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           {streamErr}
         </div>
+      )}
+      {actionErr && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{actionErr}</div>
       )}
       {lastUpdatedLabel && <p className="text-xs text-gray-500">Live · Updated {lastUpdatedLabel}</p>}
 
@@ -118,12 +147,13 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Created</th>
                 <th className="px-4 py-3 font-medium w-64">Receipt & tools</th>
+                <th className="px-4 py-3 font-medium w-24">Delete</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {food.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                     No food orders.
                   </td>
                 </tr>
@@ -184,6 +214,17 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                           </Link>
                         </div>
                       </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          disabled={deletingId === `food:${id}`}
+                          onClick={() => void removeRow("food", id, String(row.guest_name))}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4 shrink-0" aria-hidden />
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   );
                 })
@@ -206,12 +247,13 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Created</th>
                 <th className="px-4 py-3 font-medium w-64">Receipt & tools</th>
+                <th className="px-4 py-3 font-medium w-24">Delete</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     No bookings.
                   </td>
                 </tr>
@@ -276,6 +318,17 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                             Trace
                           </Link>
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          disabled={deletingId === `booking:${id}`}
+                          onClick={() => void removeRow("booking", id, `${row.first_name} ${row.last_name}`.trim())}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4 shrink-0" aria-hidden />
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   );

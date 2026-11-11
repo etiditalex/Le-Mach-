@@ -16,3 +16,9 @@ export async function insertAdminNotification(n: {
   });
   if (error) throw error;
 }
+
+export async function deleteAdminNotificationsForEntity(entityId: string): Promise<void> {
+  const sb = getServiceSupabase();
+  const { error } = await sb.from("admin_notifications").delete().eq("entity_id", entityId);
+  if (error) throw error;
+}
