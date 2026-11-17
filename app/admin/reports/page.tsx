@@ -23,12 +23,9 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
   const toDefault = searchParams.to ?? "";
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Summary report</h1>
-        </div>
-        <Link href="/admin" className="text-sm text-primary hover:underline shrink-0">
+    <div className="space-y-8">
+      <div className="flex justify-end">
+        <Link href="/admin" className="text-sm font-medium text-primary hover:underline">
           ← Dashboard
         </Link>
       </div>

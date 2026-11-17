@@ -197,13 +197,10 @@ export default function BarBrandsPanel() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Bar — alcohol brands</h1>
-        <p className="text-gray-600 mt-1">
-          Manage brands, prices, and descriptions on the Bar &amp; Restaurant page. Images are uploaded from your
-          device to Supabase Storage.
-        </p>
-      </div>
+      <p className="text-sm text-gray-500">
+        Manage brands, prices, and descriptions on the Bar &amp; Restaurant page. Images are uploaded from your device
+        to Supabase Storage.
+      </p>
 
       {err && (
         <div className="rounded-xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm">{err}</div>

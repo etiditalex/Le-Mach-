@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Pencil, Trash2, Loader2, FileText } from "lucide-react";
+import { Pencil, Trash2, Loader2 } from "lucide-react";
 
 type Row = {
   id: string;
@@ -105,16 +105,10 @@ export default function SiteContentPanel() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <FileText className="w-7 h-7 text-primary" />
-          Site content
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Text snippets for pages (taglines, footers). Use stable slugs; wire the public site to{" "}
-          <code className="text-xs bg-gray-100 px-1 rounded">/api/public/content?slug=...</code> when needed.
-        </p>
-      </div>
+      <p className="text-sm text-gray-500">
+        Text snippets for pages (taglines, footers). Use stable slugs; wire the public site to{" "}
+        <code className="rounded bg-gray-100 px-1 text-xs">/api/public/content?slug=...</code> when needed.
+      </p>
 
       {info && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">{info}</div>

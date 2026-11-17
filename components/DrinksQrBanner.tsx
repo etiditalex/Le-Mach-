@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { getSiteUrl } from "@/lib/site";
 
 const DISMISS_KEY = "lemach_drinks_qr_banner_dismissed_until";
@@ -9,6 +10,7 @@ const DISMISS_MS = 12 * 60 * 60 * 1000; // 12 hours
 const DEFAULT_CUSTOM_DOMAIN = "https://lemach.co.ke";
 
 export default function DrinksQrBanner() {
+  const pathname = usePathname();
   const [hidden, setHidden] = useState(false);
   const [origin, setOrigin] = useState("");
   const configuredSiteUrl = useMemo(() => getSiteUrl().replace(/\/$/, ""), []);
@@ -39,7 +41,7 @@ export default function DrinksQrBanner() {
     }
   }, []);
 
-  if (hidden) return null;
+  if (hidden || pathname?.startsWith("/admin")) return null;
 
   return (
     <aside

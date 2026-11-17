@@ -1,156 +1,255 @@
 import Link from "next/link";
-import { fetchAdminOverview } from "@/lib/repositories/admin-overview";
+import { BedDouble, ChevronRight, UtensilsCrossed, Wallet } from "lucide-react";
+import { requireAdminUser } from "@/lib/admin-auth";
+import { adminGreetingName, formatCount, formatKsh, percentChange } from "@/lib/admin-display";
+import { blankAdminOverview, fetchAdminOverview } from "@/lib/repositories/admin-overview";
 import { HOTEL_WHATSAPP_DISPLAY, isHotelWhatsAppConfigured } from "@/lib/whatsapp";
-import NotificationsWidgetClient from "@/app/admin/NotificationsWidgetClient";
-import { NotificationsListClient } from "@/app/admin/NotificationsWidgetClient";
+import { adminCardClass } from "@/components/admin/admin-styles";
+import MetricCard, { Sparkline } from "@/components/admin/MetricCard";
+import RevenueChart from "@/components/admin/RevenueChart";
+import StatusBadge from "@/components/admin/StatusBadge";
+import NotificationsWidgetClient, { NotificationsListClient } from "@/app/admin/NotificationsWidgetClient";
 
 export const dynamic = "force-dynamic";
 
-function formatKsh(n: number) {
-  return `KSh ${n.toLocaleString()}`;
-}
-
 export default async function AdminDashboardPage() {
-  let overview;
+  const user = await requireAdminUser();
+  let overview = blankAdminOverview();
   let err: string | null = null;
   try {
     overview = await fetchAdminOverview();
   } catch (e) {
     err = e instanceof Error ? e.message : "Could not load data";
-    overview = {
-      unreadNotifications: 0,
-      foodOrdersTotal: 0,
-      bookingsTotal: 0,
-      recentFood: [],
-      recentBookings: [],
-      recentNotifications: [],
-    };
   }
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">
-          Overview of guest orders, bookings, and alerts. New orders and bookings are also sent to WhatsApp{" "}
-          {HOTEL_WHATSAPP_DISPLAY}.
-        </p>
-      </div>
+  const paidTotal = overview.paidFoodKes + overview.paidBookingsKes;
+  const splitTotal = paidTotal;
+  const foodShare = splitTotal > 0 ? (overview.paidFoodKes / splitTotal) * 100 : 0;
+  const bookingShare = splitTotal > 0 ? 100 - foodShare : 0;
+  const change = percentChange(overview.weekPaidKes, overview.previousWeekPaidKes);
 
+  const records = [
+    ...overview.recentFood.map((order) => ({
+      id: `food-${order.id}`,
+      guest: order.guest_name,
+      type: "Food order",
+      detail: order.room_number ? `Room ${order.room_number}` : "No room",
+      status: order.status,
+      total: order.total_kes,
+      created_at: order.created_at,
+    })),
+    ...overview.recentBookings.map((booking) => ({
+      id: `booking-${booking.id}`,
+      guest: `${booking.first_name} ${booking.last_name}`.trim(),
+      type: "Booking",
+      detail: booking.room_name,
+      status: booking.status,
+      total: booking.total_kes,
+      created_at: booking.created_at,
+    })),
+  ]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 8);
+
+  return (
+    <div className="space-y-5">
       {!isHotelWhatsAppConfigured() && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           WhatsApp delivery to {HOTEL_WHATSAPP_DISPLAY} is not switched on yet. Add{" "}
-          <code className="bg-amber-100 px-1 rounded">CALLMEBOT_APIKEY</code> (or the WhatsApp Cloud API keys) in the
+          <code className="rounded bg-amber-100 px-1">CALLMEBOT_APIKEY</code> (or the WhatsApp Cloud API keys) in the
           server environment, then restart the app. Orders still appear here.
         </div>
       )}
 
       {err && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <strong>Data error:</strong> {err}. Confirm{" "}
-          <code className="bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> in{" "}
-          <code className="bg-amber-100 px-1 rounded">.env.local</code> and that SQL migrations ran.
+          <code className="rounded bg-amber-100 px-1">SUPABASE_SERVICE_ROLE_KEY</code> in{" "}
+          <code className="rounded bg-amber-100 px-1">.env.local</code> and that SQL migrations ran.
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm sm:col-span-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-12">
+        <div className="min-w-0 space-y-5 xl:col-span-5">
           <div>
-            <p className="text-sm font-medium text-gray-900">Paid revenue summary</p>
-            <p className="text-sm text-gray-500 mt-0.5">Food &amp; drinks by category and totals per room / booking.</p>
+            <p className="text-[17px] font-semibold text-gray-900">Hi, {adminGreetingName(user)}!</p>
+            <p className="mt-1 max-w-md text-[13px] leading-5 text-gray-500">
+              Overview of guest orders, bookings, and alerts. New orders and bookings are also sent to WhatsApp{" "}
+              {HOTEL_WHATSAPP_DISPLAY}.
+            </p>
           </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <MetricCard
+              href="/admin/orders"
+              label="Food orders"
+              value={formatCount(overview.foodOrdersTotal)}
+              icon={<UtensilsCrossed className="h-[18px] w-[18px]" aria-hidden />}
+              iconClassName="bg-[#FDE8EC] text-primary"
+              spark={
+                <Sparkline
+                  values={overview.days.map((day) => day.foodOrders)}
+                  color="#E31837"
+                  label="Food orders created each day for the last 7 days"
+                />
+              }
+            />
+            <MetricCard
+              href="/admin/orders"
+              label="Bookings"
+              value={formatCount(overview.bookingsTotal)}
+              icon={<BedDouble className="h-[18px] w-[18px]" aria-hidden />}
+              iconClassName="bg-[#FFF4CC] text-primary-dark"
+              spark={
+                <Sparkline
+                  values={overview.days.map((day) => day.bookings)}
+                  color="#E6B400"
+                  label="Bookings created each day for the last 7 days"
+                />
+              }
+            />
+            <NotificationsWidgetClient initialUnread={overview.unreadNotifications} />
+            <MetricCard
+              href="/admin/reports"
+              label="All-time paid (KSh)"
+              value={paidTotal.toLocaleString("en-KE")}
+              icon={<Wallet className="h-[18px] w-[18px]" aria-hidden />}
+              iconClassName="bg-[#FDE8EC] text-primary-dark"
+              spark={
+                <Sparkline
+                  values={overview.days.map((day) => day.paidKes)}
+                  color="#A51229"
+                  label="Paid revenue each day for the last 7 days"
+                />
+              }
+            />
+          </div>
+
+          <section className={`${adminCardClass} p-5`}>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-[15px] font-semibold text-gray-900">Recent activity</h2>
+              <Link
+                href="/admin/notifications"
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-gray-500 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              >
+                View all
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Link>
+            </div>
+            <div className="mt-2">
+              <NotificationsListClient
+                initialNotifications={overview.recentNotifications}
+                limit={5}
+                variant="activity"
+              />
+            </div>
+          </section>
+        </div>
+
+        <div className="min-w-0 space-y-5 xl:col-span-7">
+          <RevenueChart points={overview.days} totalKes={overview.weekPaidKes} change={change} />
+
+          <section className={`${adminCardClass} p-5 sm:p-6`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-[15px] font-semibold text-gray-900">Paid breakdown</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  <span className="font-semibold text-gray-900 tabular-nums">{formatKsh(paidTotal)}</span> combined paid
+                  total
+                </p>
+              </div>
+            </div>
+
+            {splitTotal <= 0 ? (
+              <p className="mt-6 rounded-xl bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
+                No paid room service or room bookings yet.
+              </p>
+            ) : (
+              <>
+                <div
+                  className="mt-5 flex h-10 overflow-hidden rounded-lg"
+                  role="img"
+                  aria-label={`Room service ${formatKsh(overview.paidFoodKes)}, room bookings ${formatKsh(overview.paidBookingsKes)}`}
+                >
+                  {foodShare > 0 && <div className="h-full bg-primary" style={{ width: `${foodShare}%` }} />}
+                  {bookingShare > 0 && <div className="h-full bg-secondary" style={{ width: `${bookingShare}%` }} />}
+                </div>
+                <div className="mt-3 flex items-start justify-between gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-gray-900">Room service</p>
+                    <p className="mt-0.5 tabular-nums text-gray-500">{formatKsh(overview.paidFoodKes)}</p>
+                    <p className="text-xs text-gray-400">{formatCount(overview.paidFoodCount)} paid</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900">Room bookings</p>
+                    <p className="mt-0.5 tabular-nums text-gray-500">{formatKsh(overview.paidBookingsKes)}</p>
+                    <p className="text-xs text-gray-400">{formatCount(overview.paidBookingCount)} paid</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Link
+              href="/admin/reports"
+              className="mt-5 flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            >
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </span>
+              Open the summary report for category and room totals
+            </Link>
+          </section>
+        </div>
+      </div>
+
+      <section className={`${adminCardClass} overflow-hidden`}>
+        <div className="flex items-center justify-between gap-3 px-5 py-4">
+          <h2 className="text-[15px] font-semibold text-gray-900">Recent records</h2>
           <Link
-            href="/admin/reports"
-            className="inline-flex justify-center rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-95"
+            href="/admin/orders"
+            className="inline-flex items-center gap-0.5 text-sm font-medium text-gray-500 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
-            Open summary report
-          </Link>
-        </div>
-        <NotificationsWidgetClient
-          initialUnread={overview.unreadNotifications}
-          initialNotifications={overview.recentNotifications as never}
-        />
-        <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Food orders (total)</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{overview.foodOrdersTotal}</p>
-        </div>
-        <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Bookings (total)</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{overview.bookingsTotal}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <section className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="font-semibold text-gray-900">Recent food orders</h2>
-            <Link href="/admin/orders" className="text-sm text-primary hover:underline">
-              All orders
-            </Link>
-          </div>
-          <ul className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-            {overview.recentFood.length === 0 ? (
-              <li className="px-5 py-8 text-center text-gray-500 text-sm">No orders yet.</li>
-            ) : (
-              overview.recentFood.map((o) => (
-                <li key={o.id} className="px-5 py-3 text-sm">
-                  <div className="flex justify-between gap-2">
-                    <span className="font-medium text-gray-900">{o.guest_name}</span>
-                    <span className="text-primary font-medium tabular-nums">{formatKsh(o.total_kes)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-500 text-xs mt-1">
-                    <span>
-                      {o.room_number ? `Room ${o.room_number}` : "No room"} · {o.status}
-                    </span>
-                    <span>{new Date(o.created_at).toLocaleString()}</span>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </section>
-
-        <section className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="font-semibold text-gray-900">Recent bookings</h2>
-            <Link href="/admin/orders" className="text-sm text-primary hover:underline">
-              All bookings
-            </Link>
-          </div>
-          <ul className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-            {overview.recentBookings.length === 0 ? (
-              <li className="px-5 py-8 text-center text-gray-500 text-sm">No bookings yet.</li>
-            ) : (
-              overview.recentBookings.map((b) => (
-                <li key={b.id} className="px-5 py-3 text-sm">
-                  <div className="flex justify-between gap-2">
-                    <span className="font-medium text-gray-900">
-                      {b.first_name} {b.last_name}
-                    </span>
-                    <span className="text-primary font-medium tabular-nums">{formatKsh(b.total_kes)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-500 text-xs mt-1">
-                    <span>
-                      {b.room_name} · {b.status}
-                    </span>
-                    <span>{new Date(b.created_at).toLocaleString()}</span>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </section>
-      </div>
-
-      <section className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="font-semibold text-gray-900">Recent notifications</h2>
-          <Link href="/admin/notifications" className="text-sm text-primary hover:underline">
             View all
+            <ChevronRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>
-        <div className="p-5">
-          <NotificationsListClient initialNotifications={overview.recentNotifications as never} limit={10} />
+        <div className="overflow-x-auto">
+          <table className="min-w-[720px] w-full text-sm">
+            <thead>
+              <tr className="border-y border-gray-100 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <th className="px-5 py-3 font-medium">Guest</th>
+                <th className="px-3 py-3 font-medium">Type</th>
+                <th className="px-3 py-3 font-medium">Detail</th>
+                <th className="px-3 py-3 font-medium">Status</th>
+                <th className="px-3 py-3 font-medium text-right">Amount</th>
+                <th className="px-5 py-3 font-medium text-right">When</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {records.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-sm text-gray-500">
+                    No orders or bookings yet.
+                  </td>
+                </tr>
+              ) : (
+                records.map((row) => (
+                  <tr key={row.id} className="hover:bg-gray-50/80">
+                    <td className="px-5 py-3.5 font-medium text-gray-900">{row.guest}</td>
+                    <td className="px-3 py-3.5 text-gray-600">{row.type}</td>
+                    <td className="px-3 py-3.5 text-gray-600">{row.detail}</td>
+                    <td className="px-3 py-3.5">
+                      <StatusBadge status={row.status} />
+                    </td>
+                    <td className="px-3 py-3.5 text-right font-medium tabular-nums text-gray-900">{formatKsh(row.total)}</td>
+                    <td className="whitespace-nowrap px-5 py-3.5 text-right text-gray-500">
+                      {new Date(row.created_at).toLocaleString()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

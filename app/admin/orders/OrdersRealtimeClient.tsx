@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bug, Download, Printer, Trash2 } from "lucide-react";
+import StatusBadge from "@/components/admin/StatusBadge";
 
 type FoodRow = {
   id: string;
@@ -137,7 +138,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
 
       <section>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Food orders</h2>
-        <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-sm">
+        <div className="overflow-x-auto rounded-[20px] border border-black/[0.04] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_28px_rgba(16,24,40,0.045)]">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-600">
               <tr>
@@ -173,7 +174,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                       </td>
                       <td className="px-4 py-3">{row.room_number || "—"}</td>
                       <td className="px-4 py-3">
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">{status}</span>
+                        <StatusBadge status={status} />
                       </td>
                       <td className="px-4 py-3 tabular-nums font-medium">{formatKsh(Number(row.total_kes))}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
@@ -236,7 +237,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
 
       <section>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Bookings</h2>
-        <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-sm">
+        <div className="overflow-x-auto rounded-[20px] border border-black/[0.04] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_28px_rgba(16,24,40,0.045)]">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-600">
               <tr>
@@ -278,7 +279,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                         {row.check_in} → {row.check_out}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">{status}</span>
+                        <StatusBadge status={status} />
                       </td>
                       <td className="px-4 py-3 tabular-nums font-medium">{formatKsh(Number(row.total_kes))}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">

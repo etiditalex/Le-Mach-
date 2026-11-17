@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { Bell } from "lucide-react";
+import { formatCount, relativeTime } from "@/lib/admin-display";
+import MetricCard from "@/components/admin/MetricCard";
 
 type NotificationRow = {
   id: string;
@@ -18,9 +20,27 @@ type Snapshot = {
   serverTime: string;
 };
 
-export function NotificationsListClient(props: { initialNotifications: NotificationRow[]; limit?: number }) {
+const AVATAR_TONES = [
+  "bg-[#FDE8EC] text-primary",
+  "bg-[#FFF4CC] text-primary-dark",
+  "bg-amber-50 text-amber-800",
+  "bg-red-50 text-primary-dark",
+];
+
+function avatarTone(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i += 1) hash = (hash + id.charCodeAt(i)) % AVATAR_TONES.length;
+  return AVATAR_TONES[hash] ?? AVATAR_TONES[0];
+}
+
+export function NotificationsListClient(props: {
+  initialNotifications: NotificationRow[];
+  limit?: number;
+  variant?: "cards" | "activity";
+}) {
   const [rows, setRows] = useState<NotificationRow[]>(props.initialNotifications);
   const [streamErr, setStreamErr] = useState<string | null>(null);
+  const variant = props.variant ?? "cards";
 
   useEffect(() => {
     const es = new EventSource("/api/admin/notifications/stream");
@@ -64,12 +84,51 @@ export function NotificationsListClient(props: { initialNotifications: Notificat
     return rows.slice(0, limit);
   }, [props.limit, rows]);
 
+  if (variant === "activity") {
+    return (
+      <div>
+        {streamErr && (
+          <div className="mb-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-900">{streamErr}</div>
+        )}
+        {limited.length === 0 ? (
+          <p className="py-8 text-center text-sm text-gray-500">No notifications yet.</p>
+        ) : (
+          <ul className="divide-y divide-gray-100">
+            {limited.map((n) => {
+              const initial = (n.title.trim().charAt(0) || "•").toUpperCase();
+              return (
+                <li key={n.id} className="flex items-start gap-3 py-3">
+                  <span
+                    className={`relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${avatarTone(n.id)}`}
+                  >
+                    {initial}
+                    {!n.read && <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-primary" />}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-gray-900">{n.title}</p>
+                    <p className="truncate text-xs text-gray-500">{n.body}</p>
+                  </div>
+                  <time
+                    dateTime={n.created_at}
+                    title={new Date(n.created_at).toLocaleString()}
+                    className="shrink-0 whitespace-nowrap pt-0.5 text-xs text-gray-400"
+                  >
+                    {relativeTime(n.created_at)}
+                    {!n.read && <span className="sr-only">, unread</span>}
+                  </time>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {streamErr && (
-        <div className="rounded-lg bg-amber-50 border border-amber-100 text-amber-900 px-4 py-3 text-sm">
-          {streamErr}
-        </div>
+        <div className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-900">{streamErr}</div>
       )}
       {limited.length === 0 ? (
         <p className="text-sm text-gray-500">No notifications yet.</p>
@@ -78,18 +137,16 @@ export function NotificationsListClient(props: { initialNotifications: Notificat
           {limited.map((n) => (
             <li
               key={n.id}
-              className={`rounded-xl border p-4 shadow-sm ${
-                n.read ? "bg-white border-gray-200" : "bg-amber-50/50 border-amber-100"
+              className={`rounded-[20px] border p-4 shadow-sm ${
+                n.read ? "border-black/[0.04] bg-white" : "border-amber-100 bg-amber-50/50"
               }`}
             >
-              <div className="flex justify-between gap-2 items-start">
+              <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-gray-900">{n.title}</p>
-                <span className="text-xs text-gray-500 whitespace-nowrap">
-                  {new Date(n.created_at).toLocaleString()}
-                </span>
+                <span className="whitespace-nowrap text-xs text-gray-500">{new Date(n.created_at).toLocaleString()}</span>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{n.body}</p>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="mt-1 text-sm text-gray-600">{n.body}</p>
+              <p className="mt-2 text-xs text-gray-400">
                 {n.kind}
                 {!n.read && " · unread"}
               </p>
@@ -101,12 +158,8 @@ export function NotificationsListClient(props: { initialNotifications: Notificat
   );
 }
 
-export default function NotificationsWidgetClient(props: {
-  initialUnread: number;
-  initialNotifications: NotificationRow[];
-}) {
+export default function NotificationsWidgetClient(props: { initialUnread: number }) {
   const [unread, setUnread] = useState<number>(props.initialUnread);
-  const [serverTime, setServerTime] = useState<string | null>(null);
 
   useEffect(() => {
     const es = new EventSource("/api/admin/notifications/stream");
@@ -114,7 +167,6 @@ export default function NotificationsWidgetClient(props: {
       try {
         const snap = JSON.parse(ev.data) as Snapshot;
         setUnread(typeof snap.unread === "number" ? snap.unread : 0);
-        setServerTime(typeof snap.serverTime === "string" ? snap.serverTime : null);
       } catch {
         // ignore
       }
@@ -129,22 +181,14 @@ export default function NotificationsWidgetClient(props: {
     };
   }, []);
 
-  const lastUpdated = useMemo(() => {
-    if (!serverTime) return null;
-    const d = new Date(serverTime);
-    if (Number.isNaN(d.getTime())) return null;
-    return d.toLocaleTimeString();
-  }, [serverTime]);
-
   return (
-    <div className="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <p className="text-sm text-gray-500">Unread notifications</p>
-      <p className="text-3xl font-bold text-primary mt-1">{unread}</p>
-      {lastUpdated && <p className="text-xs text-gray-400 mt-1">Live · Updated {lastUpdated}</p>}
-      <Link href="/admin/notifications" className="text-sm text-primary mt-2 inline-block hover:underline">
-        View all →
-      </Link>
-    </div>
+    <MetricCard
+      href="/admin/notifications"
+      label="Unread notifications"
+      value={formatCount(unread)}
+      live
+      icon={<Bell className="h-[18px] w-[18px]" aria-hidden />}
+      iconClassName="bg-amber-50 text-amber-700"
+    />
   );
 }
-
