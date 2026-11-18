@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CalendarDays, TrendingDown, TrendingUp } from "lucide-react";
 import { formatKsh } from "@/lib/admin-display";
-import { adminCardClass } from "@/components/admin/admin-styles";
+import { adminCardClass, adminCardTitle, adminDescription, adminLabel, adminMicro, adminRevenue } from "@/components/admin/admin-styles";
 
 export type RevenuePoint = {
   key: string;
@@ -74,22 +74,22 @@ export default function RevenueChart({
     <section className={`${adminCardClass} p-5 sm:p-6`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-[15px] font-semibold text-gray-900">Paid revenue</h2>
-          <p className="mt-0.5 text-xs text-gray-500">Room service and room bookings marked paid</p>
+          <h2 className={`text-gray-900 ${adminCardTitle}`}>Paid revenue</h2>
+          <p className={`mt-0.5 text-gray-500 ${adminDescription}`}>Room service and room bookings marked paid</p>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600">
+        <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-gray-600 ${adminLabel}`}>
           <CalendarDays className="h-3.5 w-3.5" aria-hidden />
           Last 7 days
         </span>
       </div>
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-        <p className="text-[28px] font-semibold leading-none tracking-tight text-gray-900 tabular-nums sm:text-[32px]">
+        <p className={`text-gray-900 tabular-nums ${adminRevenue}`}>
           {formatKsh(totalKes)}
         </p>
         {change != null && (
           <p
-            className={`inline-flex items-center gap-1 text-xs font-medium ${
+            className={`inline-flex items-center gap-1 ${adminLabel} ${
               changeUp ? "text-emerald-600" : changeDown ? "text-red-600" : "text-gray-500"
             }`}
           >
@@ -112,7 +112,7 @@ export default function RevenueChart({
             return (
               <g key={tick}>
                 <line x1={padL} x2={width - padR} y1={y} y2={y} stroke="#E6E8EE" strokeDasharray="4 4" />
-                <text x={padL - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#9CA3AF">
+                <text x={padL - 8} y={y + 4} textAnchor="end" fontSize="10" fontWeight="400" fontFamily="Arial, Helvetica, sans-serif" fill="#9CA3AF">
                   {axisLabel(value)}
                 </text>
               </g>
@@ -136,7 +136,7 @@ export default function RevenueChart({
                   />
                 )}
                 {barH > 0 && <rect x={x} y={y} width={barW} height={barH} rx="7" fill={active ? "#FF4D6D" : "#E31837"} />}
-                <text x={padL + slot * index + slot / 2} y={height - 8} textAnchor="middle" fontSize="11" fill="#9CA3AF">
+                <text x={padL + slot * index + slot / 2} y={height - 8} textAnchor="middle" fontSize="10" fontWeight="400" fontFamily="Arial, Helvetica, sans-serif" fill="#9CA3AF">
                   {point.label}
                 </text>
                 <rect
@@ -168,8 +168,8 @@ export default function RevenueChart({
               transform: hover >= series.length - 2 ? "translateX(-88%)" : hover === 0 ? "translateX(-12%)" : "translateX(-50%)",
             }}
           >
-            <p className="text-[11px] text-gray-500">{formatDay(series[hover].key)}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-gray-800">
+            <p className={`text-gray-500 ${adminMicro}`}>{formatDay(series[hover].key)}</p>
+            <p className={`mt-1 flex items-center gap-1.5 text-gray-800 ${adminMicro}`}>
               <span className="h-2 w-2 rounded-full bg-primary" aria-hidden />
               Revenue: {formatKsh(series[hover].paidKes)}
             </p>

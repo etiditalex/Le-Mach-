@@ -15,10 +15,10 @@ export default async function AdminNotificationsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <p className="text-sm text-gray-500">Payment and booking alerts from M-Pesa Daraja.</p>
+      <p className="text-[13px] font-normal leading-5 tracking-normal text-gray-500">Payment and booking alerts from M-Pesa Daraja.</p>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-100 text-red-800 px-4 py-3 text-sm">
+        <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-[13px] font-normal text-red-800">
           {error.message}
         </div>
       )}

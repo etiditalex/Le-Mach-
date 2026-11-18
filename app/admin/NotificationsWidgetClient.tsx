@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Bell } from "lucide-react";
+import { adminDescription, adminLabel, adminName } from "@/components/admin/admin-styles";
 import { formatCount, relativeTime } from "@/lib/admin-display";
 import MetricCard from "@/components/admin/MetricCard";
 
@@ -88,10 +89,10 @@ export function NotificationsListClient(props: {
     return (
       <div>
         {streamErr && (
-          <div className="mb-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-900">{streamErr}</div>
+          <div className={`mb-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-amber-900 ${adminDescription}`}>{streamErr}</div>
         )}
         {limited.length === 0 ? (
-          <p className="py-8 text-center text-sm text-gray-500">No notifications yet.</p>
+          <p className={`py-8 text-center text-gray-500 ${adminDescription}`}>No notifications yet.</p>
         ) : (
           <ul className="divide-y divide-gray-100">
             {limited.map((n) => {
@@ -99,19 +100,19 @@ export function NotificationsListClient(props: {
               return (
                 <li key={n.id} className="flex items-start gap-3 py-3">
                   <span
-                    className={`relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${avatarTone(n.id)}`}
+                    className={`relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${adminName} ${avatarTone(n.id)}`}
                   >
                     {initial}
                     {!n.read && <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-primary" />}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">{n.title}</p>
-                    <p className="truncate text-xs text-gray-500">{n.body}</p>
+                    <p className={`truncate text-gray-900 ${adminName}`}>{n.title}</p>
+                    <p className={`truncate text-gray-500 ${adminLabel}`}>{n.body}</p>
                   </div>
                   <time
                     dateTime={n.created_at}
                     title={new Date(n.created_at).toLocaleString()}
-                    className="shrink-0 whitespace-nowrap pt-0.5 text-xs text-gray-400"
+                    className={`shrink-0 whitespace-nowrap pt-0.5 text-gray-400 ${adminLabel}`}
                   >
                     {relativeTime(n.created_at)}
                     {!n.read && <span className="sr-only">, unread</span>}
@@ -128,10 +129,10 @@ export function NotificationsListClient(props: {
   return (
     <div className="space-y-3">
       {streamErr && (
-        <div className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-900">{streamErr}</div>
+        <div className={`rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-amber-900 ${adminDescription}`}>{streamErr}</div>
       )}
       {limited.length === 0 ? (
-        <p className="text-sm text-gray-500">No notifications yet.</p>
+        <p className={`text-gray-500 ${adminDescription}`}>No notifications yet.</p>
       ) : (
         <ul className="space-y-3">
           {limited.map((n) => (
@@ -142,11 +143,11 @@ export function NotificationsListClient(props: {
               }`}
             >
               <div className="flex items-start justify-between gap-2">
-                <p className="font-semibold text-gray-900">{n.title}</p>
-                <span className="whitespace-nowrap text-xs text-gray-500">{new Date(n.created_at).toLocaleString()}</span>
+                <p className={`text-gray-900 ${adminName}`}>{n.title}</p>
+                <span className={`whitespace-nowrap text-gray-500 ${adminLabel}`}>{new Date(n.created_at).toLocaleString()}</span>
               </div>
-              <p className="mt-1 text-sm text-gray-600">{n.body}</p>
-              <p className="mt-2 text-xs text-gray-400">
+              <p className={`mt-1 text-gray-600 ${adminDescription}`}>{n.body}</p>
+              <p className={`mt-2 text-gray-400 ${adminLabel}`}>
                 {n.kind}
                 {!n.read && " · unread"}
               </p>

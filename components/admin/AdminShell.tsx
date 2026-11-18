@@ -20,6 +20,7 @@ import {
   ChefHat,
   X,
 } from "lucide-react";
+import { adminHeaderTitle, adminLabel, adminMicro, adminNav } from "@/components/admin/admin-styles";
 import { SITE_LOGO_URL } from "@/lib/site";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
@@ -77,7 +78,7 @@ function NotificationsBell() {
     >
       <Bell className="h-[18px] w-[18px]" aria-hidden />
       {unread != null && unread > 0 && (
-        <span className="absolute -right-1 -top-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-white">
+        <span className={`absolute -right-1 -top-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-white ${adminMicro}`}>
           {unread > 9 ? "9+" : unread}
         </span>
       )}
@@ -127,12 +128,12 @@ function AccountMenu({ name, email }: { name: string; email: string }) {
         aria-haspopup="menu"
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-white ${adminNav}`}>
           {initial}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-gray-900">{name}</span>
-          <span className="block truncate text-xs text-gray-500">{email || "Admin"}</span>
+          <span className={`block truncate text-gray-900 ${adminNav}`}>{name}</span>
+          <span className={`block truncate text-gray-500 ${adminLabel}`}>{email || "Admin"}</span>
         </span>
         <ChevronDown className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
       </button>
@@ -143,12 +144,12 @@ function AccountMenu({ name, email }: { name: string; email: string }) {
             role="menuitem"
             disabled={busy}
             onClick={() => void signOut()}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60"
+            className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60 ${adminMicro}`}
           >
             <LogOut className="h-4 w-4" aria-hidden />
             {busy ? "Signing out..." : "Sign out"}
           </button>
-          {error && <p className="px-3 py-1 text-xs text-red-600">{error}</p>}
+          {error && <p className={`px-3 py-1 text-red-600 ${adminLabel}`}>{error}</p>}
         </div>
       )}
     </div>
@@ -206,7 +207,7 @@ function Sidebar({
               href={item.href}
               aria-current={active ? "page" : undefined}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${adminNav} ${
                 active ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
@@ -218,7 +219,7 @@ function Sidebar({
         <Link
           href="/"
           onClick={onNavigate}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${adminNav}`}
         >
           <Home className="h-[18px] w-[18px] shrink-0" aria-hidden />
           Public site
@@ -262,7 +263,10 @@ export default function AdminShell({
   }, [open]);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F4F5F8] text-gray-900 md:grid md:grid-cols-[232px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)]">
+    <div
+      className="min-h-screen overflow-x-hidden bg-[#F4F5F8] text-gray-900 md:grid md:grid-cols-[232px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)]"
+      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+    >
       <aside className="sticky top-0 hidden h-screen border-r border-gray-200/80 bg-white md:block">
         <Sidebar pathname={pathname} name={name} email={email} />
       </aside>
@@ -296,7 +300,7 @@ export default function AdminShell({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h1 className="truncate text-lg font-semibold tracking-tight text-gray-900">{title}</h1>
+          <h1 className={`truncate text-gray-900 ${adminHeaderTitle}`}>{title}</h1>
           <div className="ml-auto flex items-center gap-2">
             <NotificationsBell />
           </div>

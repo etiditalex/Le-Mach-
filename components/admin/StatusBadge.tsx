@@ -1,3 +1,4 @@
+import { adminMicro } from "@/components/admin/admin-styles";
 import { paymentStatusLabel } from "@/lib/admin-display";
 
 const TONE: Record<string, string> = {
@@ -12,7 +13,7 @@ export default function StatusBadge({ status }: { status: string }) {
   const tone = TONE[status] ?? "bg-gray-100 text-gray-700";
   const label = paymentStatusLabel(status);
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${tone}`}>
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 capitalize ${adminMicro} ${tone}`}>
       {label}
     </span>
   );

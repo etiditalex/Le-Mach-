@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { adminDescription, adminLabel, adminName } from "@/components/admin/admin-styles";
 
 type NotificationRow = {
   id: string;
@@ -71,18 +72,18 @@ export default function NotificationsRealtimeClient(props: { initial: Notificati
   return (
     <div className="space-y-3">
       {streamErr && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className={`rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 ${adminDescription}`}>
           {streamErr}
         </div>
       )}
-      <p className="text-xs text-gray-500">
-        Live · Unread: <span className="font-semibold text-gray-900">{unread}</span>
+      <p className={`text-gray-500 ${adminLabel}`}>
+        Live · Unread: <span className={`text-gray-900 ${adminName}`}>{unread}</span>
         {lastUpdatedLabel ? ` · Updated ${lastUpdatedLabel}` : ""}
       </p>
 
       <ul className="space-y-3">
         {rows.length === 0 ? (
-          <li className="rounded-xl bg-white border border-gray-200 p-8 text-center text-gray-500 text-sm">
+          <li className={`rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500 ${adminDescription}`}>
             No notifications yet.
           </li>
         ) : (
@@ -94,11 +95,11 @@ export default function NotificationsRealtimeClient(props: { initial: Notificati
               }`}
             >
               <div className="flex justify-between gap-2 items-start">
-                <p className="font-semibold text-gray-900">{n.title}</p>
-                <span className="text-xs text-gray-500 whitespace-nowrap">{new Date(n.created_at).toLocaleString()}</span>
+                <p className={`text-gray-900 ${adminName}`}>{n.title}</p>
+                <span className={`whitespace-nowrap text-gray-500 ${adminLabel}`}>{new Date(n.created_at).toLocaleString()}</span>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{n.body}</p>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className={`mt-1 text-gray-600 ${adminDescription}`}>{n.body}</p>
+              <p className={`mt-2 text-gray-400 ${adminLabel}`}>
                 {n.kind}
                 {!n.read && " · unread"}
               </p>

@@ -25,7 +25,7 @@ export default async function AdminOrdersPage() {
 
   return (
     <div className="space-y-8">
-      <p className="text-sm text-gray-500">
+      <p className="text-[13px] font-normal leading-5 tracking-normal text-gray-500">
         Latest room service orders and room reservations. Delete a row to remove a test so only real ones stay on the
         dashboard.
       </p>

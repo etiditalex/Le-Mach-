@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bug, Download, Printer, Trash2 } from "lucide-react";
+import { adminCardTitle, adminDescription, adminLabel, adminMicro, adminName, adminTable, adminTableHead } from "@/components/admin/admin-styles";
 import StatusBadge from "@/components/admin/StatusBadge";
 
 type FoodRow = {
@@ -127,20 +128,20 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
   return (
     <div className="space-y-10">
       {streamErr && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className={`rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 ${adminDescription}`}>
           {streamErr}
         </div>
       )}
       {actionErr && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{actionErr}</div>
+        <div className={`rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 ${adminDescription}`}>{actionErr}</div>
       )}
-      {lastUpdatedLabel && <p className="text-xs text-gray-500">Live · Updated {lastUpdatedLabel}</p>}
+      {lastUpdatedLabel && <p className={`text-gray-500 ${adminLabel}`}>Live · Updated {lastUpdatedLabel}</p>}
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Food orders</h2>
+        <h2 className={`mb-3 text-gray-900 ${adminCardTitle}`}>Food orders</h2>
         <div className="overflow-x-auto rounded-[20px] border border-black/[0.04] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_28px_rgba(16,24,40,0.045)]">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-600">
+          <table className={`min-w-full ${adminTable}`}>
+            <thead className={`bg-gray-50 text-left text-gray-600 ${adminTableHead}`}>
               <tr>
                 <th className="px-4 py-3 font-medium">Guest</th>
                 <th className="px-4 py-3 font-medium">Room</th>
@@ -169,14 +170,14 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                   return (
                     <tr key={id} className="hover:bg-gray-50/80">
                       <td className="px-4 py-3">
-                        <div className="font-medium text-gray-900">{row.guest_name}</div>
-                        <div className="text-xs text-gray-500">{row.guest_email}</div>
+                        <div className={`text-gray-900 ${adminName}`}>{row.guest_name}</div>
+                        <div className={`text-gray-500 ${adminLabel}`}>{row.guest_email}</div>
                       </td>
                       <td className="px-4 py-3">{row.room_number || "—"}</td>
                       <td className="px-4 py-3">
                         <StatusBadge status={status} />
                       </td>
-                      <td className="px-4 py-3 tabular-nums font-medium">{formatKsh(Number(row.total_kes))}</td>
+                      <td className={`px-4 py-3 tabular-nums ${adminName}`}>{formatKsh(Number(row.total_kes))}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                         {new Date(String(row.created_at)).toLocaleString()}
                       </td>
@@ -188,27 +189,27 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                                 href={`/receipt/food/${id}?key=${encodeURIComponent(key)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                                className={`inline-flex items-center gap-1.5 text-primary hover:underline ${adminMicro}`}
                               >
                                 <Printer className="w-4 h-4 shrink-0" aria-hidden />
                                 Print
                               </Link>
                               <Link
                                 href={qrHref}
-                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                                className={`inline-flex items-center gap-1.5 text-primary hover:underline ${adminMicro}`}
                               >
                                 <Download className="w-4 h-4 shrink-0" aria-hidden />
                                 QR
                               </Link>
                             </>
                           ) : (
-                            <span className="text-xs text-gray-400">After payment</span>
+                            <span className={`text-gray-400 ${adminLabel}`}>After payment</span>
                           )}
                           <Link
                             href={traceHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 hover:underline"
+                            className={`inline-flex items-center gap-1.5 text-gray-600 hover:text-gray-900 hover:underline ${adminMicro}`}
                           >
                             <Bug className="w-4 h-4 shrink-0" aria-hidden />
                             Trace
@@ -220,7 +221,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                           type="button"
                           disabled={deletingId === `food:${id}`}
                           onClick={() => void removeRow("food", id, String(row.guest_name))}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                          className={`inline-flex items-center gap-1.5 text-red-600 hover:underline disabled:opacity-50 ${adminMicro}`}
                         >
                           <Trash2 className="w-4 h-4 shrink-0" aria-hidden />
                           Delete
@@ -236,10 +237,10 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Bookings</h2>
+        <h2 className={`mb-3 text-gray-900 ${adminCardTitle}`}>Bookings</h2>
         <div className="overflow-x-auto rounded-[20px] border border-black/[0.04] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_28px_rgba(16,24,40,0.045)]">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-600">
+          <table className={`min-w-full ${adminTable}`}>
+            <thead className={`bg-gray-50 text-left text-gray-600 ${adminTableHead}`}>
               <tr>
                 <th className="px-4 py-3 font-medium">Guest</th>
                 <th className="px-4 py-3 font-medium">Room</th>
@@ -269,19 +270,19 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                   return (
                     <tr key={id} className="hover:bg-gray-50/80">
                       <td className="px-4 py-3">
-                        <div className="font-medium text-gray-900">
+                        <div className={`text-gray-900 ${adminName}`}>
                           {row.first_name} {row.last_name}
                         </div>
-                        <div className="text-xs text-gray-500">{row.email}</div>
+                        <div className={`text-gray-500 ${adminLabel}`}>{row.email}</div>
                       </td>
                       <td className="px-4 py-3">{row.room_name}</td>
-                      <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">
+                      <td className={`whitespace-nowrap px-4 py-3 text-gray-600 ${adminLabel}`}>
                         {row.check_in} → {row.check_out}
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={status} />
                       </td>
-                      <td className="px-4 py-3 tabular-nums font-medium">{formatKsh(Number(row.total_kes))}</td>
+                      <td className={`px-4 py-3 tabular-nums ${adminName}`}>{formatKsh(Number(row.total_kes))}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                         {new Date(String(row.created_at)).toLocaleString()}
                       </td>
@@ -293,27 +294,27 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                                 href={`/receipt/booking/${id}?key=${encodeURIComponent(key)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                                className={`inline-flex items-center gap-1.5 text-primary hover:underline ${adminMicro}`}
                               >
                                 <Printer className="w-4 h-4 shrink-0" aria-hidden />
                                 Print
                               </Link>
                               <Link
                                 href={qrHref}
-                                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                                className={`inline-flex items-center gap-1.5 text-primary hover:underline ${adminMicro}`}
                               >
                                 <Download className="w-4 h-4 shrink-0" aria-hidden />
                                 QR
                               </Link>
                             </>
                           ) : (
-                            <span className="text-xs text-gray-400">After payment</span>
+                            <span className={`text-gray-400 ${adminLabel}`}>After payment</span>
                           )}
                           <Link
                             href={traceHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 hover:underline"
+                            className={`inline-flex items-center gap-1.5 text-gray-600 hover:text-gray-900 hover:underline ${adminMicro}`}
                           >
                             <Bug className="w-4 h-4 shrink-0" aria-hidden />
                             Trace
@@ -325,7 +326,7 @@ export default function OrdersRealtimeClient(props: { initialFood: FoodRow[]; in
                           type="button"
                           disabled={deletingId === `booking:${id}`}
                           onClick={() => void removeRow("booking", id, `${row.first_name} ${row.last_name}`.trim())}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                          className={`inline-flex items-center gap-1.5 text-red-600 hover:underline disabled:opacity-50 ${adminMicro}`}
                         >
                           <Trash2 className="w-4 h-4 shrink-0" aria-hidden />
                           Delete

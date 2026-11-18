@@ -184,14 +184,14 @@ export default function MenuItemsPanel() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
-        <p className="text-sm text-gray-500">
+        <p className="text-[13px] font-normal leading-5 tracking-normal text-gray-500">
           Create, edit, and remove dishes shown on the public menu. Images are uploaded from your device to Supabase
           Storage.
         </p>
         <div className="mt-4">
           <a
             href="/api/admin/menu/qr"
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 hover:bg-gray-50"
           >
             <QrCode className="w-4 h-4" />
             <Download className="w-4 h-4" />
@@ -201,43 +201,43 @@ export default function MenuItemsPanel() {
       </div>
 
       {err && (
-        <div className="rounded-xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm">{err}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] font-normal text-red-800">{err}</div>
       )}
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-        <h2 className="font-semibold text-gray-900">{editingId ? "Edit item" : "Add item"}</h2>
+        <h2 className="text-[15px] font-bold tracking-normal text-gray-900">{editingId ? "Edit item" : "Add item"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {!editingId && (
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Id (optional)</label>
+              <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Id (optional)</label>
               <input
                 value={form.id}
                 onChange={(e) => setForm({ ...form, id: e.target.value })}
                 placeholder="auto-generated if empty"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
               />
             </div>
           )}
           {editingId && (
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Id</label>
-              <input value={form.id} disabled className="w-full rounded-lg border bg-gray-50 px-3 py-2 text-sm" />
+              <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Id</label>
+              <input value={form.id} disabled className="w-full rounded-lg border bg-gray-50 px-3 py-2" />
             </div>
           )}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Name</label>
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Category</label>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -247,25 +247,25 @@ export default function MenuItemsPanel() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Price (KSh)</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Price (KSh)</label>
             <input
               type="number"
               min={0}
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Image (from device)</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Image (from device)</label>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onPickFile}
-              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
+              className="w-full text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
             />
             {editingId && !imageFile && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="mt-1 text-[12px] font-normal tracking-normal text-gray-500">
                 Leave unchanged to keep the current photo, or pick a new file to replace it.
               </p>
             )}
@@ -278,12 +278,12 @@ export default function MenuItemsPanel() {
             </div>
           )}
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
         </div>
@@ -292,13 +292,13 @@ export default function MenuItemsPanel() {
             type="button"
             disabled={saving || !form.name.trim()}
             onClick={() => void save()}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {editingId ? "Save changes" : "Create item"}
           </button>
           {(editingId || form.name) && (
-            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2 text-sm">
+            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2">
               Cancel
             </button>
           )}
@@ -307,8 +307,8 @@ export default function MenuItemsPanel() {
 
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600 text-left">
+          <table className="min-w-full text-[12px] font-normal tracking-normal">
+            <thead className="bg-gray-50 text-left text-[10px] font-medium tracking-normal text-gray-600">
               <tr>
                 <th className="px-4 py-3 font-medium">Item</th>
                 <th className="px-4 py-3 font-medium">Category</th>
@@ -325,8 +325,8 @@ export default function MenuItemsPanel() {
                         <Image src={it.image} alt="" fill className="object-cover" unoptimized />
                       </div>
                       <div>
-                        <span className="font-medium text-gray-900">{it.name}</span>
-                        <p className="text-xs text-gray-500 truncate max-w-xs">{it.description}</p>
+                        <span className="text-[12px] font-medium tracking-normal text-gray-900">{it.name}</span>
+                        <p className="max-w-xs truncate text-[12px] font-normal tracking-normal text-gray-500">{it.description}</p>
                       </div>
                     </div>
                   </td>

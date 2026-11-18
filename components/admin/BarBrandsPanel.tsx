@@ -197,32 +197,32 @@ export default function BarBrandsPanel() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <p className="text-sm text-gray-500">
+      <p className="text-[13px] font-normal leading-5 tracking-normal text-gray-500">
         Manage brands, prices, and descriptions on the Bar &amp; Restaurant page. Images are uploaded from your device
         to Supabase Storage.
       </p>
 
       {err && (
-        <div className="rounded-xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm">{err}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] font-normal text-red-800">{err}</div>
       )}
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-        <h2 className="font-semibold text-gray-900">{editingId ? "Edit brand" : "Add brand"}</h2>
+        <h2 className="text-[15px] font-bold tracking-normal text-gray-900">{editingId ? "Edit brand" : "Add brand"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Name</label>
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Category</label>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             >
               {CATEGORY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -232,35 +232,35 @@ export default function BarBrandsPanel() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Price (KSh)</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Price (KSh)</label>
             <input
               type="number"
               min={0}
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Sort order</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Sort order</label>
             <input
               type="number"
               value={form.sort_order}
               onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
-            <p className="text-xs text-gray-500 mt-1">Lower numbers appear first on the bar page.</p>
+            <p className="mt-1 text-[12px] font-normal tracking-normal text-gray-500">Lower numbers appear first on the bar page.</p>
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Image (from device)</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Image (from device)</label>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onPickFile}
-              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
+              className="w-full text-gray-600 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1.5"
             />
             {editingId && !imageFile && (
-              <p className="text-xs text-gray-500 mt-1">Leave unchanged to keep the current photo, or pick a new file to replace it.</p>
+              <p className="mt-1 text-[12px] font-normal tracking-normal text-gray-500">Leave unchanged to keep the current photo, or pick a new file to replace it.</p>
             )}
           </div>
           {previewUrl && (
@@ -271,12 +271,12 @@ export default function BarBrandsPanel() {
             </div>
           )}
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
         </div>
@@ -285,13 +285,13 @@ export default function BarBrandsPanel() {
             type="button"
             disabled={saving || !form.name.trim()}
             onClick={() => void save()}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {editingId ? "Save changes" : "Create brand"}
           </button>
           {(editingId || form.name) && (
-            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2 text-sm">
+            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2">
               Cancel
             </button>
           )}
@@ -300,8 +300,8 @@ export default function BarBrandsPanel() {
 
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600 text-left">
+          <table className="min-w-full text-[12px] font-normal tracking-normal">
+            <thead className="bg-gray-50 text-left text-[10px] font-medium tracking-normal text-gray-600">
               <tr>
                 <th className="px-4 py-3 font-medium">Brand</th>
                 <th className="px-4 py-3 font-medium">Category</th>
@@ -319,13 +319,13 @@ export default function BarBrandsPanel() {
                         <Image src={it.image_url} alt="" fill className="object-cover" unoptimized />
                       </div>
                       <div>
-                        <span className="font-medium text-gray-900">{it.name}</span>
-                        <p className="text-xs text-gray-500 truncate max-w-md">{it.description}</p>
+                        <span className="text-[12px] font-medium tracking-normal text-gray-900">{it.name}</span>
+                        <p className="max-w-md truncate text-[12px] font-normal tracking-normal text-gray-500">{it.description}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-700">
+                    <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-normal capitalize tracking-normal text-gray-700">
                       {it.category}
                     </span>
                   </td>

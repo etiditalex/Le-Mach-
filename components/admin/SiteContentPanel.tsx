@@ -105,46 +105,46 @@ export default function SiteContentPanel() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <p className="text-sm text-gray-500">
+      <p className="text-[13px] font-normal leading-5 tracking-normal text-gray-500">
         Text snippets for pages (taglines, footers). Use stable slugs; wire the public site to{" "}
-        <code className="rounded bg-gray-100 px-1 text-xs">/api/public/content?slug=...</code> when needed.
+        <code className="rounded bg-gray-100 px-1 text-[12px] font-normal">/api/public/content?slug=...</code> when needed.
       </p>
 
       {info && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">{info}</div>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] font-normal text-amber-900">{info}</div>
       )}
       {err && (
-        <div className="rounded-xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm">{err}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] font-normal text-red-800">{err}</div>
       )}
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-        <h2 className="font-semibold text-gray-900">{editingId ? "Edit block" : "New block"}</h2>
+        <h2 className="text-[15px] font-bold tracking-normal text-gray-900">{editingId ? "Edit block" : "New block"}</h2>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Slug (unique key)</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Slug (unique key)</label>
             <input
               value={form.slug}
               onChange={(e) => setForm({ ...form, slug: e.target.value })}
               disabled={!!editingId}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-50"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-50"
               placeholder="e.g. tagline_home"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Title</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Title</label>
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Body</label>
+            <label className="mb-1 block text-[12px] font-normal tracking-normal text-gray-600">Body</label>
             <textarea
               value={form.body}
               onChange={(e) => setForm({ ...form, body: e.target.value })}
               rows={6}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-sans"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
         </div>
@@ -153,13 +153,13 @@ export default function SiteContentPanel() {
             type="button"
             disabled={saving || !form.slug.trim() || !form.title.trim()}
             onClick={() => void save()}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {editingId ? "Save" : "Create"}
           </button>
           {(editingId || form.slug) && (
-            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2 text-sm">
+            <button type="button" onClick={cancelEdit} className="rounded-lg border px-4 py-2">
               Cancel
             </button>
           )}
@@ -174,10 +174,10 @@ export default function SiteContentPanel() {
           >
             <div className="flex justify-between gap-2 items-start">
               <div>
-                <p className="font-mono text-xs text-gray-500">{r.slug}</p>
-                <p className="font-semibold text-gray-900">{r.title}</p>
-                <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap line-clamp-3">{r.body}</p>
-                <p className="text-xs text-gray-400 mt-2">Updated {new Date(r.updated_at).toLocaleString()}</p>
+                <p className="font-mono text-[12px] font-normal text-gray-500">{r.slug}</p>
+                <p className="text-[12px] font-medium tracking-normal text-gray-900">{r.title}</p>
+                <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-[13px] font-normal text-gray-600">{r.body}</p>
+                <p className="mt-2 text-[12px] font-normal tracking-normal text-gray-400">Updated {new Date(r.updated_at).toLocaleString()}</p>
               </div>
               <div className="flex gap-1 shrink-0">
                 <button type="button" onClick={() => startEdit(r)} className="p-2 rounded-lg hover:bg-gray-100 text-primary">

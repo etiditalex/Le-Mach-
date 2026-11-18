@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { adminCardClass } from "@/components/admin/admin-styles";
+import { adminCardClass, adminLabel, adminMetric } from "@/components/admin/admin-styles";
 
 export function Sparkline({ values, color, label }: { values: number[]; color: string; label: string }) {
   const w = 78;
@@ -57,10 +57,10 @@ export default function MetricCard({
         <span className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${iconClassName}`}>{icon}</span>
         <div className="flex h-10 w-[78px] items-start justify-end">{spark}</div>
       </div>
-      <p className="mt-3 text-[26px] font-semibold leading-none tracking-tight text-gray-900 tabular-nums" aria-live={live ? "polite" : undefined}>
+      <p className={`mt-3 text-gray-900 tabular-nums ${adminMetric}`} aria-live={live ? "polite" : undefined}>
         {value}
       </p>
-      <p className="mt-2 text-[13px] leading-4 text-gray-500">{label}</p>
+      <p className={`mt-2 text-gray-500 ${adminLabel}`}>{label}</p>
     </>
   );
 
